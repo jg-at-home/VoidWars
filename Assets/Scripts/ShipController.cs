@@ -4,6 +4,15 @@ using UnityEngine.Networking;
 namespace VoidWars {
     public class ShipController : NetworkBehaviour {
         /// <summary>
+        /// Gets the unique ID of the ship.
+        /// </summary>
+        public int ID {
+            get {
+                return (int)netId.Value;
+            }
+        }
+
+        /// <summary>
         /// Get / set the type of control on this ship (human or AI).
         /// </summary>
         public ControlType ControlType {
