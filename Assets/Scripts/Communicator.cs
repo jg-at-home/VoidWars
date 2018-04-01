@@ -4,9 +4,9 @@ using UnityEngine.Networking;
 
 namespace VoidWars {
     /// <summary>
-    /// Basically, the networking side of the game controller.
+    /// Basically, the networking side of the game controller. Acts as a bridge between clients and server.
     /// </summary>
-    public class Communicator : NetworkBehaviour {
+    public class Communicator : VoidNetworkBehaviour {
         /// <summary>
         /// Gets the unique ID of this instance.
         /// </summary>
@@ -24,13 +24,18 @@ namespace VoidWars {
         /// </summary>
         /// <param name="index"></param>
         /// <param name="shipID"></param>
-        public void NotifyActiveShip(int shipID) {
-            RpcNotifyActiveShip(shipID);
+        public void NotifyActiveShip(int ownerID, int shipID) {
+            RpcNotifyActiveShip(ownerID, shipID);
         }
 
         [ClientRpc]
-        void RpcNotifyActiveShip(int shipID) {
-            controller.SetActiveShip(shipID);
+        void RpcNotifyActiveShip(int ownerID, int shipID) {
+            if (isLocalPlayer && ID == ownerID) {
+                controller.SetActiveShip(shipID);
+            }
+            else {
+                controller.SetActiveShip(-1);
+            }
         }
 
         /// <summary>
@@ -46,7 +51,7 @@ namespace VoidWars {
             var aiConfigs = config.PlayerConfigs.FindAll(c => c.ControlType == ControlType.AI);
             var numAIPlayers = aiConfigs.Count;
             if (numAIPlayers > 0) {
-                _alienSpawnPoints = _controller.GetStartPointIndices(Faction.ALIENS, numAIPlayers, numShipsPerPlayer);
+                _alienSpawnPoints = controller.GetStartPointIndices(Faction.ALIENS, numAIPlayers, numShipsPerPlayer);
                 spawnAIShips(aiConfigs);
             }
 
@@ -55,7 +60,7 @@ namespace VoidWars {
             var humanConfigs = config.PlayerConfigs.FindAll(c => c.ControlType == ControlType.HUMAN);
             var numHumanPlayers = humanConfigs.Count;
             if (numHumanPlayers > 0) {
-                _humanSpawnPoints = _controller.GetStartPointIndices(Faction.HUMANS, numHumanPlayers, numShipsPerPlayer);
+                _humanSpawnPoints = controller.GetStartPointIndices(Faction.HUMANS, numHumanPlayers, numShipsPerPlayer);
                 spawnHumanShips(humanConfigs);
             }
         }
@@ -65,8 +70,7 @@ namespace VoidWars {
                 // Only spawn the things I control.
                 foreach (var prefabName in config.ShipPrefabs) {
                     // TODO: oh hackity hack!            
-                    RpcMaybeSpawnPlayerShip(1, prefabName, config.Faction);
-//                    RpcMaybeSpawnPlayerShip(config.ControllerID, prefabName, config.Faction);
+                    RpcMaybeSpawnPlayerShip(config.ControllerID, prefabName, config.Faction);
                 }
             }
         }
@@ -74,16 +78,18 @@ namespace VoidWars {
         private void spawnAIShips(List<PlayerConfig> aiConfigs) {
             foreach(var config in aiConfigs) {
                 foreach (var prefabName in config.ShipPrefabs) {
-                    var prefabPath = "Prefabs/" + prefabName;
+                    var prefabPath = "Prefabs/Ships/" + prefabName;
                     var prefab = (GameObject)Resources.Load(prefabPath);
                     var ship = Instantiate(prefab);
                     var spawnIndex = _alienSpawnPoints[_alienShipIndex++];
-                    var startPos = _controller.StartPositions[spawnIndex];
+                    var startPos = controller.StartPositions[spawnIndex];
                     ship.transform.localPosition = startPos.transform.position;
                     ship.transform.localRotation = startPos.transform.rotation;
                     var shipController = ship.GetComponent<ShipController>();
                     shipController.ControlType = ControlType.AI;
                     shipController.Faction = config.Faction;
+                    shipController.StartPointIndex = spawnIndex;
+                    shipController.OwnerID = ShipController.AI_OWNER;
                     NetworkServer.Spawn(ship);
                 }
             }
@@ -91,27 +97,32 @@ namespace VoidWars {
 
         [ClientRpc]
         void RpcMaybeSpawnPlayerShip(int playerID, string prefabName, Faction faction) {
-            if (hasAuthority && playerID == ID) {
-                // This causes problems client-side XXX
-                CmdSpawnPlayerShip(prefabName, faction);
+            if (hasAuthority/* && playerID == ID*/) {
+                CmdSpawnPlayerShip(playerID, prefabName, faction);
             }
         }
 
         [Command]
-        void CmdSpawnPlayerShip(string prefabName, Faction faction) {
-            var prefabPath = "Prefabs/" + prefabName;
+        void CmdSpawnPlayerShip(int ownerID, string prefabName, Faction faction) {
+            var prefabPath = "Prefabs/Ships/" + prefabName;
             var prefab = (GameObject)Resources.Load(prefabPath);
             var ship = Instantiate(prefab);
             var spawnIndex = _humanSpawnPoints[_humanShipIndex++];
-            var startPos = _controller.StartPositions[spawnIndex];
+            var startPos = controller.StartPositions[spawnIndex];
             ship.transform.localPosition = startPos.transform.position;
             ship.transform.localRotation = startPos.transform.rotation;
             var shipController = ship.GetComponent<ShipController>();
             shipController.ControlType = ControlType.HUMAN;
             shipController.Faction = faction;
+            shipController.StartPointIndex = spawnIndex;
+            shipController.OwnerID = ownerID;
             NetworkServer.SpawnWithClientAuthority(ship, connectionToClient);
         }
 
+        /// <summary>
+        /// Notifies clients of a game state change.
+        /// </summary>
+        /// <param name="newState">The new state.</param>
         public void NotifyGameStateChange(GameState newState) {
             Debug.Assert(isServer);
 
@@ -123,6 +134,10 @@ namespace VoidWars {
             controller.SetState(newState, false);
         }
 
+        /// <summary>
+        /// Notifies clients of a game phase change.
+        /// </summary>
+        /// <param name="newPhase">The new phase.</param>
         public void NotifyPlayPhaseChange(PlayPhase newPhase) {
             Debug.Assert(isServer);
 
@@ -134,25 +149,48 @@ namespace VoidWars {
             controller.SetPlayPhase(newPhase, false);
         }
 
+        /// <summary>
+        /// Tells clients to enable their info panels.
+        /// </summary>
+        /// <param name="caption">Info panel caption.</param>
+        /// <param name="prefabName">The prefab of the panel content.</param>
+        public void EnableInfoPanel(string caption, string prefabName) {
+            CmdEnableInfoPanel(caption, prefabName);
+        }
+
+        [Command]
+        void CmdEnableInfoPanel(string caption, string prefabName) {
+            RpcEnableInfoPanel(caption, prefabName);
+        }
+
+        [ClientRpc]
+        void RpcEnableInfoPanel(string caption, string prefabName) {
+            controller.EnableInfoPanel(caption, prefabName);
+        }
+
+        /// <summary>
+        /// Tells all clients to clear their info panel.
+        /// </summary>
+        public void DisableInfoPanel() {
+            CmdDisableInfoPanel();
+        }
+
+        [Command]
+        void CmdDisableInfoPanel() {
+            RpcDisableInfoPanel();
+        }
+
+        [ClientRpc]
+        void RpcDisableInfoPanel() {
+            controller.DisableInfoPanel();
+        }
+
         private void Update() {
             if (isServer) {
-                if (_controller != null) {
-                    _controller.UpdateServer();
-                }
+                controller.UpdateServer();
             }
         }
 
-        private GameController controller {
-            get {
-                if (_controller == null) {
-                    var controllerObj = GameObject.FindGameObjectWithTag("GameController");
-                    _controller = controllerObj.GetComponent<GameController>();
-                }
-                return _controller;
-            }
-
-        }
-        private GameController _controller;
         private int _humanShipIndex;
         private int _alienShipIndex;
         private int[] _humanSpawnPoints;

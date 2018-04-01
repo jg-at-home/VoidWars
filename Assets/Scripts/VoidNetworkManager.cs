@@ -2,6 +2,9 @@
 using UnityEngine.Networking;
 
 namespace VoidWars {
+    /// <summary>
+    /// Network manager class that handles player-related events.
+    /// </summary>
     public class VoidNetworkManager : NetworkManager {
         public override void OnServerAddPlayer(NetworkConnection conn, short playerControllerId) {
             base.OnServerAddPlayer(conn, playerControllerId);

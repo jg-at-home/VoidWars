@@ -2,7 +2,12 @@
 using UnityEngine.Networking;
 
 namespace VoidWars {
-    public class ShipController : NetworkBehaviour {
+    public class ShipController : VoidNetworkBehaviour {
+        /// <summary>
+        /// Value indicating that an AI rather than a human controls the ship
+        /// </summary>
+        public const int AI_OWNER = -1;
+
         /// <summary>
         /// Gets the unique ID of the ship.
         /// </summary>
@@ -29,19 +34,46 @@ namespace VoidWars {
         }
 
         /// <summary>
+        /// Get / set the index of the start point for the ship.
+        /// </summary>
+        public int StartPointIndex {
+            get { return _startPointIndex; }
+            set { _startPointIndex = value; }
+        }
+
+        /// <summary>
+        /// Get / set the ID of the player who owns the ship.
+        /// </summary>
+        public int OwnerID {
+            get { return _owner; }
+            set { _owner = value; }
+        }
+
+        /// <summary>
         /// Make this ship the active one.
         /// </summary>
         public void Activate() {
+            Debug.LogFormat("ShipController.Activate({0})", ID);
+
             Debug.Assert(_controlState == ControlState.IDLE);
+
             _controlState = ControlState.ACTIVE;
+            if (_pilot != null) {
+                _pilot.OnShipActivation(controller, this);
+            }
         }
 
         /// <summary>
         /// Deactivate this ship.
         /// </summary>
         public void Deactivate() {
+            Debug.LogFormat("ShipController.Deactivate({0})", ID);
+
             Debug.Assert(_controlState == ControlState.ACTIVE);
             _controlState = ControlState.IDLE;
+            if (_pilot != null) {
+                _pilot.OnShipDeactivation(controller, this);
+            }
         }
 
         private void Awake() {
@@ -52,9 +84,9 @@ namespace VoidWars {
             base.OnStartClient();
 
             // SyncVars should be good now.
-            _controlState = ControlState.READY;
-            _gameController = Util.GetGameController();
-            _gameController.RegisterShip(this);
+            createPilot();
+            controller.RegisterShip(this);
+            _controlState = ControlState.IDLE;
         }
 
         private void Start() {
@@ -81,7 +113,9 @@ namespace VoidWars {
                     break;
 
                 case ControlState.ACTIVE:
-                    _pilot.UpdateShip(_gameController, this);
+                    if (_pilot != null) {
+                        _pilot.UpdateShip(controller, this);
+                    }
                     break;
             }
         }
@@ -89,11 +123,17 @@ namespace VoidWars {
         private void createPilot() {
             switch(_controlType) {
                 case ControlType.HUMAN:
+                    Debug.LogFormat("ShipController: creating human pilot for ship {0}", ID);
                     _pilot = new HumanPilot();
                     break;
 
                 case ControlType.AI:
+                    Debug.LogFormat("ShipController: creating AI pilot for ship {0}", ID);
                     _pilot = new AIPilot();
+                    break;
+
+                case ControlType.NONE:
+                    Debug.LogFormat("ShipController: ship {0} is uncontrolled", ID);
                     break;
 
                 default:
@@ -113,7 +153,8 @@ namespace VoidWars {
         [SyncVar] private ControlType _controlType;
         [SyncVar] private ControlState _controlState;
         [SyncVar] private Faction _faction;
+        [SyncVar] private int _startPointIndex;
+        [SyncVar] private int _owner;
         private Pilot _pilot;
-        private GameController _gameController;
     }
 }

@@ -1,6 +1,9 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
+/// <summary>
+/// Makes the active ship indicator rotate.
+/// </summary>
 public class Rotator : MonoBehaviour {
     [Header("Rotation speeds")]
     [Tooltip("Inner speed in deg/s")]

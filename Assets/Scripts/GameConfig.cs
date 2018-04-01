@@ -9,6 +9,11 @@ namespace VoidWars {
     /// </summary>
     public enum ControlType {
         /// <summary>
+        /// Object is inert.
+        /// </summary>
+        NONE,
+
+        /// <summary>
         /// A human controls this ship.
         /// </summary>
         HUMAN,
@@ -27,7 +32,7 @@ namespace VoidWars {
         [Tooltip("What controls the ship")]
         public ControlType ControlType;
 
-        [HideInInspector]
+        [Tooltip("Unhidden for tst purposes only")]
         public int ControllerID;
 
         [Tooltip("The player's faction")]
