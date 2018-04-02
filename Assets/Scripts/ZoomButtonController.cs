@@ -2,6 +2,9 @@
 using UnityEngine.UI;
 
 namespace VoidWars {
+    /// <summary>
+    /// Controller for the zoom in/out button. Changes icons like a proper toggle.
+    /// </summary>
     public class ZoomButtonController : MonoBehaviour {
         [SerializeField] private Sprite _magPlusSprite;
         [SerializeField] private Sprite _magMinusSprite;

@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Events;
 
 namespace VoidWars {
     /// <summary>
@@ -39,6 +37,8 @@ namespace VoidWars {
         public InfoPanelController InfoPanel;
         public RectTransform ControlPanel;
         public CameraRigController CameraRig;
+        public BoardBorderController BorderController;
+        public TitleTextController TitleController;
 
         /// <summary>
         /// Gets the current game state.
@@ -47,6 +47,10 @@ namespace VoidWars {
             get { return _state; }
         }
 
+        /// <summary>
+        /// Zooms the view in. If there's an active ship it will centre on that. Otherwise to
+        /// the board centre.
+        /// </summary>
         public void ZoomIn() {
             if (_activeShip != null) {
                 CameraRig.ZoomTo(_activeShip.transform.position);
@@ -56,6 +60,9 @@ namespace VoidWars {
             }
         }
 
+        /// <summary>
+        /// Zooms the camera out.
+        /// </summary>
         public void ZoomOut() {
             CameraRig.ZoomOut();
         }
@@ -139,6 +146,11 @@ namespace VoidWars {
         }
 
         #region Client Code
+        /// <summary>
+        /// Called client-side to notify a new ship has become active.
+        /// </summary>
+        /// <param name="ownerID">The ID of the ship's owner.</param>
+        /// <param name="shipID">The ship's ID.</param>
         public void NotifyActiveShip(int ownerID, int shipID) {
             if (_communicator.ID == ownerID) {
                 SetActiveShip(shipID);
@@ -147,6 +159,10 @@ namespace VoidWars {
                 SetActiveShip(-1);
             }
 
+            // Change the border colour to ref;ect the new ship's faction.
+            var shipController = _ships.Find(s => s.ID == shipID);
+            var color = FactionColors[(int)shipController.Faction];
+            BorderController.SetColor(color);
         }
 
         /// <summary>
@@ -386,7 +402,11 @@ namespace VoidWars {
 
         private void onEnterState(GameState newState) {
             switch(newState) {
+                case GameState.LOBBY:
+                    break;
+
                 case GameState.SETUP:
+                    TitleController.Stop();
                     CameraRig.ZoomOut();
                     break;
 
@@ -442,6 +462,10 @@ namespace VoidWars {
                 _setupOrderShips.Add(p1Ships[i]);
                 _setupOrderShips.Add(p2Ships[i]);
             }
+        }
+
+        private void Start() {
+            TitleController.SetText("VOID WARS()");
         }
 
         #region Server Data

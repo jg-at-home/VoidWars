@@ -17,14 +17,24 @@ namespace VoidWars {
             gameObject.transform.position = _start.position;
         }
 
+        /// <summary>
+        /// Zoom out to the zoomed out position.
+        /// </summary>
         public void ZoomOut() {
             StartCoroutine(moveCamera(_zoomedOut.position));
         }
 
+        /// <summary>
+        /// Zooms to the start position (pretty close to the sun, looks cool).
+        /// </summary>
         public void ZoomToStart() {
             StartCoroutine(moveCamera(_start.position));
         }
 
+        /// <summary>
+        /// Zooms to be above the target position.
+        /// </summary>
+        /// <param name="target"></param>
         public void ZoomTo(Vector3 target) {
             Vector3 actualTarget;
             actualTarget.x = target.x;
