@@ -1,37 +1,74 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using System.Collections.Generic;
+using System.Text;
+using UnityEngine;
 using UnityEngine.UI;
 
-/// <summary>
-/// Controller for the Setup info panel.
-/// </summary>
-public class SetupPanelController : MonoBehaviour {
-    [SerializeField]
-    private Text _infoText;
-
-    [SerializeField]
-    private Button _doneButton;
-
+namespace VoidWars {
     /// <summary>
-    /// Sets the info text.
+    /// Controller for the Setup info panel.
     /// </summary>
-    /// <param name="text">The text.</param>
-    public void SetInfoText(string text) {
-        _infoText.text = text;
-    }
+    public class SetupPanelController : MonoBehaviour {
+        [SerializeField]
+        private Text _infoText;
 
-    /// <summary>
-    /// Enable or disable the 'done' button.
-    /// </summary>
-    /// <param name="enable">If true, enable the button.</param>
-    public void EnableDoneButton(bool enable) {
-        _doneButton.interactable = enable;
-    }
+        [SerializeField]
+        private Button _doneButton;
 
-    /// <summary>
-    /// Called when the Done button is clicked.
-    /// </summary>
-    public void OnDoneButtonClicked() {
-        Debug.Log("You clicked 'Done'");
-        // TODO: stuff.
+        [SerializeField]
+        private RectTransform _promptPanel;
+
+        [SerializeField]
+        private float _charDelay = 0.05f;
+
+        private readonly Queue<char> _textQueue = new Queue<char>();
+        private StringBuilder _sb = new StringBuilder();
+        private Coroutine _writer;
+
+        /// <summary>
+        /// Sets the info text.
+        /// </summary>
+        /// <param name="text">The text.</param>
+        public void SetInfoText(string text) {
+            _textQueue.Clear();
+            _sb.Length = 0;
+            _infoText.text = string.Empty;
+            foreach(char c in text) {
+                _textQueue.Enqueue(c);
+            }
+
+            if (_writer != null) {
+                StopCoroutine(_writer);
+            }
+
+            _writer = StartCoroutine(writeText());
+        }
+
+        /// <summary>
+        /// Enable or disable the 'done' button.
+        /// </summary>
+        /// <param name="enable">If true, enable the button.</param>
+        public void EnableDoneButton(bool enable) {
+            _doneButton.interactable = enable;
+            _promptPanel.gameObject.SetActive(enable);
+        }
+
+        /// <summary>
+        /// Called when the Done button is clicked.
+        /// </summary>
+        public void OnDoneButtonClicked() {
+            var gameController = Util.GetGameController();
+            gameController.NextShip();
+        }
+
+        private IEnumerator writeText() {
+            while(_textQueue.Count > 0) {
+                _sb.Append(_textQueue.Dequeue());
+                _infoText.text = _sb.ToString();
+                yield return new WaitForSeconds(_charDelay);
+            }
+
+            _writer = null;
+        }
     }
 }

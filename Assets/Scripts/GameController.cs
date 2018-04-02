@@ -10,8 +10,8 @@ namespace VoidWars {
         UNINITIALIZED,
         LOBBY,
         CONFIGURATION,
-        SETUP,
         WAIT_FOR_SPAWN,
+        SETUP,
         IN_PLAY,
         FINISHED
     }
@@ -117,6 +117,16 @@ namespace VoidWars {
         }
 
         #region Client Code
+        public void NotifyActiveShip(int ownerID, int shipID) {
+            if (_communicator.ID == ownerID) {
+                SetActiveShip(shipID);
+            }
+            else {
+                SetActiveShip(-1);
+            }
+
+        }
+
         /// <summary>
         /// Makes the info panel visible and sets its content up.
         /// </summary>
@@ -166,7 +176,9 @@ namespace VoidWars {
             if (shipID == -1) {
                 ActiveShipIndicator.SetActive(false);
                 _activeShip = null;
+
                 InfoPanel.NotifyContent("SetInfoText", "Please wait whilst opponent sets up their next ship");
+                InfoPanel.NotifyContent("EnableDoneButton", false);
             }
             else {
                 var shipController = _ships.Find(s => s.ID == shipID);
@@ -180,15 +192,53 @@ namespace VoidWars {
                     var color = FactionColors[(int)shipController.Faction];
                     rotator.SetColor(color);
                     InfoPanel.NotifyContent("SetInfoText", "Please set the start position and rotation of your ship");
+                    InfoPanel.NotifyContent("EnableDoneButton", true);
                 }
 
                 _activeShip = shipController;
                 _activeShip.Activate();
+                _activeShipID = shipController.ID;
             }
+        }
+
+        /// <summary>
+        /// Whatever the game state / phase, moves on to the next ship in the round. If there is none,
+        /// updates the phase / state as required.
+        /// </summary>
+        public void NextShip() {
+            Debug.Log("GameController.NextShip()");
+
+            _communicator.CmdNextShip();
         }
         #endregion Client Code
 
         #region Server code
+        public void NextShipServer() {
+            var turnList = getTurnOrder();
+            var nextIndex = _activeShipIndex + 1;
+            if (nextIndex == turnList.Count) {
+                // End of state / phase.
+                AdvanceGame();
+            }
+            else {
+                SetActiveShipByIndex(nextIndex, false);
+            }
+        }
+
+        public void AdvanceGame() {
+            Debug.Log("GameController.AdvanceGame()");
+            switch(_state) {
+                case GameState.SETUP:
+                    // Setup is done. Time to play!
+                    SetState(GameState.IN_PLAY, true);
+                    break;
+
+                default:
+                    Debug.LogError("Broken game state machine");
+                    break;
+            }
+        }
+
         /// <summary>
         /// Adds a player to the active list.
         /// </summary>
@@ -211,6 +261,10 @@ namespace VoidWars {
             else {
                 Debug.LogWarning("GameController: unable to remove player with ID " + playerID);
             }
+        }
+
+        public PlayerServerRep GetPlayer(int playerID) {
+            return _players.Find(p => p.PlayerID == playerID);
         }
 
         /// <summary>
@@ -240,7 +294,7 @@ namespace VoidWars {
                         // All the ships have spawned. Do some book-keeping, and move on to setup.
                         // TODO: simultaneous setup. For now, it's one player, one ship at a time.
                         buildTurnLists();                        
-                        setActiveShip(0, true);
+                        SetActiveShipByIndex(0, true);
                         SetState(GameState.SETUP, true);
                     }
                     break;
@@ -250,7 +304,7 @@ namespace VoidWars {
             }
         }
 
-        private void setActiveShip(int index, bool force) {
+        public void SetActiveShipByIndex(int index, bool force) {
             if (index != _activeShipIndex || force) {
                 _activeShipIndex = index;
                 var shipOrder = getTurnOrder();
@@ -282,6 +336,7 @@ namespace VoidWars {
             if (_state != newState) {
                 Debug.LogFormat("GameController.SetState({0})", newState);
                 _state = newState;
+                _activeShipIndex = 0;
                 if (notify) {
                     _communicator.NotifyGameStateChange(_state);
                 }
@@ -360,7 +415,5 @@ namespace VoidWars {
         private static readonly int[] s_p2StartPositions2 = new[] { 4, 5 };
         private static readonly int[] s_startPositions2 = new[] { 3, 2 };
         private static readonly int[] s_startPositions4 = new[] { 0, 1, 4, 5 };
-
-
     }
 }

@@ -30,6 +30,11 @@ namespace VoidWars {
                 Object.Destroy(_current);
                 _current = null;
             }
+
+            if (_startZone != null) {
+                _startZone.SetActive(false);
+                _startZone = null;
+            }
         }
 
         private MonoBehaviour _current;

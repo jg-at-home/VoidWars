@@ -20,22 +20,34 @@ namespace VoidWars {
         }
 
         /// <summary>
+        /// Advances the game at the end of a phase or state.
+        /// </summary>
+        [Command]
+        public void CmdNextShip() {
+            controller.NextShipServer();
+        }
+
+        [Command]
+        public void CmdSetActiveShip(int index) {
+            Debug.LogFormat("CmdSetActiveShip({0}", index);
+            controller.SetActiveShipByIndex(index, false);
+        }
+
+        /// <summary>
         /// Called server-side to set the active ship.
         /// </summary>
         /// <param name="index"></param>
         /// <param name="shipID"></param>
         public void NotifyActiveShip(int ownerID, int shipID) {
+            Debug.Assert(isServer);
+            Debug.LogFormat("NotifyActiveShip({0}, {1}) (ID={2})", ownerID, shipID, ID);
             RpcNotifyActiveShip(ownerID, shipID);
         }
 
         [ClientRpc]
         void RpcNotifyActiveShip(int ownerID, int shipID) {
-            if (isLocalPlayer && ID == ownerID) {
-                controller.SetActiveShip(shipID);
-            }
-            else {
-                controller.SetActiveShip(-1);
-            }
+            Debug.LogFormat("RpcNotifyActiveShip({0}, {1}) (ID={2})", ownerID, shipID, ID);
+            controller.NotifyActiveShip(ownerID, shipID);
         }
 
         /// <summary>
@@ -116,7 +128,8 @@ namespace VoidWars {
             shipController.Faction = faction;
             shipController.StartPointIndex = spawnIndex;
             shipController.OwnerID = ownerID;
-            NetworkServer.SpawnWithClientAuthority(ship, connectionToClient);
+            var player = controller.GetPlayer(ownerID);
+            NetworkServer.SpawnWithClientAuthority(ship, player.Connection);
         }
 
         /// <summary>

@@ -4118,6 +4118,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f97aad69466c7cc46954764b015ba722, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  NotificationTimeout: 1
   _titleText: {fileID: 1752568198}
   _contentRoot: {fileID: 831165118}
 --- !u!1 &725545745
@@ -12171,3 +12172,4 @@ MonoBehaviour:
       Faction: 1
   ActiveShipIndicator: {fileID: 941856637}
   InfoPanel: {fileID: 715149046}
+  Foo: -1
