@@ -162,17 +162,14 @@ namespace VoidWars {
             controller.SetPlayPhase(newPhase, false);
         }
 
+        #region UI
         /// <summary>
         /// Tells clients to enable their info panels.
         /// </summary>
         /// <param name="caption">Info panel caption.</param>
         /// <param name="prefabName">The prefab of the panel content.</param>
-        public void EnableInfoPanel(string caption, string prefabName) {
-            CmdEnableInfoPanel(caption, prefabName);
-        }
-
         [Command]
-        void CmdEnableInfoPanel(string caption, string prefabName) {
+        public void CmdEnableInfoPanel(string caption, string prefabName) {
             RpcEnableInfoPanel(caption, prefabName);
         }
 
@@ -184,12 +181,8 @@ namespace VoidWars {
         /// <summary>
         /// Tells all clients to clear their info panel.
         /// </summary>
-        public void DisableInfoPanel() {
-            CmdDisableInfoPanel();
-        }
-
         [Command]
-        void CmdDisableInfoPanel() {
+        public void CmdDisableInfoPanel() {
             RpcDisableInfoPanel();
         }
 
@@ -197,6 +190,18 @@ namespace VoidWars {
         void RpcDisableInfoPanel() {
             controller.DisableInfoPanel();
         }
+
+        [Command]
+        public void CmdEnableControlPanel(bool enable) {
+            RpcEnableControlPanel(enable);
+        }
+
+        [ClientRpc]
+        void RpcEnableControlPanel(bool enable) {
+            controller.EnableControlPanel(enable);
+        }
+        #endregion UI
+
 
         private void Update() {
             if (isServer) {

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -34,16 +35,37 @@ namespace VoidWars {
         public GameObject[] StartPositions;
         public Color[] FactionColors;
         public GameConfig Configuration;
-        public UnityEvent<GameState> StateChangeEvent;
-        public UnityEvent<PlayPhase> PhaseChangeEvent;
         public GameObject ActiveShipIndicator;
         public InfoPanelController InfoPanel;
+        public RectTransform ControlPanel;
+        public CameraRigController CameraRig;
 
         /// <summary>
         /// Gets the current game state.
         /// </summary>
         public GameState State {
             get { return _state; }
+        }
+
+        public void ZoomIn() {
+            if (_activeShip != null) {
+                CameraRig.ZoomTo(_activeShip.transform.position);
+            }
+            else {
+                CameraRig.ZoomTo(Vector3.zero);
+            }
+        }
+
+        public void ZoomOut() {
+            CameraRig.ZoomOut();
+        }
+
+        /// <summary>
+        /// Enables / disables the control panel.
+        /// </summary>
+        /// <param name="enable">Enable / disable flag.</param>
+        public void EnableControlPanel(bool enable) {
+            ControlPanel.gameObject.SetActive(enable);
         }
 
         /// <summary>
@@ -179,6 +201,7 @@ namespace VoidWars {
 
                 InfoPanel.NotifyContent("SetInfoText", "Please wait whilst opponent sets up their next ship");
                 InfoPanel.NotifyContent("EnableDoneButton", false);
+                EnableControlPanel(false);
             }
             else {
                 var shipController = _ships.Find(s => s.ID == shipID);
@@ -193,6 +216,7 @@ namespace VoidWars {
                     rotator.SetColor(color);
                     InfoPanel.NotifyContent("SetInfoText", "Please set the start position and rotation of your ship");
                     InfoPanel.NotifyContent("EnableDoneButton", true);
+                    EnableControlPanel(true);
                 }
 
                 _activeShip = shipController;
@@ -213,6 +237,9 @@ namespace VoidWars {
         #endregion Client Code
 
         #region Server code
+        /// <summary>
+        /// Server-side call for moving to the next ship in the turn order.
+        /// </summary>
         public void NextShipServer() {
             var turnList = getTurnOrder();
             var nextIndex = _activeShipIndex + 1;
@@ -225,6 +252,9 @@ namespace VoidWars {
             }
         }
 
+        /// <summary>
+        /// Updates the game when a turn ends.
+        /// </summary>
         public void AdvanceGame() {
             Debug.Log("GameController.AdvanceGame()");
             switch(_state) {
@@ -263,6 +293,11 @@ namespace VoidWars {
             }
         }
 
+        /// <summary>
+        /// Gets a player by ID (server only).
+        /// </summary>
+        /// <param name="playerID">The player ID.</param>
+        /// <returns>The player instance.</returns>
         public PlayerServerRep GetPlayer(int playerID) {
             return _players.Find(p => p.PlayerID == playerID);
         }
@@ -289,7 +324,7 @@ namespace VoidWars {
                 case GameState.WAIT_FOR_SPAWN:
                     if (_ships.Count == Configuration.NumberOfShips) {
                         // Enable the info panel UI.
-                        _communicator.EnableInfoPanel("Setup", "SetupPanel");
+                        _communicator.CmdEnableInfoPanel("Setup", "SetupPanel");
 
                         // All the ships have spawned. Do some book-keeping, and move on to setup.
                         // TODO: simultaneous setup. For now, it's one player, one ship at a time.
@@ -304,6 +339,11 @@ namespace VoidWars {
             }
         }
 
+        /// <summary>
+        /// Sets the active ship to be the index in the current turn order.
+        /// </summary>
+        /// <param name="index">Ship index.</param>
+        /// <param name="force">If true, always set the state regardless of whether it's currently active.</param>
         public void SetActiveShipByIndex(int index, bool force) {
             if (index != _activeShipIndex || force) {
                 _activeShipIndex = index;
@@ -340,9 +380,18 @@ namespace VoidWars {
                 if (notify) {
                     _communicator.NotifyGameStateChange(_state);
                 }
-                if (StateChangeEvent != null) {
-                    StateChangeEvent.Invoke(_state);
-                }
+                onEnterState(newState);
+            }
+        }
+
+        private void onEnterState(GameState newState) {
+            switch(newState) {
+                case GameState.SETUP:
+                    CameraRig.ZoomOut();
+                    break;
+
+                default:
+                    break;
             }
         }
 
@@ -358,10 +407,12 @@ namespace VoidWars {
                 if (notify) {
                     _communicator.NotifyPlayPhaseChange(_playPhase);
                 }
-                if (PhaseChangeEvent != null) {
-                    PhaseChangeEvent.Invoke(_playPhase);
-                }
+                onEnterPhase(newPhase);
             }
+        }
+
+        private void onEnterPhase(PlayPhase newPhase) {
+            // TODO
         }
 
         private void buildTurnLists() {

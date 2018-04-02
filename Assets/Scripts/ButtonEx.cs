@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
 namespace VoidWars {
@@ -8,8 +6,6 @@ namespace VoidWars {
     /// Class for setting button text colours when the button becomes disabled.
     /// </summary>
     public class ButtonEx : MonoBehaviour {
-
-        // Use this for initialization
         void Start() {
             _button = GetComponent<Button>();
             _text = _button.GetComponentInChildren<Text>();
