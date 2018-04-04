@@ -50,6 +50,15 @@ namespace VoidWars {
         }
 
         /// <summary>
+        /// Gets the class ID of the ship. The game controller can look up the specifics
+        /// using that ID.
+        /// </summary>
+        public string ClassID {
+            get { return _classID; }
+            set { _classID = value; }
+        }
+
+        /// <summary>
         /// Make this ship the active one.
         /// </summary>
         public void Activate() {
@@ -87,6 +96,7 @@ namespace VoidWars {
             createPilot();
             controller.RegisterShip(this);
             _controlState = ControlState.IDLE;
+            _class = controller.GetShipClassByName(_classID);
         }
 
         private void Start() {
@@ -155,6 +165,8 @@ namespace VoidWars {
         [SyncVar] private Faction _faction;
         [SyncVar] private int _startPointIndex;
         [SyncVar] private int _owner;
+        [SyncVar] private string _classID;
         private Pilot _pilot;
+        private ShipClass _class;
     }
 }

@@ -27,7 +27,7 @@ namespace VoidWars {
     [Serializable]
     public class PlayerConfig {
         [Tooltip("The ships this player will control")]
-        public List<string> ShipPrefabs;
+        public List<string> ShipClasses;
 
         [Tooltip("What controls the ship")]
         public ControlType ControlType;
@@ -60,7 +60,7 @@ namespace VoidWars {
             get {
                 var count = 0;
                 foreach (var pc in PlayerConfigs) {
-                    count += pc.ShipPrefabs.Count;
+                    count += pc.ShipClasses.Count;
                 }
                 return count;
             }

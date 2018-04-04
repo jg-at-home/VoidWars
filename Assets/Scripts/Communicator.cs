@@ -80,16 +80,17 @@ namespace VoidWars {
         private void spawnHumanShips(List<PlayerConfig> humanConfigs) {
             foreach (var config in humanConfigs) {
                 // Only spawn the things I control.
-                foreach (var prefabName in config.ShipPrefabs) {
-                    // TODO: oh hackity hack!            
-                    RpcMaybeSpawnPlayerShip(config.ControllerID, prefabName, config.Faction);
+                foreach (var className in config.ShipClasses) {
+                    RpcMaybeSpawnPlayerShip(config.ControllerID, className, config.Faction);
                 }
             }
         }
 
         private void spawnAIShips(List<PlayerConfig> aiConfigs) {
             foreach(var config in aiConfigs) {
-                foreach (var prefabName in config.ShipPrefabs) {
+                foreach (var className in config.ShipClasses) {
+                    var shipClass = controller.GetShipClassByName(className);
+                    var prefabName = shipClass.ModelName;
                     var prefabPath = "Prefabs/Ships/" + prefabName;
                     var prefab = (GameObject)Resources.Load(prefabPath);
                     var ship = Instantiate(prefab);
@@ -102,21 +103,23 @@ namespace VoidWars {
                     shipController.Faction = config.Faction;
                     shipController.StartPointIndex = spawnIndex;
                     shipController.OwnerID = ShipController.AI_OWNER;
+                    shipController.ClassID = className;
                     NetworkServer.Spawn(ship);
                 }
             }
         }
 
         [ClientRpc]
-        void RpcMaybeSpawnPlayerShip(int playerID, string prefabName, Faction faction) {
+        void RpcMaybeSpawnPlayerShip(int playerID, string className, Faction faction) {
             if (hasAuthority/* && playerID == ID*/) {
-                CmdSpawnPlayerShip(playerID, prefabName, faction);
+                CmdSpawnPlayerShip(playerID, className, faction);
             }
         }
 
         [Command]
-        void CmdSpawnPlayerShip(int ownerID, string prefabName, Faction faction) {
-            var prefabPath = "Prefabs/Ships/" + prefabName;
+        void CmdSpawnPlayerShip(int ownerID, string className, Faction faction) {
+            var shipClass = controller.GetShipClassByName(className);
+            var prefabPath = "Prefabs/Ships/" + shipClass.ModelName;
             var prefab = (GameObject)Resources.Load(prefabPath);
             var ship = Instantiate(prefab);
             var spawnIndex = _humanSpawnPoints[_humanShipIndex++];
@@ -128,6 +131,7 @@ namespace VoidWars {
             shipController.Faction = faction;
             shipController.StartPointIndex = spawnIndex;
             shipController.OwnerID = ownerID;
+            shipController.ClassID = className;
             var player = controller.GetPlayer(ownerID);
             NetworkServer.SpawnWithClientAuthority(ship, player.Connection);
         }

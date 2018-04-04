@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace VoidWars {
@@ -30,6 +31,8 @@ namespace VoidWars {
     /// Class responsible for coordinating the game events.
     /// </summary>
     public partial class GameController : MonoBehaviour {
+        public SpeciesInfo[] SpeciesInfo;
+        public ShipClass[] ShipClasses;
         public GameObject[] StartPositions;
         public Color[] FactionColors;
         public GameConfig Configuration;
@@ -73,6 +76,15 @@ namespace VoidWars {
         /// <param name="enable">Enable / disable flag.</param>
         public void EnableControlPanel(bool enable) {
             ControlPanel.gameObject.SetActive(enable);
+        }
+
+        /// <summary>
+        /// Gets the ship class data given its name.
+        /// </summary>
+        /// <param name="className">The ship class name.</param>
+        /// <returns>The ship class</returns>
+        public ShipClass GetShipClassByName(string className) {
+            return Array.Find(ShipClasses, sc => sc.Name == className);
         }
 
         /// <summary>
