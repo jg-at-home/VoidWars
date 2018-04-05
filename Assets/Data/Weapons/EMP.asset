@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7593adb4c9a7760498437bb5dbf92f3c, type: 3}
+  m_Name: EMP
+  m_EditorClassIdentifier: 
+  Name: EMP-Gen
+  Description: Knocks out shields for miles around
+  WeaponType: 8
+  Cardinality: 1
+  MaxDamage: 100
+  PowerUsage: 25
+  Mass: 15
+  Cost: 0
+  Range: 0
+  PrimaryAngle: 0
+  SecondaryAngle: 0

@@ -8,8 +8,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 0}
+  m_Script: {fileID: 11500000, guid: 8f54fd18b0c52da4e99ce3616fadf061, type: 3}
   m_Name: Dohahza
-  m_EditorClassIdentifier: Assembly-CSharp:VoidWars:SpeciesInfo
-  Name: Dohahza
+  m_EditorClassIdentifier: 
+  Name: 
   TechLevel: 0.9
+  Mindset: 0
+  MarkerColor: {r: 1, g: 0.77254903, b: 0.4862745, a: 1}

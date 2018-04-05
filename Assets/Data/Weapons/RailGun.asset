@@ -8,8 +8,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 0}
-  m_Name: Humans
-  m_EditorClassIdentifier: Assembly-CSharp:VoidWars:SpeciesInfo
-  Name: Human
-  TechLevel: 1
+  m_Script: {fileID: 11500000, guid: 7593adb4c9a7760498437bb5dbf92f3c, type: 3}
+  m_Name: RailGun
+  m_EditorClassIdentifier: 
+  Name: Rail Gun
+  WeaponType: 1
+  Cardinality: 0
+  MaxDamage: 90
+  PowerUsage: 15
+  Mass: 10

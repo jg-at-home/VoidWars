@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1ef9869d461ac3b4eb72df86eac649b0, type: 3}
+  m_Name: ERBInducer
+  m_EditorClassIdentifier: 
+  Name: Einstein-Rosen Bridge Inducer
+  Description: 
+  ItemType: 8
+  PowerUsage: 50
+  Mass: 10
+  Cost: 5

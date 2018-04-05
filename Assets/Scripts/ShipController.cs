@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.Networking;
 
 namespace VoidWars {
@@ -20,43 +21,39 @@ namespace VoidWars {
         /// <summary>
         /// Get / set the type of control on this ship (human or AI).
         /// </summary>
-        public ControlType ControlType {
-            get { return _controlType; }
-            set { _controlType = value; }
-        }
+        [SyncVar]
+        public ControlType ControlType;
 
         /// <summary>
         /// Get / set the faction the ship belongs to.
         /// </summary>
-        public Faction Faction {
-            get { return _faction; }
-            set { _faction = value; }
-        }
+        [SyncVar]
+        public Faction Faction; 
 
         /// <summary>
         /// Get / set the index of the start point for the ship.
         /// </summary>
-        public int StartPointIndex {
-            get { return _startPointIndex; }
-            set { _startPointIndex = value; }
-        }
+        [SyncVar]
+        public int StartPointIndex;
 
         /// <summary>
         /// Get / set the ID of the player who owns the ship.
         /// </summary>
-        public int OwnerID {
-            get { return _owner; }
-            set { _owner = value; }
-        }
+        [SyncVar]
+        public int OwnerID; 
 
         /// <summary>
         /// Gets the class ID of the ship. The game controller can look up the specifics
         /// using that ID.
         /// </summary>
-        public string ClassID {
-            get { return _classID; }
-            set { _classID = value; }
-        }
+        [SyncVar]
+        public string ClassID;
+
+        /// <summary>
+        /// Bitmask describing which weapons are equipped on the ship.
+        /// </summary>
+        [SyncVar]
+        public int WeaponMask;
 
         /// <summary>
         /// Make this ship the active one.
@@ -96,7 +93,7 @@ namespace VoidWars {
             createPilot();
             controller.RegisterShip(this);
             _controlState = ControlState.IDLE;
-            _class = controller.GetShipClassByName(_classID);
+            _class = controller.GetShipClassByName(ClassID);
         }
 
         private void Start() {
@@ -131,7 +128,7 @@ namespace VoidWars {
         }
 
         private void createPilot() {
-            switch(_controlType) {
+            switch(ControlType) {
                 case ControlType.HUMAN:
                     Debug.LogFormat("ShipController: creating human pilot for ship {0}", ID);
                     _pilot = new HumanPilot();
@@ -160,13 +157,11 @@ namespace VoidWars {
             DESTROYED
         }
 
-        [SyncVar] private ControlType _controlType;
         [SyncVar] private ControlState _controlState;
-        [SyncVar] private Faction _faction;
-        [SyncVar] private int _startPointIndex;
-        [SyncVar] private int _owner;
-        [SyncVar] private string _classID;
         private Pilot _pilot;
         private ShipClass _class;
+        private WeaponClass _primaryWeapon;
+        private WeaponClass _secondaryWeapon;
+        private readonly List<AuxiliaryClass> _equipment = new List<AuxiliaryClass>();
     }
 }

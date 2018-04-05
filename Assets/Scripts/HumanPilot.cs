@@ -16,7 +16,9 @@ namespace VoidWars {
                         _startZone = spawnPoint.StartBoundary;
                         _startZone.SetActive(true);
                         var szc = _startZone.GetComponent<StartZoneController>();
-                        szc.SetColor(gameController.FactionColors[(int)shipController.Faction]);
+                        var shipClass = gameController.GetShipClassByName(shipController.ClassID);
+                        var species = gameController.SpeciesInfo[(int)shipClass.Species];
+                        szc.SetColor(species.MarkerColor);
                         break;
                     }
                     

@@ -12,6 +12,9 @@ namespace VoidWars {
         [Tooltip("The name of the ship class")]
         public string Name;
 
+        [Tooltip("Description of the ship")]
+        public string Description;
+
         [Tooltip("The name of the associated model")]
         public string ModelName;
 
@@ -41,5 +44,8 @@ namespace VoidWars {
 
         [Tooltip("The number of actions the ship can take per turn")]
         public int ActionsPerTurn;
+
+        [Tooltip("Budget cost of the ship")]
+        public int Cost;
     }
 }

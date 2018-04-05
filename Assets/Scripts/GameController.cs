@@ -31,11 +31,17 @@ namespace VoidWars {
     /// Class responsible for coordinating the game events.
     /// </summary>
     public partial class GameController : MonoBehaviour {
+        [Header("Database")]
         public SpeciesInfo[] SpeciesInfo;
         public ShipClass[] ShipClasses;
+        public WeaponClass[] WeaponClasses;
+        public AuxiliaryClass[] ItemClasses;
         public GameObject[] StartPositions;
-        public Color[] FactionColors;
+
+        [Header("Configuration")]
         public GameConfig Configuration;
+
+        [Header("Controls")]
         public GameObject ActiveShipIndicator;
         public InfoPanelController InfoPanel;
         public RectTransform ControlPanel;
@@ -50,6 +56,7 @@ namespace VoidWars {
             get { return _state; }
         }
 
+        #region UI
         /// <summary>
         /// Zooms the view in. If there's an active ship it will centre on that. Otherwise to
         /// the board centre.
@@ -77,7 +84,9 @@ namespace VoidWars {
         public void EnableControlPanel(bool enable) {
             ControlPanel.gameObject.SetActive(enable);
         }
+        #endregion UI
 
+        #region Database
         /// <summary>
         /// Gets the ship class data given its name.
         /// </summary>
@@ -147,6 +156,7 @@ namespace VoidWars {
                 }
             }
         }
+        #endregion Database
 
         /// <summary>
         /// Sets the local communicator instance so the game controller can perform network
@@ -173,8 +183,9 @@ namespace VoidWars {
 
             // Change the border colour to ref;ect the new ship's faction.
             var shipController = _ships.Find(s => s.ID == shipID);
-            var color = FactionColors[(int)shipController.Faction];
-            BorderController.SetColor(color);
+            var shipClass = GetShipClassByName(shipController.ClassID);
+            var species = SpeciesInfo[(int)shipClass.Species];
+            BorderController.SetColor(species.MarkerColor);
         }
 
         /// <summary>
@@ -240,7 +251,9 @@ namespace VoidWars {
                     ActiveShipIndicator.transform.parent = ship.transform;
                     ActiveShipIndicator.transform.localPosition = Vector3.zero;
                     var rotator = ActiveShipIndicator.GetComponent<Rotator>();
-                    var color = FactionColors[(int)shipController.Faction];
+                    var shipClass = GetShipClassByName(shipController.ClassID);
+                    var species = SpeciesInfo[(int)shipClass.Species];
+                    var color = species.MarkerColor;
                     rotator.SetColor(color);
                     InfoPanel.NotifyContent("SetInfoText", "Please set the start position and rotation of your ship");
                     InfoPanel.NotifyContent("EnableDoneButton", true);
