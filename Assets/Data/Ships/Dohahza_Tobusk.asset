@@ -13,6 +13,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Species: 2
   Name: Tobusk
+  Description: 
   ModelName: SHIP_C_01
   HasSecondaryWeaponSlot: 1
   HasReverseThrust: 0
@@ -23,3 +24,9 @@ MonoBehaviour:
   Stealth: 0
   MaxSpeed: 11
   ActionsPerTurn: 2
+  Cost: 0
+  Maneuverability: 1
+  MaxEnergy: 100
+  MoveDrainRate: 1
+  LifeSupportDrainRate: 1
+  ShieldDrainRate: 1

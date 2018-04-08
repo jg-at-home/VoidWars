@@ -13,6 +13,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Species: 2
   Name: Phist
+  Description: 
   ModelName: SHIP_C_02
   HasSecondaryWeaponSlot: 0
   HasReverseThrust: 1
@@ -23,3 +24,9 @@ MonoBehaviour:
   Stealth: 0
   MaxSpeed: 9
   ActionsPerTurn: 2
+  Cost: 0
+  Maneuverability: 1
+  MaxEnergy: 100
+  MoveDrainRate: 1
+  LifeSupportDrainRate: 1
+  ShieldDrainRate: 1

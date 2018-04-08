@@ -21,7 +21,11 @@ namespace VoidWars {
                         szc.SetColor(species.MarkerColor);
                         break;
                     }
-                    
+
+                case GameState.IN_PLAY:
+                    setupInPlay(ship, gameController, shipController);
+                    break;
+
                 default:
                     break;
             }
@@ -36,6 +40,14 @@ namespace VoidWars {
             if (_startZone != null) {
                 _startZone.SetActive(false);
                 _startZone = null;
+            }
+        }
+
+        private void setupInPlay(GameObject ship, GameController controller, ShipController shipController) {
+            switch(controller.PlayPhase) {
+                case PlayPhase.MOVING_SHIP:
+                    _current = ship.AddComponent<HumanMoveShipManipulator>();
+                    break;
             }
         }
 

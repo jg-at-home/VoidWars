@@ -13,6 +13,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Species: 1
   Name: Evaq
+  Description: 
   ModelName: SHIP_B_02
   HasSecondaryWeaponSlot: 0
   HasReverseThrust: 0
@@ -23,3 +24,9 @@ MonoBehaviour:
   Stealth: 1
   MaxSpeed: 8
   ActionsPerTurn: 1
+  Cost: 0
+  Maneuverability: 1
+  MaxEnergy: 100
+  MoveDrainRate: 1
+  LifeSupportDrainRate: 1
+  ShieldDrainRate: 1

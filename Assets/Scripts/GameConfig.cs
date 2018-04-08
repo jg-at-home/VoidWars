@@ -25,9 +25,24 @@ namespace VoidWars {
     }
 
     [Serializable]
-    public class PlayerConfig {
+    public struct ShipConfig {
+        [Tooltip("The name of the ship's class")]
+        public string ClassName;
+
+        [Tooltip("The ship's primary weapon")]
+        public WeaponType PrimaryWeapon;
+
+        [Tooltip("The ship's secondary weapon")]
+        public WeaponType SecondaryWeapon;
+
+        [Tooltip("Bitmask indicating the equipment fitted to the ship.")]
+        public int EquipmentMask;
+    }
+
+    [Serializable]
+    public struct PlayerConfig {
         [Tooltip("The ships this player will control")]
-        public List<string> ShipClasses;
+        public ShipConfig[] ShipConfigs;
 
         [Tooltip("What controls the ship")]
         public ControlType ControlType;
@@ -60,7 +75,7 @@ namespace VoidWars {
             get {
                 var count = 0;
                 foreach (var pc in PlayerConfigs) {
-                    count += pc.ShipClasses.Count;
+                    count += pc.ShipConfigs.Length;
                 }
                 return count;
             }

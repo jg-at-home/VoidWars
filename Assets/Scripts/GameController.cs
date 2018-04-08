@@ -37,11 +37,13 @@ namespace VoidWars {
         public WeaponClass[] WeaponClasses;
         public AuxiliaryClass[] ItemClasses;
         public GameObject[] StartPositions;
+        public MoveTemplate[] MoveTemplates;
 
         [Header("Configuration")]
         public GameConfig Configuration;
 
         [Header("Controls")]
+        public GameObject Board;
         public GameObject ActiveShipIndicator;
         public InfoPanelController InfoPanel;
         public RectTransform ControlPanel;
@@ -54,6 +56,13 @@ namespace VoidWars {
         /// </summary>
         public GameState State {
             get { return _state; }
+        }
+
+        /// <summary>
+        /// Gets the current play phase.
+        /// </summary>
+        public PlayPhase PlayPhase {
+            get { return _playPhase; }
         }
 
         #region UI
@@ -156,6 +165,15 @@ namespace VoidWars {
                 }
             }
         }
+
+        /// <summary>
+        /// Gets weapon class data for the indicated type.
+        /// </summary>
+        /// <param name="type">The weapon type.</param>
+        /// <returns>The weapon class.</returns>
+        public WeaponClass GetWeaponClass(WeaponType type) {
+            return WeaponClasses[(int)type];
+        }
         #endregion Database
 
         /// <summary>
@@ -168,6 +186,10 @@ namespace VoidWars {
         }
 
         #region Client Code
+        public Rect GetBoardBounds() {
+            return _boardBounds;
+        }
+
         /// <summary>
         /// Called client-side to notify a new ship has become active.
         /// </summary>
@@ -289,6 +311,7 @@ namespace VoidWars {
                 AdvanceGame();
             }
             else {
+                beginRound();
                 SetActiveShipByIndex(nextIndex, false);
             }
         }
@@ -302,6 +325,14 @@ namespace VoidWars {
                 case GameState.SETUP:
                     // Setup is done. Time to play!
                     SetState(GameState.IN_PLAY, true);
+                    // Force here because the turn order will be different.
+                    SetActiveShipByIndex(0, true);
+                    break;
+
+                case GameState.IN_PLAY:
+                    // TODO: game over? Otherwise, around we go again.
+                    SetActiveShipByIndex(0, true);
+                    beginRound();
                     break;
 
                 default:
@@ -435,6 +466,12 @@ namespace VoidWars {
                     CameraRig.ZoomOut();
                     break;
 
+                case GameState.IN_PLAY:
+                    CameraRig.ZoomOut();
+                    _selectedMoves.Clear();
+                    SetPlayPhase(PlayPhase.MOVING_SHIP, false);
+                    break;
+
                 default:
                     break;
             }
@@ -489,8 +526,18 @@ namespace VoidWars {
             }
         }
 
+        private void beginRound() {
+            Debug.Log("GameController.beginRound()");
+            //foreach (var shipController in _ships) {
+            //    // TODO: ships accrue a bit of energy.
+            //}
+        }
+
         private void Start() {
             TitleController.SetText("VOID WARS()");
+            var boardMesh = Board.GetComponent<MeshRenderer>();
+            var bounds = boardMesh.bounds;
+            _boardBounds = new Rect(bounds.min.x, bounds.min.z, bounds.size.x, bounds.size.z);
         }
 
         #region Server Data
@@ -498,6 +545,7 @@ namespace VoidWars {
         private PlayPhase _playPhase = PlayPhase.IDLE;
         private int _activeShipIndex = -1;
         private int _activeShipID = -1;
+        private readonly List<ShipMoveInstance> _selectedMoves = new List<ShipMoveInstance>();
         #endregion Server Data
 
         private Communicator _communicator;
@@ -506,6 +554,7 @@ namespace VoidWars {
         private readonly List<ShipController> _moveOrderShips = new List<ShipController>();
         private readonly List<ShipController> _attackOrderShips = new List<ShipController>();
         private readonly List<ShipController> _setupOrderShips = new List<ShipController>();
+        private Rect _boardBounds;
 
         private ShipController _activeShip;
 

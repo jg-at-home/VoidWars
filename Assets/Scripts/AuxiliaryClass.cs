@@ -10,6 +10,7 @@ namespace VoidWars {
         HeatShield = 16,
         SelfDestruct = 32,
         Shinobi = 64,
+        Scanners = 128,
 
         // New items above here.
         NumTypes
