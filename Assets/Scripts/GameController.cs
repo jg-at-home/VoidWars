@@ -259,10 +259,8 @@ namespace VoidWars {
             if (shipID == -1) {
                 ActiveShipIndicator.SetActive(false);
                 _activeShip = null;
-
-                InfoPanel.NotifyContent("SetInfoText", "Please wait whilst opponent sets up their next ship");
-                InfoPanel.NotifyContent("EnableDoneButton", false);
-                EnableControlPanel(false);
+                _activeShipID = shipID;
+                refreshInfoPanel(false);
             }
             else {
                 var shipController = _ships.Find(s => s.ID == shipID);
@@ -277,9 +275,7 @@ namespace VoidWars {
                     var species = SpeciesInfo[(int)shipClass.Species];
                     var color = species.MarkerColor;
                     rotator.SetColor(color);
-                    InfoPanel.NotifyContent("SetInfoText", "Please set the start position and rotation of your ship");
-                    InfoPanel.NotifyContent("EnableDoneButton", true);
-                    EnableControlPanel(true);
+                    refreshInfoPanel(true);
                 }
 
                 _activeShip = shipController;
@@ -296,6 +292,47 @@ namespace VoidWars {
             Debug.Log("GameController.NextShip()");
 
             _communicator.CmdNextShip();
+        }
+
+        private void refreshInfoPanel(bool isActive) {
+            switch (_state) {
+                case GameState.SETUP:
+                    if (isActive) {
+                        InfoPanel.NotifyContent("SetInfoText", "Please set the start position and rotation of your ship");
+                    }
+                    else {
+                        InfoPanel.NotifyContent("SetInfoText", "Please wait whilst opponent sets up their next ship");
+                    }
+                    break;
+
+                case GameState.IN_PLAY:
+                    setInPlayText(isActive);
+                    break;
+
+                default:
+                    //                    InfoPanel.NotifyContent("SetInfoText", "Unhandled state in refreshInfoPanel()");
+                    break;
+            }
+
+            InfoPanel.NotifyContent("EnableDoneButton", isActive);
+            EnableControlPanel(isActive);
+        }
+
+        private void setInPlayText(bool isActive) {
+            switch(_playPhase) {
+                case PlayPhase.MOVING_SHIP:
+                    if (isActive) {
+                        InfoPanel.NotifyContent("SetInfoText", "Please select a move for the highlighted ship");
+                    }
+                    else {
+                        InfoPanel.NotifyContent("SetInfoText", "Please wait whilst opponent moves their next ship");
+                    }
+                    break;
+
+                default:
+                    InfoPanel.NotifyContent("SetInfoText", "Unhandled play phase in setInPlayText()");
+                    break;
+            }
         }
         #endregion Client Code
 
@@ -325,7 +362,7 @@ namespace VoidWars {
                 case GameState.SETUP:
                     // Setup is done. Time to play!
                     SetState(GameState.IN_PLAY, true);
-                    // Force here because the turn order will be different.
+                    _communicator.CmdEnableInfoPanel("Move", "MovePanel");
                     SetActiveShipByIndex(0, true);
                     break;
 
@@ -400,9 +437,9 @@ namespace VoidWars {
 
                         // All the ships have spawned. Do some book-keeping, and move on to setup.
                         // TODO: simultaneous setup. For now, it's one player, one ship at a time.
-                        buildTurnLists();                        
-                        SetActiveShipByIndex(0, true);
+                        buildTurnLists();
                         SetState(GameState.SETUP, true);
+                        SetActiveShipByIndex(0, true);
                     }
                     break;
 

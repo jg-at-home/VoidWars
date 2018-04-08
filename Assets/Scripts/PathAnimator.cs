@@ -5,16 +5,14 @@ namespace VoidWars {
     public class PathAnimator : MonoBehaviour {
         public float ScrollSpeed = 1.0f;
 
-        // Use this for initialization
-        void Start() {
+        private void Start() {
             var lineRenderer = gameObject.GetComponent<LineRenderer>();
             _material = lineRenderer.material;
             var template = gameObject.GetComponent<MoveTemplate>();
             _material.SetTextureScale("_MainTex", new Vector2(4f * template.Size, 1f));
         }
 
-        // Update is called once per frame
-        void Update() {
+        private void Update() {
             _offset.x = -Time.time * ScrollSpeed;
             _material.SetTextureOffset("_MainTex", _offset);
         }

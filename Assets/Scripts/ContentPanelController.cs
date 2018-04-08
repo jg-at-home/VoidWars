@@ -5,25 +5,18 @@ using UnityEngine;
 using UnityEngine.UI;
 
 namespace VoidWars {
-    /// <summary>
-    /// Controller for the Setup info panel.
-    /// </summary>
-    public class SetupPanelController : MonoBehaviour {
+    public class ContentPanelController : MonoBehaviour {
         [SerializeField]
         private Text _infoText;
+
+        [SerializeField]
+        private float _charDelay = 0.05f;
 
         [SerializeField]
         private Button _doneButton;
 
         [SerializeField]
         private RectTransform _promptPanel;
-
-        [SerializeField]
-        private float _charDelay = 0.05f;
-
-        private readonly Queue<char> _textQueue = new Queue<char>();
-        private StringBuilder _sb = new StringBuilder();
-        private Coroutine _writer;
 
         /// <summary>
         /// Sets the info text.
@@ -33,7 +26,7 @@ namespace VoidWars {
             _textQueue.Clear();
             _sb.Length = 0;
             _infoText.text = string.Empty;
-            foreach(char c in text) {
+            foreach (char c in text) {
                 _textQueue.Enqueue(c);
             }
 
@@ -53,16 +46,8 @@ namespace VoidWars {
             _promptPanel.gameObject.SetActive(enable);
         }
 
-        /// <summary>
-        /// Called when the Done button is clicked.
-        /// </summary>
-        public void OnDoneButtonClicked() {
-            var gameController = Util.GetGameController();
-            gameController.NextShip();
-        }
-
         private IEnumerator writeText() {
-            while(_textQueue.Count > 0) {
+            while (_textQueue.Count > 0) {
                 _sb.Append(_textQueue.Dequeue());
                 _infoText.text = _sb.ToString();
                 yield return new WaitForSeconds(_charDelay);
@@ -70,5 +55,18 @@ namespace VoidWars {
 
             _writer = null;
         }
+
+        /// <summary>
+        /// Called when the Done button is clicked.
+        /// </summary>
+        public virtual void OnDoneButtonClicked() {
+            var gameController = Util.GetGameController();
+            gameController.NextShip();
+        }
+
+        private readonly Queue<char> _textQueue = new Queue<char>();
+        private StringBuilder _sb = new StringBuilder();
+        private Coroutine _writer;
+
     }
 }

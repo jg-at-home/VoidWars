@@ -224,7 +224,7 @@ GameObject:
   m_Component:
   - component: {fileID: 224626191637874352}
   - component: {fileID: 222610540999702934}
-  - component: {fileID: 114933254548698056}
+  - component: {fileID: 114482200870703516}
   m_Layer: 5
   m_Name: SetupPanel
   m_TagString: Untagged
@@ -346,6 +346,21 @@ MonoBehaviour:
   m_FillAmount: 1
   m_FillClockwise: 1
   m_FillOrigin: 0
+--- !u!114 &114482200870703516
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1928963921728888}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 43237b0d152143c46aaccddded711c44, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _infoText: {fileID: 114884232547955242}
+  _charDelay: 0.05
+  _doneButton: {fileID: 114553378627360230}
+  _promptPanel: {fileID: 224868606313778986}
 --- !u!114 &114515474470877816
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -418,7 +433,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 114933254548698056}
+      - m_Target: {fileID: 114482200870703516}
         m_MethodName: OnDoneButtonClicked
         m_Mode: 1
         m_Arguments:
@@ -551,21 +566,6 @@ MonoBehaviour:
   m_FillAmount: 1
   m_FillClockwise: 1
   m_FillOrigin: 0
---- !u!114 &114933254548698056
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1928963921728888}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 85fadea6ff54de441ba3ddd5132d3392, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _infoText: {fileID: 114884232547955242}
-  _doneButton: {fileID: 114553378627360230}
-  _promptPanel: {fileID: 224868606313778986}
-  _charDelay: 0.05
 --- !u!114 &114968116586776520
 MonoBehaviour:
   m_ObjectHideFlags: 1
