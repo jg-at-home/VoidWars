@@ -17,7 +17,17 @@ namespace VoidWars {
             refreshUI();
         }
 
+        public void ZoomOut() {
+            if (_magnify) {
+                toggleZoom();
+            }
+        }
+
         public void OnButtonPressed() {
+            toggleZoom();
+        }
+
+        private void toggleZoom() {
             _magnify = !_magnify;
             refreshUI();
             var gameController = Util.GetGameController();

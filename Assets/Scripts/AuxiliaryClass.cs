@@ -5,12 +5,13 @@ namespace VoidWars {
         None = 0,
         BussardCollector = 1,
         FlareLauncher = 2,
-        SecondaryFuelTank = 4,
+        DriveBoost = 4,
         ERBInducer = 8,
         HeatShield = 16,
         SelfDestruct = 32,
         Shinobi = 64,
         Scanners = 128,
+        PowerCell = 256,
 
         // New items above here.
         NumTypes
@@ -35,5 +36,8 @@ namespace VoidWars {
 
         [Tooltip("Budget cost of the item")]
         public int Cost;
+
+        [Tooltip("Metadata for the item held as a string")]
+        public string Metadata;
     }
 }

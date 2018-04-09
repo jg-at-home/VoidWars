@@ -101,6 +101,13 @@ namespace VoidWars {
         }
 
         /// <summary>
+        /// Gets the maximum move size for the ship.
+        /// </summary>
+        public int MaxMoveSize {
+            get { return _maxMoveSize; }
+        }
+
+        /// <summary>
         /// Gets the energy available for the given consumer.
         /// </summary>
         /// <param name="consumer">The consumer.</param>
@@ -152,6 +159,7 @@ namespace VoidWars {
             // Set initial values from class.
             _energyBudget = new EnergyBudget();
             _energy = _class.MaxEnergy;
+            _powerDrain = 0.0f;
 
             // Figure out the total mass from the constituent bits - weapons and equipment.
             _totalMass = _class.Mass;
@@ -223,6 +231,24 @@ namespace VoidWars {
             }
         }
 
+        private void applyAuxiliary(AuxiliaryClass aux) {
+            // Everything adds a bit of mass.
+            _totalMass += aux.Mass;
+            _powerDrain += aux.PowerUsage;
+            switch(aux.ItemType) {
+                case AuxType.PowerCell:
+                    _energy += float.Parse(aux.Metadata);
+                    break;
+
+                case AuxType.DriveBoost:
+                    _maxMoveSize = int.Parse(aux.Metadata);
+                    break;
+
+                // TODO: other stuff.
+
+            }
+        }
+
         private enum ControlState {
             UNINITIALIZED,
             READY,
@@ -239,6 +265,8 @@ namespace VoidWars {
         private WeaponClass _secondaryWeapon;
         private readonly List<AuxiliaryClass> _equipment = new List<AuxiliaryClass>();
         private int _totalMass;
+        private float _powerDrain;
         private EnergyBudget _energyBudget;
+        private int _maxMoveSize = 3;
     }
 }

@@ -5,6 +5,7 @@ using System;
 namespace VoidWars {
     public class HumanMoveShipManipulator : MonoBehaviour {
         void Start() {
+            // TODO: cache nodes.
             _shipController = gameObject.GetComponent<ShipController>();
             _gameController = Util.GetGameController();
             _bounds = _gameController.GetBoardBounds();
@@ -53,9 +54,12 @@ namespace VoidWars {
                 }
 
                 var position = node.transform.position;
-                position.y += 1.0f;
+                // Offset in y to appear above the active ship marker. TODO: maybe use layer order?
+                position.y += 0.01f;
                 _moveTemplate = Instantiate(templatePrefab, position, node.transform.rotation);
             }
+
+            _gameController.InfoPanel.NotifyContent("SetMoveName", current.ToString());
         }
 
         private void generateLegalMoves() {
@@ -110,7 +114,7 @@ namespace VoidWars {
             var localEndPosition = startPos + direction*endObj.localPosition;
             var worldEndPosition = gameObject.transform.TransformPoint(localEndPosition);
 
-            // 1. Is this within the board bounds?
+            // Is this within the board bounds?
             if (!_bounds.Contains(new Vector2(worldEndPosition.x, worldEndPosition.z))) { 
                 // TODO: less harsh condition, say "any of the ship can be in bounds"? 
                 return false;
@@ -129,6 +133,11 @@ namespace VoidWars {
                         return false;
                     }
                 }
+            }
+
+            // Can the ship do it at all?
+            if (_shipController.MaxMoveSize < size) {
+                return false;
             }
 
             // Compute the energy requirement of the move and see if we've got enough to do it.

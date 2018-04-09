@@ -9,11 +9,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1ef9869d461ac3b4eb72df86eac649b0, type: 3}
-  m_Name: FuelTank
+  m_Name: DriveBoost
   m_EditorClassIdentifier: 
-  Name: Secondary Fuel Tank
-  Description: 
+  Name: Drive Boost
+  Description: Additional range for the ship
   ItemType: 4
-  PowerUsage: 0
+  PowerUsage: 5
   Mass: 5
-  Cost: 3
+  Cost: 7
+  Metadata: 4

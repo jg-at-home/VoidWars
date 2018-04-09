@@ -295,45 +295,11 @@ namespace VoidWars {
         }
 
         private void refreshInfoPanel(bool isActive) {
-            switch (_state) {
-                case GameState.SETUP:
-                    if (isActive) {
-                        InfoPanel.NotifyContent("SetInfoText", "Please set the start position and rotation of your ship");
-                    }
-                    else {
-                        InfoPanel.NotifyContent("SetInfoText", "Please wait whilst opponent sets up their next ship");
-                    }
-                    break;
-
-                case GameState.IN_PLAY:
-                    setInPlayText(isActive);
-                    break;
-
-                default:
-                    //                    InfoPanel.NotifyContent("SetInfoText", "Unhandled state in refreshInfoPanel()");
-                    break;
-            }
-
+            InfoPanel.NotifyActiveShipChange(isActive);
             InfoPanel.NotifyContent("EnableDoneButton", isActive);
             EnableControlPanel(isActive);
         }
 
-        private void setInPlayText(bool isActive) {
-            switch(_playPhase) {
-                case PlayPhase.MOVING_SHIP:
-                    if (isActive) {
-                        InfoPanel.NotifyContent("SetInfoText", "Please select a move for the highlighted ship");
-                    }
-                    else {
-                        InfoPanel.NotifyContent("SetInfoText", "Please wait whilst opponent moves their next ship");
-                    }
-                    break;
-
-                default:
-                    InfoPanel.NotifyContent("SetInfoText", "Unhandled play phase in setInPlayText()");
-                    break;
-            }
-        }
         #endregion Client Code
 
         #region Server code
@@ -504,7 +470,7 @@ namespace VoidWars {
                     break;
 
                 case GameState.IN_PLAY:
-                    CameraRig.ZoomOut();
+                    ControlPanel.SendMessage("ZoomOut");
                     _selectedMoves.Clear();
                     SetPlayPhase(PlayPhase.MOVING_SHIP, false);
                     break;

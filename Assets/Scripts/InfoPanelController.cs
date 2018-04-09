@@ -32,10 +32,22 @@ namespace VoidWars {
             // It's possible a network message to enable the info panel hasn't got to its
             // destination yet, so we wait a while to see if it gets enabled to avoid race
             // conditions.
-            StartCoroutine(notifyContentInner(notification, value));
+            notifyInner(notification, value, SendMessageOptions.RequireReceiver);
         }
 
-        private IEnumerator notifyContentInner(string notification, object value) {
+        /// <summary>
+        /// Called when the active ship changes.
+        /// </summary>
+        /// <param name="shipID">The active ship ID, or -1 if inactive.</param>
+        public void NotifyActiveShipChange(bool active) {
+            notifyInner("OnActiveShipChanged", active, SendMessageOptions.DontRequireReceiver);
+        }
+
+        private void notifyInner(string notification, object value, SendMessageOptions smo) {
+            StartCoroutine(notifyCoro(notification, value, smo));
+        }
+
+        private IEnumerator notifyCoro(string notification, object value, SendMessageOptions smo) {
             for (float t = 0f; t < NotificationTimeout; t += Time.deltaTime) {
                 if (_content == null) {
                     yield return null;
@@ -55,7 +67,7 @@ namespace VoidWars {
         public void ClearContent() {
             if (_content != null) {
                 _content.SetParent(null);
-                Destroy(_content);
+                Destroy(_content.gameObject);
                 _content = null;
             }
         }

@@ -18,5 +18,18 @@ namespace VoidWars {
         public void SetMoveName(string moveName) {
             _moveText.text = moveName;
         }
+
+        public void OnActiveShipChanged(bool active) {
+            string text;
+            if (active) {
+                // It's the local ship.
+                text = "Please select a move for the highlighted ship";
+            }
+            else {
+                // It's the other guy's ship.
+                text = "Please wait whilst opponent moves their next ship";
+            }
+            SetInfoText(text);
+        }
     }
 }
