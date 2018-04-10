@@ -14,7 +14,7 @@ MonoBehaviour:
   Name: Power Cell
   Description: Adds extra power to your ship
   ItemType: 256
-  PowerUsage: 0
+  PowerUsage: -1
   Mass: 2
   Cost: 2
   Metadata: 10

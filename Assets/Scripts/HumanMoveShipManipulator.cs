@@ -12,7 +12,6 @@ namespace VoidWars {
         }
 
         private void Start() {
-            // TODO: cache nodes.
             _shipController = gameObject.GetComponent<ShipController>();
             _gameController = Util.GetGameController();
             _bounds = _gameController.GetBoardBounds();
@@ -75,8 +74,8 @@ namespace VoidWars {
         private void generateLegalMoves() {
             // For all possible moves, determine if it will take the ship OOB or collide with another
             // ship on the way, and whether the ship has sufficient energy.
-            var frontNode = gameObject.transform.Find("NodeFront");
-            var rearNode = gameObject.transform.Find("NodeRear");
+            var frontNode = _shipController.FrontNode;
+            var rearNode = _shipController.RearNode;
             foreach(var template in _gameController.MoveTemplates) { 
                 if (checkMove(frontNode, rearNode, template)) {
                     _legalMoves.Add(new ShipMove(template.MoveType, template.Size));
@@ -151,36 +150,14 @@ namespace VoidWars {
             }
 
             // Compute the energy requirement of the move and see if we've got enough to do it.
-            var energyRequired = _shipController.MassRatio * shipClass.MoveDrainRate * moveScale(type, size);
-            var energyAvailable = _shipController.GetEnergyFor(EnergyConsumer.Propulsion);
+            var move = new ShipMove { MoveType = type, Size = size };
+            var energyRequired = _shipController.GetEnergyForMove(move);
+            var energyAvailable = _shipController.GetEnergyBudgetFor(EnergyConsumer.Propulsion);
             if (energyRequired > energyAvailable) {
                 return false;
             }
 
             return true;
-        }
-
-        private static float moveScale(MoveType type, int size) {
-            switch(type) {
-                case MoveType.Forward:
-                case MoveType.Reverse:
-                    return size;
-
-                case MoveType.GentleTurnLeft:
-                case MoveType.GentleTurnRight:
-                    return size * Mathf.PI/4f;
-
-                case MoveType.SharpTurnLeft:
-                case MoveType.SharpTurnRight:
-                    return size * Mathf.PI/2f;
-
-                case MoveType.TurnAbout:
-                    return size * 3f;
-
-                default:
-                    Debug.Assert(false, "Huh?");
-                    return size;
-            }
         }
 
         private int _currentMove;

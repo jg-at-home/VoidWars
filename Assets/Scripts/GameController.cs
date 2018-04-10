@@ -380,6 +380,10 @@ namespace VoidWars {
         /// </summary>
         public void BeginRoundServer() {
             Debug.LogFormat("GameController.BeginRoundServer({0})", _round);
+
+            foreach (var shipController in _ships) {
+                shipController.BeginRound(_round);
+            }
             ++_round;
         }
 
@@ -568,6 +572,14 @@ namespace VoidWars {
             }
         }
         
+        /// <summary>
+        /// Called when a ship is above to move.
+        /// </summary>
+        /// <param name="move">The move.</param>
+        public void BeginMove(ShipMoveInstance move) {
+            var shipController = _ships.Find(s => s.ID == move.ShipID);
+            shipController.BeginMove(move.Move);
+        }
 
         /// <summary>
         ///  Called when a ship has finished its motion.

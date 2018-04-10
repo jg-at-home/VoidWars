@@ -212,6 +212,7 @@ namespace VoidWars {
         public void EnactMoves(List<ShipMoveInstance> moves) {
             foreach(var move in moves) {
                 if (move.Move.MoveType != MoveType.None) {
+                    controller.BeginMove(move);
                     RpcMoveShip(move);
                 }
             }

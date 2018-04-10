@@ -30,3 +30,4 @@ MonoBehaviour:
   MoveDrainRate: 1
   LifeSupportDrainRate: 1
   ShieldDrainRate: 1
+  RechargeRate: 5

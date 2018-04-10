@@ -69,5 +69,8 @@ namespace VoidWars {
 
         [Tooltip("Shield drain rate (when active)")]
         public float ShieldDrainRate;
+
+        [Tooltip("Recharge rate")]
+        public float RechargeRate;
     }
 }

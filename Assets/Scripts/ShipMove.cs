@@ -39,6 +39,34 @@ namespace VoidWars {
             Size = size;
         }
 
+        /// <summary>
+        /// Gets a scalar that reflects the energy demands of a specific move type.
+        /// </summary>
+        public float EnergyScale {
+            get {
+                switch (MoveType) {
+                    case MoveType.Forward:
+                    case MoveType.Reverse:
+                        return Size;
+
+                    case MoveType.GentleTurnLeft:
+                    case MoveType.GentleTurnRight:
+                        return Size * Mathf.PI / 4f;
+
+                    case MoveType.SharpTurnLeft:
+                    case MoveType.SharpTurnRight:
+                        return Size * Mathf.PI / 2f;
+
+                    case MoveType.TurnAbout:
+                        return Size * 3f;
+
+                    default:
+                        Debug.Assert(false, "Huh?");
+                        return Size;
+                }
+            }
+        }
+
         public override string ToString() {
             string name = MoveType.ToString();
             switch(MoveType) {
