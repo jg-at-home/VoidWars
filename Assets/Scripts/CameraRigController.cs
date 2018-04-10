@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace VoidWars {
@@ -11,7 +10,7 @@ namespace VoidWars {
         [SerializeField] private Transform _zoomedOut;
         [SerializeField] private Transform _zoomedIn;
         [SerializeField] private float _smoothTime = 1.0f;
-        [SerializeField] private float _tolerance = 0.1f;
+        [SerializeField] private float _tolerance = 0.01f;
 
         private void Start() {
             gameObject.transform.position = _start.position;

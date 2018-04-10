@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -85,6 +86,13 @@ namespace VoidWars {
         }
 
         /// <summary>
+        /// Gets the max amount of energy the ship can have.
+        /// </summary>
+        public float MaxEnergy {
+            get { return _maxEnergy; }
+        }
+
+        /// <summary>
         /// Gets the ship's static class data.
         /// </summary>
         public ShipClass ShipClass {
@@ -106,6 +114,17 @@ namespace VoidWars {
         public int MaxMoveSize {
             get { return _maxMoveSize; }
         }
+
+        /// <summary>
+        /// How long it takes to move a single unit.
+        /// </summary>
+        public float MoveDuration = 1.0f;
+
+        /// <summary>
+        /// Signature for move finished callback.
+        /// </summary>
+        /// <param name="shipID">ID of shi.</param>
+        public delegate void OnMoveFinished(int shipID);
 
         /// <summary>
         /// Gets the energy available for the given consumer.
@@ -143,6 +162,50 @@ namespace VoidWars {
             }
         }
 
+        /// <summary>
+        /// Enacts a move for the ship.
+        /// </summary>
+        /// <param name="move"></param>
+        public void EnactMove(ShipMoveInstance move, OnMoveFinished finishedHandler) {
+            StartCoroutine(enactMove(move, finishedHandler));
+        }
+
+        private IEnumerator enactMove(ShipMoveInstance move, OnMoveFinished finishedHandler) {
+            var points = new List<Vector3>();
+            points.Add(gameObject.transform.position);
+
+            // Locate the move template. Points are in local space so need to be transformed.
+            var moveTemplate = controller.GetMoveTemplate(move.Move);
+            var node = (moveTemplate.MoveType == MoveType.Reverse) ? RearNode: FrontNode;
+            var renderer = moveTemplate.GetComponent<LineRenderer>();
+            for (int i = 0; i < renderer.positionCount; ++i) {
+                var positionLocal = renderer.GetPosition(i);
+                var positionWorld = node.transform.TransformPoint(positionLocal);
+                points.Add(positionWorld);
+            }
+
+            // Create a curve to follow, and follow it.
+            var curve = new PiecewiseLinearCurve(points);
+            var duration = MoveDuration * move.Move.Size;
+            Vector3 position;
+            Quaternion rotation;
+            var rb = gameObject.GetComponent<Rigidbody>();
+            for (var t = 0f; t < duration; t += Time.deltaTime) {
+                var s = t / duration;
+                curve.GetPositionAndRotation(s, out position, out rotation);
+                rb.position = position;
+                rb.rotation = rotation;
+                yield return null;
+            }
+
+            // Snap to end values.
+            rb.position = move.Position;
+            rb.rotation = move.Rotation;
+
+            // Notify we're done.
+            finishedHandler(ID);
+        }
+
         private void Awake() {
             _controlState = ControlState.UNINITIALIZED;
         }
@@ -159,6 +222,7 @@ namespace VoidWars {
             // Set initial values from class.
             _energyBudget = new EnergyBudget();
             _energy = _class.MaxEnergy;
+            _maxEnergy = _energy;
             _powerDrain = 0.0f;
 
             // Figure out the total mass from the constituent bits - weapons and equipment.
@@ -238,6 +302,7 @@ namespace VoidWars {
             switch(aux.ItemType) {
                 case AuxType.PowerCell:
                     _energy += float.Parse(aux.Metadata);
+                    _maxEnergy = _energy;
                     break;
 
                 case AuxType.DriveBoost:
@@ -259,6 +324,7 @@ namespace VoidWars {
 
         [SyncVar] private ControlState _controlState;
         [SyncVar] private float _energy;
+        [SyncVar] private float _maxEnergy;
         private Pilot _pilot;
         private ShipClass _class;
         private WeaponClass _primaryWeapon;

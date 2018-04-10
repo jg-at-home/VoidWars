@@ -44,7 +44,6 @@ namespace VoidWars {
 
         [Header("Configuration")]
         public GameConfig Configuration;
-        public float MoveDuration = 1.0f;
 
         [Header("Controls")]
         public GameObject Board;
@@ -101,6 +100,15 @@ namespace VoidWars {
         #endregion UI
 
         #region Database
+        /// <summary>
+        /// Gets the template for a move.
+        /// </summary>
+        /// <param name="move">The move for a ship.</param>
+        /// <returns></returns>
+        public MoveTemplate GetMoveTemplate(ShipMove move) {
+            return Array.Find(MoveTemplates, mt => mt.MoveType == move.MoveType && mt.Size == move.Size);
+        }
+
         /// <summary>
         /// Gets the ship class data given its name.
         /// </summary>
@@ -349,8 +357,12 @@ namespace VoidWars {
             var shipController = _ships.Find(s => s.ID == move.ShipID);
             if (shipController.OwnerID == _communicator.ID) {
                 // Ship is controlled by me.
-                StartCoroutine(enactMove(shipController, move));
+                shipController.EnactMove(move, onMoveFinished);
             }
+        }
+
+        private void onMoveFinished(int shipID) {
+            _communicator.CmdMoveFinished(shipID);
         }
         #endregion Client Code
 
@@ -556,19 +568,6 @@ namespace VoidWars {
             }
         }
         
-        private IEnumerator enactMove(ShipController ship, ShipMoveInstance move) {
-            var startPos = ship.transform.position;
-            var startRot = ship.transform.rotation;
-            var duration = MoveDuration * move.Move.Size;
-            for(var t = 0f; t < duration; t += Time.deltaTime) {
-                var s = t / duration;
-                ship.transform.position = Vector3.Lerp(startPos, move.Position, s);
-                ship.transform.rotation = Quaternion.Slerp(startRot, move.Rotation, s);
-                yield return null;
-            }
-
-            _communicator.CmdMoveFinished(ship.ID);
-        }
 
         /// <summary>
         ///  Called when a ship has finished its motion.
