@@ -6,6 +6,8 @@ namespace VoidWars {
     /// </summary>
     public class HumanPilot : Pilot {
         public override void OnShipActivation(GameController gameController, ShipController shipController) {
+            Debug.Log("HumanPilot.OnShipActivation()");
+
             // Ship has become active. Pick a manipulator depending on what state the game is in.
             var ship = shipController.gameObject;
             switch (gameController.State) {
@@ -29,10 +31,17 @@ namespace VoidWars {
                 default:
                     break;
             }
+
+            if (_current != null) {
+                _current.OnActivation();
+            }
         }
 
         public override void OnShipDeactivation(GameController gameController, ShipController shipController) {
+            Debug.Log("HumanPilot.OnShipDeactivation()");
+
             if (_current != null) {
+                _current.OnDeactivation();
                 Object.Destroy(_current);
                 _current = null;
             }
@@ -45,13 +54,13 @@ namespace VoidWars {
 
         private void setupInPlay(GameObject ship, GameController controller, ShipController shipController) {
             switch(controller.PlayPhase) {
-                case PlayPhase.MOVING_SHIP:
+                case PlayPhase.SELECTING_MOVES:
                     _current = ship.AddComponent<HumanMoveShipManipulator>();
                     break;
             }
         }
 
-        private MonoBehaviour _current;
+        private Manipulator _current;
         private GameObject _startZone;
     }
 }

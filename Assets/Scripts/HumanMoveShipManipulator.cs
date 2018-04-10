@@ -3,8 +3,15 @@ using System.Collections.Generic;
 using System;
 
 namespace VoidWars {
-    public class HumanMoveShipManipulator : MonoBehaviour {
-        void Start() {
+    public class HumanMoveShipManipulator : Manipulator {
+        public override void OnDeactivation() {
+            if (_moveTemplate != null) {
+                Destroy(_moveTemplate.gameObject);
+                _moveTemplate = null;
+            }
+        }
+
+        private void Start() {
             // TODO: cache nodes.
             _shipController = gameObject.GetComponent<ShipController>();
             _gameController = Util.GetGameController();
@@ -42,6 +49,10 @@ namespace VoidWars {
             }
 
             var current = _legalMoves[_currentMove];
+            var moveInstance = new ShipMoveInstance {
+                Move = current,
+                ShipID = _shipController.ID
+            };
             if (current.MoveType != MoveType.None) {
                 var templatePrefab = Array.Find(_gameController.MoveTemplates,
                     t => t.MoveType == current.MoveType && t.Size == current.Size);
@@ -53,12 +64,11 @@ namespace VoidWars {
                     node = gameObject.transform.Find("NodeFront");
                 }
 
-                var position = node.transform.position;
-                // Offset in y to appear above the active ship marker. TODO: maybe use layer order?
-                position.y += 0.01f;
-                _moveTemplate = Instantiate(templatePrefab, position, node.transform.rotation);
+                _moveTemplate = Instantiate(templatePrefab, node.transform.position, node.transform.rotation);
+                moveInstance.Position = _moveTemplate.EndPoint.transform.position;
+                moveInstance.Rotation = _moveTemplate.EndPoint.transform.rotation;
             }
-
+            _gameController.SelectedMove = moveInstance;
             _gameController.InfoPanel.NotifyContent("SetMoveName", current.ToString());
         }
 

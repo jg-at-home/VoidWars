@@ -20,6 +20,41 @@ namespace VoidWars {
         }
 
         /// <summary>
+        /// Called when a round ends.
+        /// </summary>
+        public void EndThisRound() {
+            controller.EndRoundServer();
+            RpcEndThisRound();
+        }
+
+        [ClientRpc]
+        void RpcEndThisRound() {
+            controller.EndRoundClient();
+        }
+
+        /// <summary>
+        /// Called when a new round begins.
+        /// </summary>
+        public void BeginNextRound() {
+            controller.BeginRoundServer();
+            RpcBeginNextRound();
+        }
+
+        [ClientRpc]
+        void RpcBeginNextRound() {
+            controller.BeginRoundClient();
+        }
+
+        /// <summary>
+        /// Called by clients to add a move to the server.
+        /// </summary>
+        /// <param name="move">The move to add.</param>
+        [Command]
+        public void CmdAddPlayerMove(ShipMoveInstance move) {
+            controller.AddPlayerMove(move);
+        }
+
+        /// <summary>
         /// Advances the game at the end of a phase or state.
         /// </summary>
         [Command]
@@ -169,6 +204,33 @@ namespace VoidWars {
             controller.SetPlayPhase(newPhase, false);
         }
 
+        /// <summary>
+        /// Executes the selected moves (paying attention to ownership because it's not a 
+        /// server-authoratative model and we have to move them on their owner client).
+        /// </summary>
+        /// <param name="moves">List of moves.</param>
+        public void EnactMoves(List<ShipMoveInstance> moves) {
+            foreach(var move in moves) {
+                if (move.Move.MoveType != MoveType.None) {
+                    RpcMoveShip(move);
+                }
+            }
+        }
+
+        [ClientRpc]
+        void RpcMoveShip(ShipMoveInstance move) {
+            controller.MoveShip(move);
+        }
+
+        /// <summary>
+        ///  Called when a ship has finished its motion.
+        /// </summary>
+        /// <param name="shipID">The ship ID.</param>
+        [Command]
+        public void CmdMoveFinished(int shipID) {
+            controller.MoveFinished(shipID);
+        }
+
         #region UI
         /// <summary>
         /// Tells clients to enable their info panels.
@@ -198,6 +260,10 @@ namespace VoidWars {
             controller.DisableInfoPanel();
         }
 
+        /// <summary>
+        /// Enables the control panel.
+        /// </summary>
+        /// <param name="enable">Enable / disable flag.</param>
         [Command]
         public void CmdEnableControlPanel(bool enable) {
             RpcEnableControlPanel(enable);
@@ -208,7 +274,6 @@ namespace VoidWars {
             controller.EnableControlPanel(enable);
         }
         #endregion UI
-
 
         private void Update() {
             if (isServer) {

@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace VoidWars {
@@ -21,7 +23,8 @@ namespace VoidWars {
     /// </summary>
     public enum PlayPhase {
         IDLE,
-        MOVING_SHIP,
+        SELECTING_MOVES,
+        MOVING_SHIPS,
         TAKING_ACTION,
         ATTACKING,
         // TODO: other stuff.
@@ -41,6 +44,7 @@ namespace VoidWars {
 
         [Header("Configuration")]
         public GameConfig Configuration;
+        public float MoveDuration = 1.0f;
 
         [Header("Controls")]
         public GameObject Board;
@@ -50,6 +54,7 @@ namespace VoidWars {
         public CameraRigController CameraRig;
         public BoardBorderController BorderController;
         public TitleTextController TitleController;
+        public GameObject MapPinPrefab;
 
         /// <summary>
         /// Gets the current game state.
@@ -203,11 +208,13 @@ namespace VoidWars {
                 SetActiveShip(-1);
             }
 
-            // Change the border colour to ref;ect the new ship's faction.
-            var shipController = _ships.Find(s => s.ID == shipID);
-            var shipClass = GetShipClassByName(shipController.ClassID);
-            var species = SpeciesInfo[(int)shipClass.Species];
-            BorderController.SetColor(species.MarkerColor);
+            if (shipID >= 0) {
+                // Change the border colour to reflect the new ship's faction.
+                var shipController = _ships.Find(s => s.ID == shipID);
+                var shipClass = GetShipClassByName(shipController.ClassID);
+                var species = SpeciesInfo[(int)shipClass.Species];
+                BorderController.SetColor(species.MarkerColor);
+            }
         }
 
         /// <summary>
@@ -300,9 +307,78 @@ namespace VoidWars {
             EnableControlPanel(isActive);
         }
 
+        /// <summary>
+        /// Get / set the selected move for the current ship.
+        /// </summary>
+        public ShipMoveInstance SelectedMove { get; set; }
+
+        /// <summary>
+        /// Sets the move for a ship.
+        /// </summary>
+        public void StoreSelectedMove() {
+            if (SelectedMove.Move.MoveType != MoveType.None) {
+                // Drop a pin to show where the move will take the ship.
+                var pin = Instantiate(MapPinPrefab, SelectedMove.Position, Quaternion.identity);
+                _mapPins.Add(pin);
+            }
+
+            // Tell the server about the move.
+            _communicator.CmdAddPlayerMove(SelectedMove);
+        }
+
+        /// <summary>
+        /// Called to perform client work at the start of a round.
+        /// </summary>
+        public void BeginRoundClient() {
+            Debug.Log("GameController.BeginRoundClient()");
+
+        }
+
+        /// <summary>
+        /// Called to perform client work at the end of a round.
+        /// </summary>
+        public void EndRoundClient() {
+            Debug.Log("GameController.EndRoundClient()");
+        }
+
+        /// <summary>
+        /// Moves the indicated ship to the target point IF it's the controlled ship.
+        /// </summary>
+        /// <param name="move">The move to execute.</param>
+        public void MoveShip(ShipMoveInstance move) {
+            var shipController = _ships.Find(s => s.ID == move.ShipID);
+            if (shipController.OwnerID == _communicator.ID) {
+                // Ship is controlled by me.
+                StartCoroutine(enactMove(shipController, move));
+            }
+        }
         #endregion Client Code
 
         #region Server code
+        /// <summary>
+        /// Adds a player move to the set. There should be one for each player.
+        /// </summary>
+        /// <param name="move"></param>
+        public void AddPlayerMove(ShipMoveInstance move) {
+            _selectedMoves.Add(move);
+        }
+
+        /// <summary>
+        /// Called when a round begins.
+        /// </summary>
+        public void BeginRoundServer() {
+            Debug.LogFormat("GameController.BeginRoundServer({0})", _round);
+            ++_round;
+        }
+
+        /// <summary>
+        /// Called when a round ends.
+        /// </summary>
+        public void EndRoundServer() {
+            Debug.Log("GameController.EndRoundServer()");
+            _selectedMoves.Clear();
+        }
+
         /// <summary>
         /// Server-side call for moving to the next ship in the turn order.
         /// </summary>
@@ -314,7 +390,6 @@ namespace VoidWars {
                 AdvanceGame();
             }
             else {
-                beginRound();
                 SetActiveShipByIndex(nextIndex, false);
             }
         }
@@ -327,19 +402,42 @@ namespace VoidWars {
             switch(_state) {
                 case GameState.SETUP:
                     // Setup is done. Time to play!
+                    _round = 0;
                     SetState(GameState.IN_PLAY, true);
                     _communicator.CmdEnableInfoPanel("Move", "MovePanel");
                     SetActiveShipByIndex(0, true);
                     break;
 
                 case GameState.IN_PLAY:
+                    advancePlay();
                     // TODO: game over? Otherwise, around we go again.
                     SetActiveShipByIndex(0, true);
-                    beginRound();
                     break;
 
                 default:
                     Debug.LogError("Broken game state machine");
+                    break;
+            }
+        }
+
+        private void advancePlay() {
+            switch(_playPhase) {
+                case PlayPhase.SELECTING_MOVES:
+                    // TODO: lockout UI.
+                    _communicator.NotifyActiveShip(-1, -1);
+                    _movesToMake = _selectedMoves.Count(m => m.Move.MoveType != MoveType.None);
+                    _communicator.EnactMoves(_selectedMoves);
+                    SetPlayPhase(PlayPhase.MOVING_SHIPS, true);
+                    break;
+
+                case PlayPhase.TAKING_ACTION:
+                    SetPlayPhase(PlayPhase.ATTACKING, true);
+                    break;
+
+                case PlayPhase.ATTACKING:
+                    SetPlayPhase(PlayPhase.SELECTING_MOVES, true);
+                    _communicator.EndThisRound();
+                    _communicator.BeginNextRound();
                     break;
             }
         }
@@ -409,6 +507,23 @@ namespace VoidWars {
                     }
                     break;
 
+                case GameState.IN_PLAY:
+                    updateServerInPlay();
+                    break;
+
+                default:
+                    break;
+            }
+        }
+
+        private void updateServerInPlay() {
+            switch(_playPhase) {
+                case PlayPhase.MOVING_SHIPS:
+                    if (_movesToMake == 0) {
+                        SetPlayPhase(PlayPhase.TAKING_ACTION, true);
+                    }
+                    break;
+
                 default:
                     break;
             }
@@ -440,6 +555,30 @@ namespace VoidWars {
                 return _moveOrderShips;
             }
         }
+        
+        private IEnumerator enactMove(ShipController ship, ShipMoveInstance move) {
+            var startPos = ship.transform.position;
+            var startRot = ship.transform.rotation;
+            var duration = MoveDuration * move.Move.Size;
+            for(var t = 0f; t < duration; t += Time.deltaTime) {
+                var s = t / duration;
+                ship.transform.position = Vector3.Lerp(startPos, move.Position, s);
+                ship.transform.rotation = Quaternion.Slerp(startRot, move.Rotation, s);
+                yield return null;
+            }
+
+            _communicator.CmdMoveFinished(ship.ID);
+        }
+
+        /// <summary>
+        ///  Called when a ship has finished its motion.
+        /// </summary>
+        /// <param name="shipID">The ship ID.</param>
+        public void MoveFinished(int shipID) {
+            Debug.LogFormat("GameController.MoveFinished({0})", shipID);
+            --_movesToMake;
+            Debug.Assert(_movesToMake >= 0);
+        }
         #endregion
 
         /// <summary>
@@ -470,9 +609,10 @@ namespace VoidWars {
                     break;
 
                 case GameState.IN_PLAY:
-                    ControlPanel.SendMessage("ZoomOut");
+                    var zoomControl = ControlPanel.GetComponentInChildren<ZoomButtonController>();
+                    zoomControl.ZoomOut();
                     _selectedMoves.Clear();
-                    SetPlayPhase(PlayPhase.MOVING_SHIP, false);
+                    SetPlayPhase(PlayPhase.SELECTING_MOVES, true);
                     break;
 
                 default:
@@ -487,6 +627,7 @@ namespace VoidWars {
         /// <param name="notify">If true, all clients are notified of the change.</param>
         public void SetPlayPhase(PlayPhase newPhase, bool notify) {
             if (_playPhase != newPhase) {
+                onExitPhase(_playPhase);
                 Debug.LogFormat("GameController.SetPlayPhase({0})", newPhase);
                 _playPhase = newPhase;
                 if (notify) {
@@ -497,7 +638,22 @@ namespace VoidWars {
         }
 
         private void onEnterPhase(PlayPhase newPhase) {
+            Debug.LogFormat("GameController.onEnterPhase{0})", newPhase);
             // TODO
+        }
+
+        private void onExitPhase(PlayPhase oldPhase) {
+            Debug.LogFormat("GameController.onExitPhase{0})", oldPhase);
+
+            switch(oldPhase) {
+                case PlayPhase.SELECTING_MOVES:
+                    // Purge any map pins.
+                    foreach (var pin in _mapPins) {
+                        Destroy(pin);
+                    }
+                    _mapPins.Clear();
+                    break;
+            }
         }
 
         private void buildTurnLists() {
@@ -529,13 +685,6 @@ namespace VoidWars {
             }
         }
 
-        private void beginRound() {
-            Debug.Log("GameController.beginRound()");
-            //foreach (var shipController in _ships) {
-            //    // TODO: ships accrue a bit of energy.
-            //}
-        }
-
         private void Start() {
             TitleController.SetText("VOID WARS()");
             var boardMesh = Board.GetComponent<MeshRenderer>();
@@ -549,6 +698,9 @@ namespace VoidWars {
         private int _activeShipIndex = -1;
         private int _activeShipID = -1;
         private readonly List<ShipMoveInstance> _selectedMoves = new List<ShipMoveInstance>();
+        private readonly List<GameObject> _mapPins = new List<GameObject>();
+        private int _round;
+        private int _movesToMake;
         #endregion Server Data
 
         private Communicator _communicator;

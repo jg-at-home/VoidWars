@@ -4,7 +4,7 @@ namespace VoidWars {
     /// <summary>
     /// Comoponent that allows a human to set their ships up.
     /// </summary>
-    public class HumanSetupManipulator : MonoBehaviour {
+    public class HumanSetupManipulator : Manipulator {
         [Tooltip("Speed of ship rotation")]
         public float TurnSpeed = 22.0f;
 
@@ -13,7 +13,7 @@ namespace VoidWars {
 
         private void Start() {
             _shipController = gameObject.GetComponent<ShipController>();
-            _rb = _shipController.gameObject.GetComponent<Rigidbody>();
+            _rb = gameObject.GetComponent<Rigidbody>();
             _gameController = Util.GetGameController();
             _bounds = _gameController.GetStartPositionBoundary(_shipController.StartPointIndex);
         }

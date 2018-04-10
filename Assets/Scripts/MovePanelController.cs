@@ -2,12 +2,16 @@
 using UnityEngine.UI;
 
 namespace VoidWars {
+    /// <summary>
+    /// Controller script for the movement panel.
+    /// </summary>
     public class MovePanelController : ContentPanelController {
         [SerializeField]
         private Text _moveText;
 
         public override void OnDoneButtonClicked() {
             var gameController = Util.GetGameController();
+            gameController.StoreSelectedMove();
             gameController.NextShip();
         }
 

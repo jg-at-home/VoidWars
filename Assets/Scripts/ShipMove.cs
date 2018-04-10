@@ -1,4 +1,6 @@
-﻿namespace VoidWars {
+﻿using UnityEngine;
+
+namespace VoidWars {
     public enum MoveType {
         None,
 
@@ -18,6 +20,9 @@
         Reverse,
     }
 
+    /// <summary>
+    /// Describes a ship manuever.
+    /// </summary>
     public struct ShipMove {
         /// <summary>
         /// What we're going to do.
@@ -61,8 +66,28 @@
         }
     }
 
-    public class ShipMoveInstance {
+    /// <summary>
+    /// Describes a move for a specific ship.
+    /// </summary>
+    public struct ShipMoveInstance {
+        /// <summary>
+        /// The move to make.
+        /// </summary>
         public ShipMove Move;
+
+        /// <summary>
+        /// The ship that's making it.
+        /// </summary>
         public int ShipID;
+
+        /// <summary>
+        /// The target position to move to.
+        /// </summary>
+        public Vector3 Position;
+
+        /// <summary>
+        /// The target rotation.
+        /// </summary>
+        public Quaternion Rotation;
     }
 }
