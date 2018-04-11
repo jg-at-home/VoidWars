@@ -429,6 +429,8 @@ namespace VoidWars {
                     _totalMass += auxClass.Mass;
                 }
             }
+
+            updateSystemStatuses();
         }
 
         private void Update() {

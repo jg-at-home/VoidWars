@@ -260,20 +260,6 @@ namespace VoidWars {
         void RpcDisableInfoPanel() {
             controller.DisableInfoPanel();
         }
-
-        /// <summary>
-        /// Enables the control panel.
-        /// </summary>
-        /// <param name="enable">Enable / disable flag.</param>
-        [Command]
-        public void CmdEnableControlPanel(bool enable) {
-            RpcEnableControlPanel(enable);
-        }
-
-        [ClientRpc]
-        void RpcEnableControlPanel(bool enable) {
-            controller.EnableControlPanel(enable);
-        }
         #endregion UI
 
         private void Update() {

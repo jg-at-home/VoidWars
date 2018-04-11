@@ -53,6 +53,7 @@ namespace VoidWars {
         public CameraRigController CameraRig;
         public BoardBorderController BorderController;
         public TitleTextController TitleController;
+        public StatusPanelController StatusPanelController;
         public GameObject MapPinPrefab;
 
         /// <summary>
@@ -97,9 +98,26 @@ namespace VoidWars {
         public void EnableControlPanel(bool enable) {
             ControlPanel.gameObject.SetActive(enable);
         }
+
+        public void EnableStatusPanel(bool enable) {
+            StatusPanelController.gameObject.SetActive(enable);
+        }
         #endregion UI
 
         #region Database
+        /// <summary>
+        /// Gets the currently active ship controller.
+        /// </summary>
+        /// <returns>The active ship controller, or null.</returns>
+        public ShipController GetActiveShip() {
+            if (_activeShipID == -1) {
+                return null;
+            }
+            else {
+                return _ships.Find(s => s.ID == _activeShipID);
+            }
+        }
+
         /// <summary>
         /// Gets the template for a move.
         /// </summary>
@@ -313,6 +331,7 @@ namespace VoidWars {
             InfoPanel.NotifyActiveShipChange(isActive);
             InfoPanel.NotifyContent("EnableDoneButton", isActive);
             EnableControlPanel(isActive);
+            EnableStatusPanel(isActive);
         }
 
         /// <summary>
