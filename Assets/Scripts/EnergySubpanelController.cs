@@ -8,24 +8,8 @@ namespace VoidWars {
         public Image WeaponsImage;
         public Image PropulsionImage;
         public Image TotalEnergyImage;
-        public float SamplePeriod = 1.0f;
-        public float MeterSpeed = 0.7f;
 
-        public override void OnActivation() {
-            _timer = 0f;    
-        }
-
-        private void Awake() {
-            _controller = Util.GetGameController();
-        }
-
-        private void Update() {
-            _timer += Time.deltaTime;
-            if (_timer >= SamplePeriod) {
-                _timer -= SamplePeriod;
-                readValues();
-            }
-
+        protected override void updateInner() {            
             maybeUpdateLevel(ShieldImage, _shieldLevel);
             maybeUpdateLevel(WeaponsImage, _weaponsLevel);
             maybeUpdateLevel(LifeSupportImage, _lifeSupportLevel);
@@ -33,18 +17,8 @@ namespace VoidWars {
             maybeUpdateLevel(TotalEnergyImage, _energyLevel);
         }
 
-        private void maybeUpdateLevel(Image image, float level) {
-            var current = image.fillAmount;
-            if (current < level) {
-                image.fillAmount = Mathf.Min(image.fillAmount + MeterSpeed * Time.deltaTime, level);
-            }
-            else if (current > level) {
-                image.fillAmount = Mathf.Max(image.fillAmount - MeterSpeed * Time.deltaTime, level);
-            }
-        }
-
-        private void readValues() {
-            var shipController = _controller.GetActiveShip();
+        protected override void refresh() {
+            var shipController = controller.GetActiveShip();
             if (shipController != null) {
                 var shieldEnergy = shipController.ShieldEnergy;
                 var weaponsEnergy = shipController.WeaponsEnergy;
@@ -60,8 +34,6 @@ namespace VoidWars {
             }
         }
 
-        private GameController _controller;
-        private float _timer;
         private float _shieldLevel;
         private float _weaponsLevel;
         private float _lifeSupportLevel;

@@ -133,7 +133,7 @@ namespace VoidWars {
         /// Gets the amount of energy available for shields.
         /// </summary>
         public float ShieldEnergy {
-            get { return _shieldLevel; }
+            get { return _shieldEnergy; }
         }
 
         /// <summary>
@@ -182,7 +182,14 @@ namespace VoidWars {
         /// Shields working?
         /// </summary>
         public bool IsShieldsOK {
-            get { return _shieldLevel >= _class.ShieldDrainRate; }
+            get { return _shieldEnergy >= _class.ShieldDrainRate; }
+        }
+
+        /// <summary>
+        /// Gets the percentage efficacy of the shields.
+        /// </summary>
+        public float ShieldPercent {
+            get { return _shieldPercent; }
         }
 
         /// <summary>
@@ -248,9 +255,9 @@ namespace VoidWars {
 
         private void updateSystemStatuses() {
             // Check systems.
-            _shieldLevel = GetEnergyBudgetFor(EnergyConsumer.Shields);
+            _shieldEnergy = GetEnergyBudgetFor(EnergyConsumer.Shields);
             if (_shieldsOK) {
-                if (_shieldLevel < _class.ShieldDrainRate) {
+                if (_shieldEnergy < _class.ShieldDrainRate) {
                     // Shields have failed.
                     Debug.Log("Shields failed.");
                     _shieldsOK = false;
@@ -258,7 +265,7 @@ namespace VoidWars {
                 }
             }
             else {
-                if (_shieldLevel >= _class.ShieldDrainRate) {
+                if (_shieldEnergy >= _class.ShieldDrainRate) {
                     _shieldsOK = true;
                     Debug.Log("Shields online");
                 }
@@ -520,7 +527,7 @@ namespace VoidWars {
         [SyncVar] private bool _cloakActive;
         [SyncVar] private float _lifeSupportLevel;
         [SyncVar] private float _propulsionLevel;
-        [SyncVar] private float _shieldLevel;
+        [SyncVar] private float _shieldEnergy;
         [SyncVar] private float _weaponsLevel;
         [SyncVar] private float _shieldPercent;
         private bool _lifeSupportOK = true;
