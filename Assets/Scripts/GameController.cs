@@ -50,6 +50,7 @@ namespace VoidWars {
         public GameObject ActiveShipIndicator;
         public InfoPanelController InfoPanel;
         public RectTransform ControlPanel;
+        public RectTransform ActionPanel;
         public CameraRigController CameraRig;
         public BoardBorderController BorderController;
         public TitleTextController TitleController;
@@ -68,6 +69,13 @@ namespace VoidWars {
         /// </summary>
         public PlayPhase PlayPhase {
             get { return _playPhase; }
+        }
+
+        /// <summary>
+        /// Is the active ship the local one?
+        /// </summary>
+        public bool IsActiveShipLocal {
+            get { return (_activeShip != null) && (_activeShip.OwnerID == _communicator.ID); }
         }
 
         #region UI
@@ -99,8 +107,27 @@ namespace VoidWars {
             ControlPanel.gameObject.SetActive(enable);
         }
 
+        /// <summary>
+        /// Enables / disables the action selection panel.
+        /// </summary>
+        /// <param name="enable"></param>
+        public void EnableActionPanel(bool enable) {
+            ActionPanel.gameObject.SetActive(enable);
+        }
+
+        /// <summary>
+        /// Enables / disables the ship status panel.
+        /// </summary>
+        /// <param name="enable">Enable flag.</param>
         public void EnableStatusPanel(bool enable) {
             StatusPanelController.gameObject.SetActive(enable);
+        }
+
+        private void refreshInfoPanel(bool isActive) {
+            InfoPanel.NotifyActiveShipChange(isActive);
+            InfoPanel.NotifyContent("EnableDoneButton", isActive);
+            EnableControlPanel(isActive);
+            EnableStatusPanel(isActive);
         }
         #endregion UI
 
@@ -217,6 +244,10 @@ namespace VoidWars {
         }
 
         #region Client Code
+        /// <summary>
+        /// Gets the bounding rectangle of the play area.
+        /// </summary>
+        /// <returns>The bounding rectangle.</returns>
         public Rect GetBoardBounds() {
             return _boardBounds;
         }
@@ -294,26 +325,37 @@ namespace VoidWars {
                 _activeShip = null;
                 _activeShipID = shipID;
                 refreshInfoPanel(false);
+                EnableActionPanel(false);
             }
             else {
-                var shipController = _ships.Find(s => s.ID == shipID);
-                if (shipController.ControlType == ControlType.HUMAN) {
+                _activeShip = _ships.Find(s => s.ID == shipID);
+                _activeShipID = _activeShip.ID;
+                if (_activeShip.ControlType == ControlType.HUMAN) {
                     // Fire up the UI.
                     ActiveShipIndicator.SetActive(true);
-                    var ship = shipController.gameObject;
+                    var ship = _activeShip.gameObject;
                     ActiveShipIndicator.transform.parent = ship.transform;
                     ActiveShipIndicator.transform.localPosition = Vector3.zero;
                     var rotator = ActiveShipIndicator.GetComponent<Rotator>();
-                    var shipClass = GetShipClassByName(shipController.ClassID);
+                    var shipClass = GetShipClassByName(_activeShip.ClassID);
                     var species = SpeciesInfo[(int)shipClass.Species];
                     var color = species.MarkerColor;
                     rotator.SetColor(color);
-                    refreshInfoPanel(true);
+                    updateUI(true);
                 }
 
-                _activeShip = shipController;
                 _activeShip.Activate();
-                _activeShipID = shipController.ID;
+            }
+        }
+
+        private void updateUI(bool infoPanelStatus) {
+            refreshInfoPanel(infoPanelStatus);
+            switch(_playPhase) {
+                case PlayPhase.TAKING_ACTION:
+                    if (IsActiveShipLocal) {
+                        EnableActionPanel(true);
+                    }
+                    break;
             }
         }
 
@@ -325,13 +367,6 @@ namespace VoidWars {
             Debug.Log("GameController.NextShip()");
 
             _communicator.CmdNextShip();
-        }
-
-        private void refreshInfoPanel(bool isActive) {
-            InfoPanel.NotifyActiveShipChange(isActive);
-            InfoPanel.NotifyContent("EnableDoneButton", isActive);
-            EnableControlPanel(isActive);
-            EnableStatusPanel(isActive);
         }
 
         /// <summary>
@@ -347,6 +382,11 @@ namespace VoidWars {
                 // Drop a pin to show where the move will take the ship.
                 var pin = Instantiate(MapPinPrefab, SelectedMove.Position, Quaternion.identity);
                 _mapPins.Add(pin);
+            }
+            else {
+                // If you elect not to move you can do an additional action.
+                Debug.Log("GameController: additional action scheduled");
+                _activeShip.IncreaseActionsThisTurn();
             }
 
             // Tell the server about the move.
@@ -556,6 +596,7 @@ namespace VoidWars {
                 case PlayPhase.MOVING_SHIPS:
                     if (_movesToMake == 0) {
                         SetPlayPhase(PlayPhase.TAKING_ACTION, true);
+                        SetActiveShipByIndex(0, true);
                     }
                     break;
 
@@ -669,7 +710,18 @@ namespace VoidWars {
 
         private void onEnterPhase(PlayPhase newPhase) {
             Debug.LogFormat("GameController.onEnterPhase{0})", newPhase);
-            // TODO
+            
+            switch(newPhase) {
+                case PlayPhase.SELECTING_MOVES:
+                    // Reset the *local* action counter to 1.
+                    foreach(var ship in _ships) {
+                        ship.ResetActionsThisTurn();
+                    }
+                    break;
+
+                case PlayPhase.TAKING_ACTION:
+                    break;
+            }
         }
 
         private void onExitPhase(PlayPhase oldPhase) {
@@ -740,7 +792,6 @@ namespace VoidWars {
         private readonly List<ShipController> _attackOrderShips = new List<ShipController>();
         private readonly List<ShipController> _setupOrderShips = new List<ShipController>();
         private Rect _boardBounds;
-
         private ShipController _activeShip;
 
         private static readonly int[] s_p1StartPositions1 = new[] { 3 };

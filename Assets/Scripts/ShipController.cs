@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 
 namespace VoidWars {
-    public class ShipController : VoidNetworkBehaviour {
+    public partial class ShipController : VoidNetworkBehaviour {
         /// <summary>
         /// Front node where movement indicators attach.
         /// </summary>
@@ -116,6 +116,11 @@ namespace VoidWars {
         }
 
         /// <summary>
+        /// Gets the number of actions the ship can perform this turn.
+        /// </summary>
+        public int ActionsThisTurn { get { return _actionsThisTurn; } }
+
+        /// <summary>
         /// Gets the amount of energy available for life support.
         /// </summary>
         public float LifeSupportEnergy {
@@ -210,6 +215,22 @@ namespace VoidWars {
         /// <returns>The amount of available energy for that thing.</returns>
         public float GetEnergyBudgetFor(EnergyConsumer consumer) {
             return _energy * _energyBudget.Available(consumer);
+        }
+
+        /// <summary>
+        /// Increases the number of actions the ship can make on this turn.
+        /// </summary>
+        public void IncreaseActionsThisTurn() {
+            Debug.Assert(_actionsThisTurn == 1);
+
+            ++_actionsThisTurn;
+        }
+
+        /// <summary>
+        /// Resets the action count for this turn to the default.
+        /// </summary>
+        public void ResetActionsThisTurn() {
+            _actionsThisTurn = 1;
         }
 
         /// <summary>
@@ -432,7 +453,7 @@ namespace VoidWars {
                 if ((EquipmentMask & mask) != 0) {
                     // Auxiliary device is equipped.
                     var auxClass = controller.ItemClasses[i];
-                    _equipment.Add(auxClass);
+                    _equipment.Add(new AuxiliaryItem(auxClass));
                     _totalMass += auxClass.Mass;
                 }
             }
@@ -540,10 +561,12 @@ namespace VoidWars {
         private ShipClass _class;
         private WeaponClass _primaryWeapon;
         private WeaponClass _secondaryWeapon;
-        private readonly List<AuxiliaryClass> _equipment = new List<AuxiliaryClass>();
+        private readonly List<AuxiliaryItem> _equipment = new List<AuxiliaryItem>();
         private int _totalMass;
         private float _powerDrain;
         private EnergyBudget _energyBudget;
         private int _maxMoveSize = 3;
+        private bool _canRepairItems;
+        private int _actionsThisTurn = 1;
     }
 }

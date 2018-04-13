@@ -1,16 +1,17 @@
 ﻿using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 namespace VoidWars {
     public class TitleTextController : MonoBehaviour {
-        private Text _text;
+        private TextMeshProUGUI _text;
         [SerializeField] private float _fadeInTime = 3.0f;
         [SerializeField] private float _holdTime = 5.0f;
         [SerializeField] private float _fadeOutTime = 4.0f;
 
         private void Start() {
-            _text = GetComponent<Text>();
+            _text = GetComponent<TextMeshProUGUI>();
             SetText(string.Empty);
         }
 
