@@ -106,11 +106,19 @@ namespace VoidWars {
                         Description = string.Format("Repair {0}", aux.Class.ItemType),
                         Detail = "Restore function of this device at some cost to your energy",
                         Icon = ImageManager.GetImage("RepairIcon"),
-                        EditorPrefabInfo = string.Format("ImageDetailPanel RepairImage")
+                        EditorPrefabInfo = "ImageDetailPanel RepairImage"
                     });
                 }
             }
 
+            // You can always pass!
+            actions.Add(new ActionItem {
+                Action = "pass",
+                Description = "Do nothing",
+                Detail = "Skip this action",
+                Icon = ImageManager.GetImage("PassIcon"),
+                EditorPrefabInfo = "ImageDetailPanel PassImage"
+            });
             return actions;
         }
     }

@@ -380,6 +380,16 @@ namespace VoidWars {
         }
 
         /// <summary>
+        /// Enable / disable the engine FX.
+        /// </summary>
+        /// <param name="enable">Status flag.</param>
+        public void EnableEngineFX(bool enable) {
+            foreach(var engine in _engineFX) {
+                engine.SetActive(enable);
+            }
+        }
+
+        /// <summary>
         /// Enacts a move for the ship. Called client-side.
         /// </summary>
         /// <param name="move">The move to execute.</param>
@@ -425,6 +435,7 @@ namespace VoidWars {
 
         private void Awake() {
             _controlState = ControlState.UNINITIALIZED;
+            _engineFX = Util.FindChildrenWithTag(gameObject, "Engine");
         }
 
         public override void OnStartClient() {
@@ -573,5 +584,6 @@ namespace VoidWars {
         private int _maxMoveSize = 3;
         private bool _canRepairItems;
         private int _actionsThisTurn = 1;
+        private GameObject[] _engineFX;
     }
 }

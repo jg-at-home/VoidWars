@@ -100,6 +100,25 @@ namespace VoidWars {
         }
 
         /// <summary>
+        /// Makes the info panel visible and sets its content up.
+        /// </summary>
+        /// <param name="caption">The caption for the info panel.</param>
+        /// <param name="prefabName">The name of the content prefab.</param>
+        public void EnableInfoPanel(string caption, string prefabName) {
+            InfoPanel.gameObject.SetActive(true);
+            InfoPanel.SetTitle(caption);
+            InfoPanel.SetContent(prefabName);
+        }
+
+        /// <summary>
+        /// Disables the info panel in the UI.
+        /// </summary>
+        public void DisableInfoPanel() {
+            InfoPanel.ClearContent();
+            InfoPanel.gameObject.SetActive(false);
+        }
+
+        /// <summary>
         /// Enables / disables the control panel.
         /// </summary>
         /// <param name="enable">Enable / disable flag.</param>
@@ -136,6 +155,15 @@ namespace VoidWars {
         #endregion UI
 
         #region Database
+        /// <summary>
+        /// Gets ta ship (controller) by ID.
+        /// </summary>
+        /// <param name="shipID">The ship ID.</param>
+        /// <returns>The ship (controller) with that ID.</returns>
+        public ShipController GetShip(int shipID) {
+            return _ships.Find(s => s.ID == shipID);
+        }
+
         /// <summary>
         /// Gets the currently active ship controller.
         /// </summary>
@@ -276,25 +304,6 @@ namespace VoidWars {
                 var species = SpeciesInfo[(int)shipClass.Species];
                 BorderController.SetColor(species.MarkerColor);
             }
-        }
-
-        /// <summary>
-        /// Makes the info panel visible and sets its content up.
-        /// </summary>
-        /// <param name="caption">The caption for the info panel.</param>
-        /// <param name="prefabName">The name of the content prefab.</param>
-        public void EnableInfoPanel(string caption, string prefabName) {
-            InfoPanel.gameObject.SetActive(true);
-            InfoPanel.SetTitle(caption);
-            InfoPanel.SetContent(prefabName);
-        }
-
-        /// <summary>
-        /// Disables the info panel in the UI.
-        /// </summary>
-        public void DisableInfoPanel() {
-            InfoPanel.ClearContent();
-            InfoPanel.gameObject.SetActive(false);
         }
 
         /// <summary>

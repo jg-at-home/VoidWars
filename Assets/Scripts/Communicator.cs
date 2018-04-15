@@ -221,6 +221,8 @@ namespace VoidWars {
         [ClientRpc]
         void RpcMoveShip(ShipMoveInstance move) {
             controller.MoveShip(move);
+            var shipController = controller.GetShip(move.ShipID);
+            shipController.EnableEngineFX(true);
         }
 
         /// <summary>
@@ -230,6 +232,13 @@ namespace VoidWars {
         [Command]
         public void CmdMoveFinished(int shipID) {
             controller.MoveFinished(shipID);
+            RpcEnableEngineFX(shipID, false);
+        }
+
+        [ClientRpc]
+        void RpcEnableEngineFX(int shipID, bool enable) {
+            var shipController = controller.GetShip(shipID);
+            shipController.EnableEngineFX(enable);
         }
 
         #region UI
