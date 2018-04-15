@@ -27,6 +27,7 @@ namespace VoidWars {
             actions.Add(new ActionItem {
                 Action = "energy",
                 Description = "Reroute system power",
+                Detail = "Change the balance of power in your ships to suit your needs",
                 Icon = ImageManager.GetImage("EnergyIcon"),
                 EditorPrefabInfo = "RerouteEnergyPanel"
             });
@@ -35,6 +36,7 @@ namespace VoidWars {
                 actions.Add(new ActionItem {
                     Action = "recharge",
                     Description = "Recover some power",
+                    Detail = "Regain some additional energy",
                     Icon = ImageManager.GetImage("EnergyIcon"),
                     EditorPrefabInfo = "OKPanel RechargeImage"
                 });
@@ -47,6 +49,7 @@ namespace VoidWars {
                     actions.Add(new ActionItem {
                         Action = "shields false",
                         Description = "Lower shields",
+                        Detail = "Drop your shields if you're feeling safe",
                         Icon = ImageManager.GetImage("ShieldsIcon"),
                         EditorPrefabInfo = "OKPanel ShieldsImage"
                     });
@@ -55,6 +58,7 @@ namespace VoidWars {
                     actions.Add(new ActionItem {
                         Action = "shields true",
                         Description = "Raise shields",
+                        Detail = "Raise shields and protect yourself from unwanted destruction",
                         Icon = ImageManager.GetImage("ShieldsIcon"),
                         EditorPrefabInfo = "OKPanel ShieldsImage"
                     });
@@ -69,6 +73,7 @@ namespace VoidWars {
                             actions.Add(new ActionItem {
                                 Action = string.Format("aux {0} false", aux.Class.ItemType),
                                 Description = string.Format("Disable {0}", aux.Class.Description),
+                                Detail = aux.Class.Detail,
                                 Icon = aux.Class.Icon,
                                 EditorPrefabInfo = string.Format("OKPanel {0}Image", aux.Class.ItemType)
                             });
@@ -77,6 +82,7 @@ namespace VoidWars {
                             actions.Add(new ActionItem {
                                 Action = string.Format("aux {0} true", aux.Class.ItemType),
                                 Description = string.Format("Enable {0}", aux.Class.Description),
+                                Detail = aux.Class.Detail,
                                 Icon = aux.Class.Icon,
                                 EditorPrefabInfo = string.Format("OKPanel {0}Image", aux.Class.ItemType)
                             });
@@ -87,6 +93,7 @@ namespace VoidWars {
                             actions.Add(new ActionItem {
                                 Action = string.Format("aux {0} true", aux.Class.ItemType),
                                 Description = string.Format("Use {0}", aux.Class.Description),
+                                Detail = aux.Class.Detail,
                                 Icon = aux.Class.Icon,
                                 EditorPrefabInfo = string.Format("OKPanel {0}Image", aux.Class.ItemType)
                             });
@@ -97,6 +104,7 @@ namespace VoidWars {
                     actions.Add(new ActionItem {
                         Action = string.Format("repair {0}", aux.Class.ItemType),
                         Description = string.Format("Repair {0}", aux.Class.ItemType),
+                        Detail = "Restore function of this device at some cost to your energy",
                         Icon = ImageManager.GetImage("RepairIcon"),
                         EditorPrefabInfo = string.Format("OKPanel RepairImage")
                     });

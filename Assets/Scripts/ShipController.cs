@@ -121,6 +121,11 @@ namespace VoidWars {
         public int ActionsThisTurn { get { return _actionsThisTurn; } }
 
         /// <summary>
+        /// Gets the ship's energy budget.
+        /// </summary>
+        public EnergyBudget EnergyBudget {  get { return _energyBudget; } }
+
+        /// <summary>
         /// Gets the amount of energy available for life support.
         /// </summary>
         public float LifeSupportEnergy {

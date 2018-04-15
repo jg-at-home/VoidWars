@@ -50,7 +50,7 @@ namespace VoidWars {
         public GameObject ActiveShipIndicator;
         public InfoPanelController InfoPanel;
         public RectTransform ControlPanel;
-        public RectTransform ActionPanel;
+        public ActionPanelController ActionPanel;
         public CameraRigController CameraRig;
         public BoardBorderController BorderController;
         public TitleTextController TitleController;
@@ -330,6 +330,7 @@ namespace VoidWars {
             else {
                 _activeShip = _ships.Find(s => s.ID == shipID);
                 _activeShipID = _activeShip.ID;
+                _actionCount = 1;
                 if (_activeShip.ControlType == ControlType.HUMAN) {
                     // Fire up the UI.
                     ActiveShipIndicator.SetActive(true);
@@ -349,13 +350,36 @@ namespace VoidWars {
         }
 
         private void updateUI(bool infoPanelStatus) {
-            refreshInfoPanel(infoPanelStatus);
             switch(_playPhase) {
                 case PlayPhase.TAKING_ACTION:
                     if (IsActiveShipLocal) {
+                        _communicator.CmdEnableInfoPanel("Act", "ActionInfoPanel");
                         EnableActionPanel(true);
+                        setActionPanelTitle();
                     }
                     break;
+            }
+            refreshInfoPanel(infoPanelStatus);
+        }
+
+        private void setActionPanelTitle() {
+            if (_activeShip.ActionsThisTurn == 1) {
+                ActionPanel.SetTitle("Action");
+            }
+            else {
+                ActionPanel.SetTitle(string.Format("Action #{0}", _actionCount));
+            }
+        }
+
+        /// <summary>
+        /// Call to indicate a ship wants to take its next action. If it's run out of actions,
+        /// move on to the next ship.
+        /// </summary>
+        public void NextAction() {
+            ++_actionCount;
+            if (_actionCount > _activeShip.ActionsThisTurn) {
+                _actionCount = 1;
+                NextShip();
             }
         }
 
@@ -793,6 +817,7 @@ namespace VoidWars {
         private readonly List<ShipController> _setupOrderShips = new List<ShipController>();
         private Rect _boardBounds;
         private ShipController _activeShip;
+        private int _actionCount;
 
         private static readonly int[] s_p1StartPositions1 = new[] { 3 };
         private static readonly int[] s_p1StartPositions2 = new[] { 0, 1 };

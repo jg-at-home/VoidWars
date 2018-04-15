@@ -48,8 +48,11 @@ namespace VoidWars {
         [Tooltip("The icon for the equipment")]
         public Sprite Icon;
 
-        [Tooltip("Description of the item")]
+        [Tooltip("Description of the item (terse)")]
         public string Description;
+
+        [Tooltip("Description of the item (verbose)")]
+        public string Detail;
 
         [Tooltip("The type of the item")]
         public AuxType ItemType;

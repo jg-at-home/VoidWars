@@ -15,8 +15,8 @@ namespace VoidWars {
         }
 
         public void OnPointerClick(PointerEventData eventData) {
-            Debug.LogFormat("ActionItemView: you selected '{0}'" + _item.Action);
-            // TODO: handle click.
+            Debug.LogFormat("ActionItemView: you selected '{0}'", _item.Action);
+            _actionList.OnItemClicked(_item);
         }
 
         private ActionItem _item;

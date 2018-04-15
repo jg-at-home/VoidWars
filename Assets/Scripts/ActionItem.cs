@@ -7,6 +7,7 @@ namespace VoidWars {
         public Sprite Icon;
         public string Action;
         public string Description;
+        public string Detail;
         public string EditorPrefabInfo;
     }
 }
