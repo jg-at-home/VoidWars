@@ -43,7 +43,9 @@ namespace VoidWars {
         /// <param name="enable">If true, enable the button.</param>
         public void EnableDoneButton(bool enable) {
             _doneButton.interactable = enable;
-            _promptPanel.gameObject.SetActive(enable);
+            if (_promptPanel != null) {
+                _promptPanel.gameObject.SetActive(enable);
+            }
         }
 
         private IEnumerator writeText() {

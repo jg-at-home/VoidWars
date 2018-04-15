@@ -6,7 +6,7 @@ namespace VoidWars {
         public TextMeshProUGUI DetailText;
         public Image DetailImage;
 
-        public override void Setup(ActionItem item, string[] args) {
+        public override void Initialize(ActionItem item, string[] args) {
             DetailImage.sprite = ImageManager.GetImage(args[1]);
             DetailText.text = item.Detail;            
         }

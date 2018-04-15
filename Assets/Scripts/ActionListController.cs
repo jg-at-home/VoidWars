@@ -8,27 +8,40 @@ namespace VoidWars {
         public ObjectPool ButtonPool;
         public RectTransform DetailPanel;
 
+        public void SelectCurrentAction() {
+            Debug.Log("ActionListController.SelectCurrentAction()");
+            Debug.Assert(_current != null);
+
+            _current.SelectAction();
+        }
+
         public void OnItemClicked(ActionItem item) {
+            if (_currentItem == item) {
+                return;
+            }
+
             var prefabInfoParts = item.EditorPrefabInfo.Split(' ');
             var prefabName = prefabInfoParts[0];
-            var prefabPath = Path.Combine("/Prefabs/UI", prefabName);
-            var panel = (ActionDetailPanelController)Resources.Load(prefabPath);
+            var prefabPath = "Prefabs/UI/" + prefabName;
+            var panelPrefab = (GameObject)Resources.Load(prefabPath);
+            var panel = Instantiate(panelPrefab);
             if (_current != null) {
                 _current.transform.SetParent(null, false);
                 // TODO: cache?
-                Destroy(_current);
+                Destroy(_current.gameObject);
             }
 
-            _current = panel;
-            _current.transform.SetParent(DetailPanel, false);
-            _current.Setup(item, prefabInfoParts);
+            panel.transform.SetParent(DetailPanel, false);
+            _current = panel.GetComponent<ActionDetailPanelController>();
+            _current.Initialize(item, prefabInfoParts);
+            _currentItem = item;
         }
 
         private void OnEnable() {
-            //var gameController = Util.GetGameController();
-            //var activeShip = gameController.GetActiveShip();
-            //_items = activeShip.GetAvailableActions();
-            //refresh();
+            var gameController = Util.GetGameController();
+            var activeShip = gameController.GetActiveShip();
+            _items = activeShip.GetAvailableActions();
+            refresh();
         }
 
         private void Start() {
@@ -61,5 +74,6 @@ namespace VoidWars {
 
         private List<ActionItem> _items;
         private ActionDetailPanelController _current;
+        private ActionItem _currentItem;
     }
 }

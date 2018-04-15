@@ -27,7 +27,7 @@ namespace VoidWars {
             actions.Add(new ActionItem {
                 Action = "energy",
                 Description = "Reroute system power",
-                Detail = "Change the balance of power in your ships to suit your needs",
+                Detail = "Change the balance of power in your ship to suit your needs",
                 Icon = ImageManager.GetImage("EnergyIcon"),
                 EditorPrefabInfo = "RerouteEnergyPanel"
             });
@@ -38,7 +38,7 @@ namespace VoidWars {
                     Description = "Recover some power",
                     Detail = "Regain some additional energy",
                     Icon = ImageManager.GetImage("EnergyIcon"),
-                    EditorPrefabInfo = "OKPanel RechargeImage"
+                    EditorPrefabInfo = "ImageDetailPanel RechargeImage"
                 });
             }
 
@@ -51,7 +51,7 @@ namespace VoidWars {
                         Description = "Lower shields",
                         Detail = "Drop your shields if you're feeling safe",
                         Icon = ImageManager.GetImage("ShieldsIcon"),
-                        EditorPrefabInfo = "OKPanel ShieldsImage"
+                        EditorPrefabInfo = "ImageDetailPanel ShieldsImage"
                     });
                 }
                 else if (ShieldEnergy >= _class.ShieldDrainRate) {
@@ -60,7 +60,7 @@ namespace VoidWars {
                         Description = "Raise shields",
                         Detail = "Raise shields and protect yourself from unwanted destruction",
                         Icon = ImageManager.GetImage("ShieldsIcon"),
-                        EditorPrefabInfo = "OKPanel ShieldsImage"
+                        EditorPrefabInfo = "ImageDetailPanel ShieldsImage"
                     });
                 }
             }
@@ -75,7 +75,7 @@ namespace VoidWars {
                                 Description = string.Format("Disable {0}", aux.Class.Description),
                                 Detail = aux.Class.Detail,
                                 Icon = aux.Class.Icon,
-                                EditorPrefabInfo = string.Format("OKPanel {0}Image", aux.Class.ItemType)
+                                EditorPrefabInfo = string.Format("ImageDetailPanel {0}Image", aux.Class.ItemType)
                             });
                         }
                         else if (_energy >= aux.Class.PowerUsage) {
@@ -84,7 +84,7 @@ namespace VoidWars {
                                 Description = string.Format("Enable {0}", aux.Class.Description),
                                 Detail = aux.Class.Detail,
                                 Icon = aux.Class.Icon,
-                                EditorPrefabInfo = string.Format("OKPanel {0}Image", aux.Class.ItemType)
+                                EditorPrefabInfo = string.Format("ImageDetailPanel {0}Image", aux.Class.ItemType)
                             });
                         }
                     }
@@ -95,7 +95,7 @@ namespace VoidWars {
                                 Description = string.Format("Use {0}", aux.Class.Description),
                                 Detail = aux.Class.Detail,
                                 Icon = aux.Class.Icon,
-                                EditorPrefabInfo = string.Format("OKPanel {0}Image", aux.Class.ItemType)
+                                EditorPrefabInfo = string.Format("ImageDetailPanel {0}Image", aux.Class.ItemType)
                             });
                         }
                     }
@@ -106,7 +106,7 @@ namespace VoidWars {
                         Description = string.Format("Repair {0}", aux.Class.ItemType),
                         Detail = "Restore function of this device at some cost to your energy",
                         Icon = ImageManager.GetImage("RepairIcon"),
-                        EditorPrefabInfo = string.Format("OKPanel RepairImage")
+                        EditorPrefabInfo = string.Format("ImageDetailPanel RepairImage")
                     });
                 }
             }

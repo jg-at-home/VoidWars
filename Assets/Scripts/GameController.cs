@@ -123,9 +123,13 @@ namespace VoidWars {
             StatusPanelController.gameObject.SetActive(enable);
         }
 
+        public void EnableDoneButton(bool enable) {
+            InfoPanel.NotifyContent("EnableDoneButton", enable);
+        }
+
         private void refreshInfoPanel(bool isActive) {
             InfoPanel.NotifyActiveShipChange(isActive);
-            InfoPanel.NotifyContent("EnableDoneButton", isActive);
+            EnableDoneButton(isActive);
             EnableControlPanel(isActive);
             EnableStatusPanel(isActive);
         }
@@ -353,9 +357,13 @@ namespace VoidWars {
             switch(_playPhase) {
                 case PlayPhase.TAKING_ACTION:
                     if (IsActiveShipLocal) {
-                        _communicator.CmdEnableInfoPanel("Act", "ActionInfoPanel");
+                        InfoPanel.NotifyActiveShipChange(true);
                         EnableActionPanel(true);
                         setActionPanelTitle();
+                    }
+                    else {
+                        InfoPanel.NotifyActiveShipChange(false);
+                        EnableActionPanel(false);
                     }
                     break;
             }
@@ -367,6 +375,7 @@ namespace VoidWars {
                 ActionPanel.SetTitle("Action");
             }
             else {
+                // TODO: show as n/m
                 ActionPanel.SetTitle(string.Format("Action #{0}", _actionCount));
             }
         }
@@ -620,6 +629,7 @@ namespace VoidWars {
                 case PlayPhase.MOVING_SHIPS:
                     if (_movesToMake == 0) {
                         SetPlayPhase(PlayPhase.TAKING_ACTION, true);
+                        _communicator.CmdEnableInfoPanel("Act", "ActionInfoPanel");
                         SetActiveShipByIndex(0, true);
                     }
                     break;

@@ -1,8 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-namespace VoidWars {
+﻿namespace VoidWars {
     public class ActionInfoPanelController : ContentPanelController {
         public void OnActiveShipChanged(bool active) {
             string text;
@@ -22,9 +18,9 @@ namespace VoidWars {
         /// Called when the Done button is clicked.
         /// </summary>
         public override void OnDoneButtonClicked() {
-            // TODO
-            //var gameController = Util.GetGameController();
-            //gameController.NextAction();
+            var gameController = Util.GetGameController();
+            gameController.ActionPanel.SelectCurrentAction();
+            gameController.NextAction();
         }
 
     }
