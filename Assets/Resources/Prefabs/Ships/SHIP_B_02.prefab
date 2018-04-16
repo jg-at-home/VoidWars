@@ -30,6 +30,7 @@ GameObject:
   - component: {fileID: 114510644557821940}
   - component: {fileID: 65361635624905066}
   - component: {fileID: 54155967644940918}
+  - component: {fileID: 114322268687627694}
   m_Layer: 8
   m_Name: SHIP_B_02
   m_TagString: Untagged
@@ -346,6 +347,21 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 2.2, y: 1, z: 1.5}
   m_Center: {x: 0, y: 0, z: 0.1}
+--- !u!114 &114322268687627694
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 100002}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8a9dbc5c7c577e0498a6b5c8fc433605, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  effect: {fileID: 2100000, guid: d63ce50eafcabfe40a10047373449e80, type: 2}
+  effectMode: 0
+  effectActivation: 1
+  hideObject: 0
 --- !u!114 &114396126105988272
 MonoBehaviour:
   m_ObjectHideFlags: 1

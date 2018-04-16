@@ -17,8 +17,7 @@ namespace VoidWars {
 
         public override void SelectAction() {
             var gameController = Util.GetGameController();
-            var shipController = gameController.GetActiveShip();
-            shipController.ExecuteCommand(Item.Action);
+            gameController.ExecuteCommand(Item.Action);
         }
     }
 }

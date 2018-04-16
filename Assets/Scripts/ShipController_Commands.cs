@@ -7,22 +7,6 @@ namespace VoidWars {
     /// </summary>
     public partial class ShipController {
         /// <summary>
-        /// Executes the command string provided.
-        /// </summary>
-        /// <param name="command">The command to execute.</param>
-        public void ExecuteCommand(string command) {
-            Debug.LogFormat("ShipController.ExecuteCommand{0})", command);
-
-            switch(command) {
-                case "pass":
-                    // Nothing to do, carry on.
-                    break;
-
-                // TODO: everything else
-            }
-        }
-
-        /// <summary>
         /// Gets a list of all the actions the ship can perform.
         /// </summary>
         /// <returns>The list of actions.</returns>

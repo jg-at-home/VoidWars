@@ -239,6 +239,28 @@ namespace VoidWars {
         }
 
         /// <summary>
+        /// Called server-side to change the shield status.
+        /// </summary>
+        /// <param name="enable">Enable / disable the shields.</param>
+        public void EnableShields(bool enable) {
+            Debug.LogFormat("ShipController.EnableShields({0})", enable);
+
+            _shieldsActive = enable;
+        }
+
+        private void onShieldStatusChanged(bool status) {
+            Debug.LogFormat("ShipController.onShieldStatusChanged({0})", status);
+
+            var shields = gameObject.GetComponent<ForceField3Y3>();
+            if (status) {
+                shields.SetEffectOn();
+            }
+            else {
+                shields.SetEffectOff();
+            }
+        }
+
+        /// <summary>
         /// Make this ship the active one.
         /// </summary>
         public void Activate() {
@@ -560,7 +582,7 @@ namespace VoidWars {
         [SyncVar] private ControlState _controlState;
         [SyncVar] private float _energy;
         [SyncVar] private float _maxEnergy;
-        [SyncVar] private bool _shieldsActive;
+        [SyncVar(hook="onShieldStatusChanged")] private bool _shieldsActive;
         [SyncVar] private bool _cloakActive;
         [SyncVar] private float _lifeSupportLevel;
         [SyncVar] private float _propulsionLevel;

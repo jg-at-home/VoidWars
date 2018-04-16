@@ -71,6 +71,7 @@ GameObject:
   - component: {fileID: 114253784898554232}
   - component: {fileID: 65192486084617432}
   - component: {fileID: 54256841574414810}
+  - component: {fileID: 114898360433965638}
   m_Layer: 8
   m_Name: SHIP_C_01
   m_TagString: Untagged
@@ -457,6 +458,21 @@ MonoBehaviour:
     i15: 56
   m_ServerOnly: 0
   m_LocalPlayerAuthority: 1
+--- !u!114 &114898360433965638
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1187893023313884}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8a9dbc5c7c577e0498a6b5c8fc433605, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  effect: {fileID: 2100000, guid: e540cd0306c85054999e645d6e912e8c, type: 2}
+  effectMode: 0
+  effectActivation: 1
+  hideObject: 0
 --- !u!114 &114927774034527132
 MonoBehaviour:
   m_ObjectHideFlags: 1

@@ -241,6 +241,17 @@ namespace VoidWars {
             shipController.EnableEngineFX(enable);
         }
 
+        /// <summary>
+        /// Sets the status of a ship's shields.
+        /// </summary>
+        /// <param name="shipID">The ship to modify.</param>
+        /// <param name="enable">Enable / disable.</param>
+        [Command]
+        public void CmdSetShieldStatus(int shipID, bool enable) {
+            var shipController = controller.GetShip(shipID);
+            shipController.EnableShields(enable);
+        }
+
         #region UI
         /// <summary>
         /// Tells clients to enable their info panels.
