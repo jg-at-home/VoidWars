@@ -583,7 +583,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8a9dbc5c7c577e0498a6b5c8fc433605, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  effect: {fileID: 2100000, guid: e540cd0306c85054999e645d6e912e8c, type: 2}
+  effect: {fileID: 2100000, guid: af90d7a6716d4384496503e08d056ec3, type: 2}
   effectMode: 0
   effectActivation: 1
   hideObject: 0

@@ -253,6 +253,16 @@ namespace VoidWars {
         }
 
         #region UI
+        [Command]
+        public void CmdDisableActionPanel() {
+            RpcDisableActionPanel();
+        }
+
+        [ClientRpc]
+        void RpcDisableActionPanel() {
+            controller.EnableActionPanel(false);
+        }
+
         /// <summary>
         /// Tells clients to enable their info panels.
         /// </summary>

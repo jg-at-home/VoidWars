@@ -553,6 +553,8 @@ namespace VoidWars {
                     break;
 
                 case PlayPhase.TAKING_ACTION:
+                    // Ensure all action panels are closed.
+                    _communicator.CmdDisableActionPanel();
                     SetPlayPhase(PlayPhase.ATTACKING, true);
                     break;
 

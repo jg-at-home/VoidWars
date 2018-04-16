@@ -245,7 +245,15 @@ namespace VoidWars {
         public void EnableShields(bool enable) {
             Debug.LogFormat("ShipController.EnableShields({0})", enable);
 
-            _shieldsActive = enable;
+            if (_shieldsActive != enable) {
+                _shieldsActive = enable;
+                if (enable) {
+                    _powerDrain += _class.ShieldDrainRate;
+                }
+                else {
+                    _powerDrain -= _class.ShieldDrainRate;
+                }
+            }            
         }
 
         private void onShieldStatusChanged(bool status) {

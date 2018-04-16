@@ -25,6 +25,11 @@ namespace VoidWars {
     /// </summary>
     public struct ShipMove {
         /// <summary>
+        /// GeneraL scale for movement cost.
+        /// </summary>
+        private const float CostScale = 2f;
+
+        /// <summary>
         /// What we're going to do.
         /// </summary>
         public MoveType MoveType;
@@ -47,18 +52,18 @@ namespace VoidWars {
                 switch (MoveType) {
                     case MoveType.Forward:
                     case MoveType.Reverse:
-                        return Size;
+                        return Size * CostScale;
 
                     case MoveType.GentleTurnLeft:
                     case MoveType.GentleTurnRight:
-                        return Size * Mathf.PI / 4f;
+                        return Size * (CostScale * Mathf.PI / 4f);
 
                     case MoveType.SharpTurnLeft:
                     case MoveType.SharpTurnRight:
-                        return Size * Mathf.PI / 2f;
+                        return Size * (CostScale * Mathf.PI / 2f);
 
                     case MoveType.TurnAbout:
-                        return Size * 3f;
+                        return Size * (3f * CostScale);
 
                     default:
                         Debug.Assert(false, "Huh?");
