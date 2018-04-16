@@ -1,13 +1,28 @@
 ﻿using System.Collections.Generic;
-using System.IO;
 using UnityEngine;
 
 namespace VoidWars {
+    /// <summary>
+    /// Script controlling the list of actions.
+    /// </summary>
     public class ActionListController : MonoBehaviour {
-        public RectTransform ContentPanel;
-        public ObjectPool ButtonPool;
-        public RectTransform DetailPanel;
+        [SerializeField] private RectTransform _contentPanel;
+        [SerializeField] private ObjectPool _buttonPool;
+        [SerializeField] private RectTransform _detailPanel;
 
+        /// <summary>
+        /// Rebuilds the list of actions.
+        /// </summary>
+        public void Refresh() {
+            var gameController = Util.GetGameController();
+            var activeShip = gameController.GetActiveShip();
+            _items = activeShip.GetAvailableActions();
+            refreshButtons();
+        }
+
+        /// <summary>
+        /// Selects the current action for execution.
+        /// </summary>
         public void SelectCurrentAction() {
             Debug.Log("ActionListController.SelectCurrentAction()");
             Debug.Assert(_current != null);
@@ -15,6 +30,10 @@ namespace VoidWars {
             _current.SelectAction();
         }
 
+        /// <summary>
+        /// Handler for click event.
+        /// </summary>
+        /// <param name="item">The selected item.</param>
         public void OnItemClicked(ActionItem item) {
             if (_currentItem == item) {
                 return;
@@ -31,26 +50,17 @@ namespace VoidWars {
                 Destroy(_current.gameObject);
             }
 
-            panel.transform.SetParent(DetailPanel, false);
+            panel.transform.SetParent(_detailPanel, false);
             _current = panel.GetComponent<ActionDetailPanelController>();
             _current.Initialize(item, prefabInfoParts);
             _currentItem = item;
         }
 
         private void OnEnable() {
-            var gameController = Util.GetGameController();
-            var activeShip = gameController.GetActiveShip();
-            _items = activeShip.GetAvailableActions();
-            refresh();
+            Refresh();
         }
 
-        private void Start() {
-        }
-
-        private void Update() {
-        }
-
-        private void refresh() {
+        private void refreshButtons() {
             removeButtons();
             addButtons();
         }
@@ -58,17 +68,17 @@ namespace VoidWars {
         private void addButtons() {
             for(var i = 0; i < _items.Count; ++i) {
                 var action = _items[i];
-                var control = ButtonPool.GetObject();
-                control.transform.SetParent(ContentPanel, false);
+                var control = _buttonPool.GetObject();
+                control.transform.SetParent(_contentPanel, false);
                 var actionControl = control.GetComponent<ActionItemView>();
                 actionControl.Setup(action, this);
             }
         }
 
         private void removeButtons() {
-            while(ContentPanel.childCount > 0) {
-                var item = ContentPanel.transform.GetChild(0).gameObject;
-                ButtonPool.ReturnObject(item);
+            while(_contentPanel.childCount > 0) {
+                var item = _contentPanel.transform.GetChild(0).gameObject;
+                _buttonPool.ReturnObject(item);
             }
         }
 

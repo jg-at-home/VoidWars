@@ -13,7 +13,13 @@ namespace VoidWars {
         public void ExecuteCommand(string command) {
             Debug.LogFormat("ShipController.ExecuteCommand{0})", command);
 
-            // TODO
+            switch(command) {
+                case "pass":
+                    // Nothing to do, carry on.
+                    break;
+
+                // TODO: everything else
+            }
         }
 
         /// <summary>

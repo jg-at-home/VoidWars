@@ -3,6 +3,9 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace VoidWars {
+    /// <summary>
+    /// UI viee of an ActionItem.
+    /// </summary>
     public class ActionItemView : PooledObject, IPointerClickHandler {
         public Image Icon;
         public Text ItemText;

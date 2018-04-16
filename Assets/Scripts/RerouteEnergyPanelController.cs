@@ -8,12 +8,7 @@ namespace VoidWars {
         public TextMeshProUGUI[] Percentages;
         public TextMeshProUGUI DescriptionText;
 
-        /// <summary>
-        /// Initializes the panel controls.
-        /// </summary>
-        /// <param name="item">The item the panel relates to.</param>
-        /// <param name="args">List of arguments to the panel.</param>
-        public override void Initialize(ActionItem item, string[] args) {
+        protected override void initializeInner(ActionItem item, string[] args) {
             var gameController = Util.GetGameController();
             var shipController = gameController.GetActiveShip();
             _budget = shipController.EnergyBudget;
@@ -25,7 +20,7 @@ namespace VoidWars {
             DescriptionText.text = item.Detail;
 
             // Don't allow user to select OK until they change something.
-            gameController.InfoPanel.NotifyContent("EnableDone", false);
+            gameController.InfoPanel.NotifyContent("EnableDoneButton", false);
         }
 
         public override void SelectAction() {
@@ -63,7 +58,7 @@ namespace VoidWars {
                 refresh();
                 // Allow selection of OK.
                 var gameController = Util.GetGameController();
-                gameController.InfoPanel.NotifyContent("EnableDone", true);
+                gameController.InfoPanel.NotifyContent("EnableDoneButton", true);
             }
         }
 

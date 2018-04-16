@@ -394,10 +394,15 @@ namespace VoidWars {
         /// move on to the next ship.
         /// </summary>
         public void NextAction() {
+            Debug.Log("GameController.NextAction()");
+
             ++_actionCount;
             if (_actionCount > _activeShip.ActionsThisTurn) {
                 _actionCount = 1;
                 NextShip();
+            }
+            else {
+                ActionPanel.Refresh();
             }
         }
 

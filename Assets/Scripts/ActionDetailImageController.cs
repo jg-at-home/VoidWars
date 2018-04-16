@@ -6,13 +6,19 @@ namespace VoidWars {
         public TextMeshProUGUI DetailText;
         public Image DetailImage;
 
-        public override void Initialize(ActionItem item, string[] args) {
+        protected override void initializeInner(ActionItem item, string[] args) {
             DetailImage.sprite = ImageManager.GetImage(args[1]);
-            DetailText.text = item.Detail;            
+            DetailText.text = item.Detail;
+
+            // Allow OK for these panels.
+            var gameController = Util.GetGameController();
+            gameController.InfoPanel.NotifyContent("EnableDoneButton", true);
         }
 
         public override void SelectAction() {
-            // TODO
+            var gameController = Util.GetGameController();
+            var shipController = gameController.GetActiveShip();
+            shipController.ExecuteCommand(Item.Action);
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿//#define RESCALE_LEVELS
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace VoidWars {
@@ -24,8 +25,12 @@ namespace VoidWars {
                 var weaponsEnergy = shipController.WeaponsEnergy;
                 var lifeSupportEnergy = shipController.LifeSupportEnergy;
                 var propulsionEnergy = shipController.PropulsionEnergy;
+#if RESCALE_LEVELS
                 var maxEnergy = Mathf.Max(shieldEnergy, weaponsEnergy, lifeSupportEnergy, propulsionEnergy);
                 var energyScale = maxEnergy > 0f ? 1.0f / maxEnergy : 0f;
+#else
+                var energyScale = 1f;
+#endif
                 _shieldLevel = shieldEnergy * energyScale;
                 _weaponsLevel = weaponsEnergy * energyScale;
                 _lifeSupportLevel = lifeSupportEnergy * energyScale;
