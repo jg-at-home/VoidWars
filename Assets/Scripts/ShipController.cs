@@ -256,6 +256,13 @@ namespace VoidWars {
             }            
         }
 
+        /// <summary>
+        /// Are the shields active?
+        /// </summary>
+        public bool ShieldsActive {
+            get { return _shieldsActive; }
+        }
+
         private void onShieldStatusChanged(bool status) {
             Debug.LogFormat("ShipController.onShieldStatusChanged({0})", status);
 

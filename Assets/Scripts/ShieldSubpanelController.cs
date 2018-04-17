@@ -10,8 +10,13 @@ namespace VoidWars {
         protected override void refresh() {
             var activeShip = controller.GetActiveShip();
             _shieldPower = activeShip.ShieldEnergy / activeShip.MaxEnergy;
-            _shieldLevel = activeShip.ShieldPercent;
-            ShieldLevelText.text = string.Format("{0}%", (int)Mathf.Clamp(_shieldLevel, 0f, 100f));
+            if (activeShip.ShieldsActive) {
+                _shieldLevel = activeShip.ShieldPercent;
+                ShieldLevelText.text = string.Format("{0}%", (int)Mathf.Clamp(_shieldLevel, 0f, 100f));
+            }
+            else {
+                ShieldLevelText.text = "OFF";
+            }
         }
 
         protected override void updateInner() {
