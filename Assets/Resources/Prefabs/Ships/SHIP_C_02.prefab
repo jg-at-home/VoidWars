@@ -42,7 +42,7 @@ GameObject:
   - component: {fileID: 114386373542203706}
   m_Layer: 8
   m_Name: SHIP_C_02
-  m_TagString: Untagged
+  m_TagString: Targetable
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

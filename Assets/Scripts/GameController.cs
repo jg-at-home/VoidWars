@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -56,6 +55,7 @@ namespace VoidWars {
         public TitleTextController TitleController;
         public StatusPanelController StatusPanelController;
         public GameObject MapPinPrefab;
+        public GameObject TargetIndicatorPrefab;
 
         /// <summary>
         /// Gets the current game state.
@@ -262,7 +262,7 @@ namespace VoidWars {
         /// <param name="type">The weapon type.</param>
         /// <returns>The weapon class.</returns>
         public WeaponClass GetWeaponClass(WeaponType type) {
-            return WeaponClasses[(int)type];
+            return WeaponClasses[(int)type-1];
         }
         #endregion Database
 
@@ -276,6 +276,55 @@ namespace VoidWars {
         }
 
         #region Client Code
+        /// <summary>
+        /// Sets the active weapon on the active ship.
+        /// </summary>
+        /// <param name="index">0=primary, 1 = secondary.</param>
+        public void SetActiveWeapon(int index) {
+            _activeWeapon = index;
+            computeAttackTargets();
+        }
+
+        /// <summary>
+        /// Gets the number of attack targets.
+        /// </summary>
+        public int AttackTargetCount {
+            get { return _attackTargets.Count; }
+        }
+
+        private void computeAttackTargets() {
+            clearAttackTargets();
+
+            // Find max range of the weapons.
+            var shipController = GetActiveShip();
+            var weapon = _activeWeapon == 0 ? shipController.PrimaryWeaponType : shipController.SecondaryWeaponType;
+            var weaponClass = GetWeaponClass(weapon);
+            var range = weaponClass.Range;
+            var position = shipController.gameObject.transform.position;
+            var layer = LayerMask.NameToLayer("ActiveObjects");
+            //var objectsInRange = Physics.OverlapSphere(position, range, layer);
+            var objectsInRange = Physics.OverlapSphere(position, range);
+            foreach (var target in objectsInRange) {
+                if ((target.gameObject != shipController.gameObject) &&
+                    (target.gameObject.CompareTag("Targetable"))) {
+                    var indicatorGO = Instantiate(TargetIndicatorPrefab);
+                    var indicator = indicatorGO.GetComponent<TargetIndicatorController>();
+                    indicator.Initialize(shipController.gameObject, target.gameObject);
+                    _attackTargets.Add(indicator);
+                }
+            }
+
+            InfoPanel.NotifyTargetsChanged();
+        }
+
+        private void clearAttackTargets() {
+            // TODO: object pool?
+            foreach(var target in _attackTargets) {
+                Destroy(target.gameObject);
+            }
+            _attackTargets.Clear();
+        }
+
         /// <summary>
         /// Gets the bounding rectangle of the play area.
         /// </summary>
@@ -375,6 +424,15 @@ namespace VoidWars {
                         EnableActionPanel(false);
                     }
                     break;
+
+                case PlayPhase.ATTACKING:
+                    if (IsActiveShipLocal) {
+
+                    }
+                    else {
+
+                    }
+                    break;
             }
             refreshInfoPanel(infoPanelStatus);
         }
@@ -384,8 +442,7 @@ namespace VoidWars {
                 ActionPanel.SetTitle("Action");
             }
             else {
-                // TODO: show as n/m
-                ActionPanel.SetTitle(string.Format("Action #{0}", _actionCount));
+                ActionPanel.SetTitle(string.Format("Action {0}/{1}", _actionCount, _activeShip.ActionsThisTurn));
             }
         }
 
@@ -526,7 +583,7 @@ namespace VoidWars {
                     // Setup is done. Time to play!
                     _round = 0;
                     SetState(GameState.IN_PLAY, true);
-                    _communicator.CmdEnableInfoPanel("Move", "MovePanel");
+                    _communicator.CmdEnableInfoPanel("Move", "MoveInfoPanel");
                     SetActiveShipByIndex(0, true);
                     break;
 
@@ -555,6 +612,7 @@ namespace VoidWars {
                 case PlayPhase.TAKING_ACTION:
                     // Ensure all action panels are closed.
                     _communicator.CmdDisableActionPanel();
+                    _communicator.CmdEnableInfoPanel("Attacking", "AttackInfoPanel");
                     SetPlayPhase(PlayPhase.ATTACKING, true);
                     break;
 
@@ -621,7 +679,7 @@ namespace VoidWars {
                 case GameState.WAIT_FOR_SPAWN:
                     if (_ships.Count == Configuration.NumberOfShips) {
                         // Enable the info panel UI.
-                        _communicator.CmdEnableInfoPanel("Setup", "SetupPanel");
+                        _communicator.CmdEnableInfoPanel("Setup", "SetupInfoPanel");
 
                         // All the ships have spawned. Do some book-keeping, and move on to setup.
                         // TODO: simultaneous setup. For now, it's one player, one ship at a time.
@@ -672,7 +730,8 @@ namespace VoidWars {
 
         private List<ShipController> getTurnOrder() {
             if ((_state == GameState.IN_PLAY) && (_playPhase == PlayPhase.ATTACKING)) {
-                return _attackOrderShips;
+                return _setupOrderShips;
+//                return _attackOrderShips;
             }
             else if (_state == GameState.SETUP) {
                 return _setupOrderShips;
@@ -771,6 +830,10 @@ namespace VoidWars {
 
                 case PlayPhase.TAKING_ACTION:
                     break;
+
+                case PlayPhase.ATTACKING:
+                    _activeWeapon = 0;
+                    break;
             }
         }
 
@@ -784,6 +847,10 @@ namespace VoidWars {
                         Destroy(pin);
                     }
                     _mapPins.Clear();
+                    break;
+
+                case PlayPhase.ATTACKING:
+                    clearAttackTargets();
                     break;
             }
         }
@@ -841,9 +908,11 @@ namespace VoidWars {
         private readonly List<ShipController> _moveOrderShips = new List<ShipController>();
         private readonly List<ShipController> _attackOrderShips = new List<ShipController>();
         private readonly List<ShipController> _setupOrderShips = new List<ShipController>();
+        private readonly List<TargetIndicatorController> _attackTargets = new List<TargetIndicatorController>();
         private Rect _boardBounds;
         private ShipController _activeShip;
         private int _actionCount;
+        private int _activeWeapon;
 
         private static readonly int[] s_p1StartPositions1 = new[] { 3 };
         private static readonly int[] s_p1StartPositions2 = new[] { 0, 1 };

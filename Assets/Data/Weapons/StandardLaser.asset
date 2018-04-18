@@ -19,6 +19,6 @@ MonoBehaviour:
   PowerUsage: 10
   Mass: 5
   Cost: 3
-  Range: 1
+  Range: 50
   PrimaryAngle: 45
   SecondaryAngle: 30

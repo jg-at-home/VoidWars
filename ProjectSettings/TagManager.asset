@@ -6,6 +6,7 @@ TagManager:
   tags:
   - ActiveShipIndicator
   - Engine
+  - Targetable
   layers:
   - Default
   - TransparentFX

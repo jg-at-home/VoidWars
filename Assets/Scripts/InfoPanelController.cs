@@ -43,6 +43,13 @@ namespace VoidWars {
             notifyInner("OnActiveShipChanged", active, SendMessageOptions.DontRequireReceiver);
         }
 
+        /// <summary>
+        /// Called when there's been a a targetting change. 
+        /// </summary>
+        public void NotifyTargetsChanged() {
+            notifyInner("OnTargetsRecomputed", null, SendMessageOptions.DontRequireReceiver);
+        }
+
         private void notifyInner(string notification, object value, SendMessageOptions smo) {
             StartCoroutine(notifyCoro(notification, value, smo));
         }
