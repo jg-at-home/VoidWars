@@ -58,7 +58,7 @@ namespace VoidWars {
                     _current = ship.AddComponent<HumanMoveShipManipulator>();
                     break;
 
-                case PlayPhase.ATTACKING:
+                case PlayPhase.SELECTING_ATTACK:
                     _current = ship.AddComponent<HumanAttackManipulator>();
                     break;
             }

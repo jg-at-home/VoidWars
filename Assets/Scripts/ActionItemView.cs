@@ -6,7 +6,7 @@ namespace VoidWars {
     /// <summary>
     /// UI viee of an ActionItem.
     /// </summary>
-    public class ActionItemView : PooledObject, IPointerClickHandler {
+    public class ActionItemView : MonoBehaviour, IPointerClickHandler {
         public Image Icon;
         public Text ItemText;
 

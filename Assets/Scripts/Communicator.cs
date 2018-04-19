@@ -55,6 +55,22 @@ namespace VoidWars {
         }
 
         /// <summary>
+        /// Performs an attack.
+        /// </summary>
+        /// <param name="sourceID">The ID of the attacking ship.</param>
+        /// <param name="targetID">The ID of the target ship.</param>
+        /// <param name="weaponSlot">0=front, 1=rear</param>
+        [Command]
+        public void CmdPerformAttack(int sourceID, int targetID, int weaponSlot) {
+            RpcPerformAttack(sourceID, targetID, weaponSlot);
+        }
+
+        [ClientRpc]
+        void RpcPerformAttack(int sourceID, int targetID, int weaponSlot) {
+            controller.PerformAttack(sourceID, targetID, weaponSlot);
+        }
+
+        /// <summary>
         /// Advances the game at the end of a phase or state.
         /// </summary>
         [Command]

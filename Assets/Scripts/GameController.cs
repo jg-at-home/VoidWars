@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -25,7 +26,7 @@ namespace VoidWars {
         SELECTING_MOVES,
         MOVING_SHIPS,
         TAKING_ACTION,
-        ATTACKING,
+        SELECTING_ATTACK,
         // TODO: other stuff.
     }
 
@@ -277,12 +278,86 @@ namespace VoidWars {
 
         #region Client Code
         /// <summary>
+        /// Ses the selected target for something.
+        /// </summary>
+        public void SelectTarget(GameObject target) {
+            // If the ship is one of "ours", bail.
+            var targetShip = target.GetComponent<ShipController>();
+            if ((targetShip == null) || (targetShip.OwnerID == _communicator.ID)) {
+                return;
+            }
+
+            // It's an enemy. Change phase to ATTACKING.
+            _target = target;
+            performAttack();
+        }
+
+        public void PerformAttack(int sourceID, int targetID, int weaponSlot) {
+            EnableDoneButton(false);
+            StartCoroutine(attackCoroutine(sourceID, targetID, weaponSlot));
+        }
+
+        private IEnumerator attackCoroutine(int sourceID, int targetID, int weaponSlot) {
+            const float margin = 1f;
+
+            // Stash the current camera state.
+            var oldCameraPos = CameraRig.transform.position;
+            var oldCameraRot = CameraRig.transform.rotation;
+
+            // Compute the new camera position to frame the ships.
+            var sourceShip = GetShip(sourceID);
+            var aspectRatio = Screen.width / Screen.height;
+            var tanFOV = Mathf.Tan(Mathf.Deg2Rad * Camera.main.fieldOfView / 2.0f);
+            var targetShip = GetShip(targetID);
+            var sourceObj = sourceShip.gameObject;
+            var targetObj = targetShip.gameObject;
+            var sourcePos = sourceObj.transform.position;
+            var targetPos = targetObj.transform.position;
+            var delta = targetPos - sourcePos;
+            var midPoint = sourcePos + 0.5f * delta;
+            var separation = delta.magnitude;
+            var cameraDistance = (separation / 2f / aspectRatio) / tanFOV;
+            var direction = (CameraRig.transform.position - midPoint).normalized;
+            var cameraDestination = midPoint + direction * (cameraDistance + margin);
+
+            // Zip the camera over there.
+            Vector3 velocity = Vector3.zero;
+            while(Vector3.Distance(CameraRig.transform.position, cameraDestination) > 1.0e-3f) {
+                CameraRig.transform.position = Vector3.SmoothDamp(CameraRig.transform.position, cameraDestination, ref velocity, 1.0f);
+                yield return null;
+            }
+
+            yield return sourceShip.Attack(targetShip, weaponSlot);
+
+            // Restore the camera state.
+            velocity = Vector3.zero;
+            while (Vector3.Distance(CameraRig.transform.position, oldCameraPos) > 1.0e-3f) {
+                CameraRig.transform.position = Vector3.SmoothDamp(CameraRig.transform.position, oldCameraPos, ref velocity, 1.0f);
+                yield return null;
+            }
+
+            CameraRig.transform.position = oldCameraPos;
+            CameraRig.transform.rotation = oldCameraRot;
+
+            // TODO: is this ok? The Done button should always be on for the attack panel.
+            EnableDoneButton(true);
+        }
+
+        /// <summary>
         /// Sets the active weapon on the active ship.
         /// </summary>
         /// <param name="index">0=primary, 1 = secondary.</param>
         public void SetActiveWeapon(int index) {
             _activeWeapon = index;
             computeAttackTargets();
+        }
+
+        /// <summary>
+        /// Gets the currently active weapon.
+        /// </summary>
+        /// <returns></returns>
+        public int GetActiveWeaponIndex() {
+            return _activeWeapon;
         }
 
         /// <summary>
@@ -301,20 +376,56 @@ namespace VoidWars {
             var weaponClass = GetWeaponClass(weapon);
             var range = weaponClass.Range;
             var position = shipController.gameObject.transform.position;
-            var layer = LayerMask.NameToLayer("ActiveObjects");
-            //var objectsInRange = Physics.OverlapSphere(position, range, layer);
             var objectsInRange = Physics.OverlapSphere(position, range);
             foreach (var target in objectsInRange) {
                 if ((target.gameObject != shipController.gameObject) &&
                     (target.gameObject.CompareTag("Targetable"))) {
-                    var indicatorGO = Instantiate(TargetIndicatorPrefab);
-                    var indicator = indicatorGO.GetComponent<TargetIndicatorController>();
-                    indicator.Initialize(shipController.gameObject, target.gameObject);
-                    _attackTargets.Add(indicator);
+                    if (checkTargetGeometry(shipController, target.gameObject, weaponClass)) {
+                        var indicatorGO = Instantiate(TargetIndicatorPrefab);
+                        var indicator = indicatorGO.GetComponent<TargetIndicator>();
+                        indicator.Initialize(shipController.gameObject, target.gameObject);
+                        _attackTargets.Add(indicator);
+                    }
                 }
             }
 
             InfoPanel.NotifyTargetsChanged();
+        }
+
+        /// <summary>
+        /// Given that a target is within range, check that it lies within the targetable cone that the
+        /// weapon can reach.
+        /// </summary>
+        /// <param name="shipController">The ship (controller)</param>
+        /// <param name="target">The targeted object.</param>
+        /// <param name="weapon">The weapon being used.</param>
+        /// <returns>True if the target can be hit.</returns>
+        private bool checkTargetGeometry(ShipController shipController, GameObject target, WeaponClass weapon) {
+            // Front or back?
+            Transform node;
+            float angle;
+            if (_activeWeapon == 0) {
+                // Front.
+                node = shipController.FrontNode;
+                angle = Mathf.Deg2Rad * weapon.PrimaryAngle / 2;
+            }
+            else {
+                node = shipController.RearNode;
+                angle = Mathf.Deg2Rad * weapon.SecondaryAngle / 2;
+            }
+
+            var nodeToTargetDir = (target.transform.position - node.position).normalized;
+            var cosAngle = Vector3.Dot(nodeToTargetDir, node.forward);
+            if (cosAngle <= 0f) {
+                // Look out, he's behind you!
+                return false;
+            }
+
+            if (Mathf.Acos(cosAngle) > angle/2f) {
+                return false;
+            }
+
+            return true;
         }
 
         private void clearAttackTargets() {
@@ -388,6 +499,7 @@ namespace VoidWars {
                 _activeShipID = shipID;
                 refreshInfoPanel(false);
                 EnableActionPanel(false);
+                clearAttackTargets();
             }
             else {
                 _activeShip = _ships.Find(s => s.ID == shipID);
@@ -425,7 +537,7 @@ namespace VoidWars {
                     }
                     break;
 
-                case PlayPhase.ATTACKING:
+                case PlayPhase.SELECTING_ATTACK:
                     if (IsActiveShipLocal) {
 
                     }
@@ -503,6 +615,7 @@ namespace VoidWars {
         public void BeginRoundClient() {
             Debug.Log("GameController.BeginRoundClient()");
 
+            EnableInfoPanel("Move", "MoveInfoPanel");
         }
 
         /// <summary>
@@ -583,7 +696,7 @@ namespace VoidWars {
                     // Setup is done. Time to play!
                     _round = 0;
                     SetState(GameState.IN_PLAY, true);
-                    _communicator.CmdEnableInfoPanel("Move", "MoveInfoPanel");
+                    _communicator.BeginNextRound();
                     SetActiveShipByIndex(0, true);
                     break;
 
@@ -613,10 +726,10 @@ namespace VoidWars {
                     // Ensure all action panels are closed.
                     _communicator.CmdDisableActionPanel();
                     _communicator.CmdEnableInfoPanel("Attacking", "AttackInfoPanel");
-                    SetPlayPhase(PlayPhase.ATTACKING, true);
+                    SetPlayPhase(PlayPhase.SELECTING_ATTACK, true);
                     break;
 
-                case PlayPhase.ATTACKING:
+                case PlayPhase.SELECTING_ATTACK:
                     SetPlayPhase(PlayPhase.SELECTING_MOVES, true);
                     _communicator.EndThisRound();
                     _communicator.BeginNextRound();
@@ -729,7 +842,7 @@ namespace VoidWars {
         }
 
         private List<ShipController> getTurnOrder() {
-            if ((_state == GameState.IN_PLAY) && (_playPhase == PlayPhase.ATTACKING)) {
+            if ((_state == GameState.IN_PLAY) && (_playPhase == PlayPhase.SELECTING_ATTACK)) {
                 return _setupOrderShips;
 //                return _attackOrderShips;
             }
@@ -831,8 +944,9 @@ namespace VoidWars {
                 case PlayPhase.TAKING_ACTION:
                     break;
 
-                case PlayPhase.ATTACKING:
+                case PlayPhase.SELECTING_ATTACK:
                     _activeWeapon = 0;
+                    _target = null;
                     break;
             }
         }
@@ -849,7 +963,7 @@ namespace VoidWars {
                     _mapPins.Clear();
                     break;
 
-                case PlayPhase.ATTACKING:
+                case PlayPhase.SELECTING_ATTACK:
                     clearAttackTargets();
                     break;
             }
@@ -884,6 +998,22 @@ namespace VoidWars {
             }
         }
 
+        private void performAttack() {
+            var targetShip = _target.GetComponent<ShipController>();
+            _communicator.CmdPerformAttack(_activeShipID, targetShip.ID, _activeWeapon);
+
+            // Coroutine: camera frame the 2 ships.
+
+            // Perform the attack.
+
+            // Compute damage.
+
+            // Restore camera.
+
+            // Advance game.
+
+        }
+
         private void Start() {
             TitleController.SetText("VOID WARS()");
             var boardMesh = Board.GetComponent<MeshRenderer>();
@@ -908,11 +1038,12 @@ namespace VoidWars {
         private readonly List<ShipController> _moveOrderShips = new List<ShipController>();
         private readonly List<ShipController> _attackOrderShips = new List<ShipController>();
         private readonly List<ShipController> _setupOrderShips = new List<ShipController>();
-        private readonly List<TargetIndicatorController> _attackTargets = new List<TargetIndicatorController>();
+        private readonly List<TargetIndicator> _attackTargets = new List<TargetIndicator>();
         private Rect _boardBounds;
         private ShipController _activeShip;
         private int _actionCount;
         private int _activeWeapon;
+        private GameObject _target;
 
         private static readonly int[] s_p1StartPositions1 = new[] { 3 };
         private static readonly int[] s_p1StartPositions2 = new[] { 0, 1 };
