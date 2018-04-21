@@ -22,3 +22,4 @@ MonoBehaviour:
   Range: 2.5
   PrimaryAngle: 25
   SecondaryAngle: 20
+  RequiresLineOfSight: 1

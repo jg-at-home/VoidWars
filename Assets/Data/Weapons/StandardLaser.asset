@@ -22,3 +22,4 @@ MonoBehaviour:
   Range: 50
   PrimaryAngle: 45
   SecondaryAngle: 30
+  RequiresLineOfSight: 1

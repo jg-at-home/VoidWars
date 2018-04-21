@@ -55,8 +55,11 @@ namespace VoidWars {
         public BoardBorderController BorderController;
         public TitleTextController TitleController;
         public StatusPanelController StatusPanelController;
+
+        [Header("Prefabs")]
         public GameObject MapPinPrefab;
         public GameObject TargetIndicatorPrefab;
+        public GameObject LaserPrefab;
 
         /// <summary>
         /// Gets the current game state.
@@ -287,6 +290,13 @@ namespace VoidWars {
                 return;
             }
 
+            // Check power requirements.
+            var weaponType = (_activeWeapon== 0) ? _activeShip.PrimaryWeaponType : _activeShip.SecondaryWeaponType;
+            var weaponClass = GetWeaponClass(weaponType);
+            if (_activeShip.GetEnergyBudgetFor(EnergyConsumer.Weapons) < weaponClass.PowerUsage) {
+                return;
+            }
+
             // It's an enemy. Change phase to ATTACKING.
             _target = target;
             performAttack();
@@ -322,16 +332,18 @@ namespace VoidWars {
 
             // Zip the camera over there.
             Vector3 velocity = Vector3.zero;
-            while(Vector3.Distance(CameraRig.transform.position, cameraDestination) > 1.0e-3f) {
+            while(Vector3.Distance(CameraRig.transform.position, cameraDestination) > 1.0e-1f) {
                 CameraRig.transform.position = Vector3.SmoothDamp(CameraRig.transform.position, cameraDestination, ref velocity, 1.0f);
                 yield return null;
             }
 
             yield return sourceShip.Attack(targetShip, weaponSlot);
 
+            // TODO: if target is wiped, do death stuff.
+
             // Restore the camera state.
             velocity = Vector3.zero;
-            while (Vector3.Distance(CameraRig.transform.position, oldCameraPos) > 1.0e-3f) {
+            while (Vector3.Distance(CameraRig.transform.position, oldCameraPos) > 1.0e-1f) {
                 CameraRig.transform.position = Vector3.SmoothDamp(CameraRig.transform.position, oldCameraPos, ref velocity, 1.0f);
                 yield return null;
             }
@@ -341,6 +353,7 @@ namespace VoidWars {
 
             // TODO: is this ok? The Done button should always be on for the attack panel.
             EnableDoneButton(true);
+            NextShip();
         }
 
         /// <summary>
@@ -423,6 +436,20 @@ namespace VoidWars {
 
             if (Mathf.Acos(cosAngle) > angle/2f) {
                 return false;
+            }
+
+            // Depending on weapon type, ray cast to see if there's anything in the way.
+            if (weapon.RequiresLineOfSight) {
+                RaycastHit hit;
+                var direction = (target.transform.position - node.position).normalized;
+                var ray = new Ray(node.position, direction);
+                var layer = 1 << LayerMask.NameToLayer("ActiveObjects");
+                if (Physics.Raycast(ray, out hit, layer)) {
+                    if (!ReferenceEquals(hit.collider.transform.root.gameObject, target)) {
+                        // Something is obstructing the ray.
+                        return false;
+                    }
+                }
             }
 
             return true;
@@ -999,19 +1026,9 @@ namespace VoidWars {
         }
 
         private void performAttack() {
+            clearAttackTargets();
             var targetShip = _target.GetComponent<ShipController>();
             _communicator.CmdPerformAttack(_activeShipID, targetShip.ID, _activeWeapon);
-
-            // Coroutine: camera frame the 2 ships.
-
-            // Perform the attack.
-
-            // Compute damage.
-
-            // Restore camera.
-
-            // Advance game.
-
         }
 
         private void Start() {

@@ -54,5 +54,8 @@ namespace VoidWars {
 
         [Tooltip("What angle the weapon can operate over as a secondary")]
         public float SecondaryAngle;
+
+        [Tooltip("If true, weapon requires direct line-of-sight to function")]
+        public bool RequiresLineOfSight;
     }
 }

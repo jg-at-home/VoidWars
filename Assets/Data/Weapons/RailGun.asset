@@ -12,8 +12,14 @@ MonoBehaviour:
   m_Name: RailGun
   m_EditorClassIdentifier: 
   Name: Rail Gun
+  Description: 
   WeaponType: 1
   Cardinality: 0
   MaxDamage: 90
   PowerUsage: 15
   Mass: 10
+  Cost: 0
+  Range: 0
+  PrimaryAngle: 0
+  SecondaryAngle: 0
+  RequiresLineOfSight: 1
