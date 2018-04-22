@@ -1,6 +1,9 @@
 ﻿using UnityEngine;
 
 namespace VoidWars {
+    /// <summary>
+    /// Types of weapon.
+    /// </summary>
     public enum WeaponType {
         None = 0,
         Laser = 1,
@@ -14,20 +17,20 @@ namespace VoidWars {
 
     }
 
+    /// <summary>
+    /// Which slot a weapon can attach to.
+    /// </summary>
     public enum WeaponCardinality {
         Primary,
         Secondary,
         Any
     }
 
+    /// <summary>
+    /// Weapon descriptor.
+    /// </summary>
     [CreateAssetMenu(menuName ="VoidWars/Weapon")]
-    public class WeaponClass : ScriptableObject {
-        [Tooltip("The name of the weapon")]
-        public string Name;
-
-        [Tooltip("Description of the weapon")]
-        public string Description;
-
+    public class WeaponClass : ItemClass {
         [Tooltip("The type of the weapon")]
         public WeaponType WeaponType;
 
@@ -36,15 +39,6 @@ namespace VoidWars {
 
         [Tooltip("The max damage the weapon can do")]
         public int MaxDamage;
-
-        [Tooltip("How much power it takes to use the weapon.")]
-        public int PowerUsage;
-
-        [Tooltip("How much mass the weapon adds")]
-        public int Mass;
-
-        [Tooltip("Nominal cost of the item")]
-        public int Cost;
 
         [Tooltip("How far away the weapon is effective")]
         public float Range;

@@ -12,14 +12,19 @@ MonoBehaviour:
   m_Name: UltravioletLaser
   m_EditorClassIdentifier: 
   Name: UV Laser
+  Icon: {fileID: 0}
   Description: Very powerful laser
+  Detail: 
+  Cost: 5
+  Mass: 8
+  PowerUsage: 20
+  MaxTemperature: 70
+  Metadata: 
+  RepairCost: 4
   WeaponType: 16
   Cardinality: 0
   MaxDamage: 100
-  PowerUsage: 20
-  Mass: 8
-  Cost: 5
-  Range: 2.5
+  Range: 15
   PrimaryAngle: 25
   SecondaryAngle: 20
   RequiresLineOfSight: 1

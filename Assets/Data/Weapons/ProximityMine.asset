@@ -12,13 +12,19 @@ MonoBehaviour:
   m_Name: ProximityMine
   m_EditorClassIdentifier: 
   Name: Proximity Mine
+  Icon: {fileID: 0}
   Description: Drop a little present for enemy ships to run into
+  Detail: 
+  Cost: 5
+  Mass: 5
+  PowerUsage: 5
+  MaxTemperature: 95
+  Metadata: 
+  RepairCost: 1
   WeaponType: 32
   Cardinality: 1
   MaxDamage: 60
-  PowerUsage: 5
-  Mass: 5
-  Cost: 5
   Range: 0
   PrimaryAngle: 0
   SecondaryAngle: 0
+  RequiresLineOfSight: 0

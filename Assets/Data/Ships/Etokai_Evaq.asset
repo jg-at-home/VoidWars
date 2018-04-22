@@ -11,20 +11,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a91ac458d308ae04ea0ee95532cdf8b0, type: 3}
   m_Name: Etokai_Evaq
   m_EditorClassIdentifier: 
-  Species: 1
   Name: Evaq
+  Icon: {fileID: 0}
   Description: 
+  Detail: 
+  Cost: 5
+  Mass: 3
+  PowerUsage: 3
+  MaxTemperature: 0
+  Metadata: 
+  RepairCost: 0
+  Species: 1
   ModelName: SHIP_B_02
   HasSecondaryWeaponSlot: 0
   HasReverseThrust: 0
-  Mass: 3
-  HullStrength: 3
+  MaxHealth: 100
   MaxFuelLevel: 80
   NumAuxiliarySlots: 2
   Stealth: 1
   MaxSpeed: 8
   ActionsPerTurn: 1
-  Cost: 0
   Maneuverability: 1
   MaxEnergy: 100
   MoveDrainRate: 1

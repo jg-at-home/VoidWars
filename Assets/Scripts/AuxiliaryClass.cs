@@ -41,39 +41,12 @@ namespace VoidWars {
     }
 
     [CreateAssetMenu(menuName = "VoidWars/Auxiliary Item")]
-    public class AuxiliaryClass : ScriptableObject {
-        [Tooltip("The name of the item")]
-        public string Name;
-
-        [Tooltip("The icon for the equipment")]
-        public Sprite Icon;
-
-        [Tooltip("Description of the item (terse)")]
-        public string Description;
-
-        [Tooltip("Description of the item (verbose)")]
-        public string Detail;
-
+    public class AuxiliaryClass : ItemClass {
         [Tooltip("The type of the item")]
         public AuxType ItemType;
 
-        [Tooltip("How much power it takes to use the item.")]
-        public int PowerUsage;
-
-        [Tooltip("How much mass the item adds")]
-        public int Mass;
-
-        [Tooltip("Budget cost of the item")]
-        public int Cost;
-
         [Tooltip("The mode of operation")]
         public AuxMode Mode;
-
-        [Tooltip("How much energy it takes to repair the item")]
-        public float RepairCost;
-
-        [Tooltip("Metadata for the item held as a string")]
-        public string Metadata;
     }
 
     /// <summary>

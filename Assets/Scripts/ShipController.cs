@@ -203,6 +203,13 @@ namespace VoidWars {
         }
 
         /// <summary>
+        /// Gets the hull temperature.
+        /// </summary>
+        public float HullTemperature {
+            get { return _hullTemperature; }
+        }
+
+        /// <summary>
         /// How long it takes to move a single unit.
         /// </summary>
         public float MoveDuration = 1.0f;
@@ -212,6 +219,26 @@ namespace VoidWars {
         /// </summary>
         /// <param name="shipID">ID of shi.</param>
         public delegate void OnMoveFinished(int shipID);
+
+        /// <summary>
+        /// Gets the weapon type for the slot (0=primary, 1 = secondary)
+        /// </summary>
+        /// <param name="slot">Slot index.</param>
+        /// <returns>Weapon type.</returns>
+        public WeaponType GetWeaponType(int slot) {
+            Debug.Assert(slot == 0 || slot == 1);
+
+            return (slot == 0) ? PrimaryWeaponType : SecondaryWeaponType;
+        }
+
+        /// <summary>
+        /// Gets the weapon node for the slot (0=primary, 1 = secondary)
+        /// </summary>
+        /// <param name="slot">Slot index.</param>
+        /// <returns>Weapon node.</returns>
+        public Transform GetWeaponNode(int slot) {
+            return (slot == 0) ? FrontNode : RearNode;
+        }
 
         /// <summary>
         /// Gets the energy available for the given consumer.
@@ -303,6 +330,20 @@ namespace VoidWars {
         }
 
         /// <summary>
+        /// Does damage to the ship.
+        /// </summary>
+        /// <param name="damage">The amount of damage to apply.</param>
+        public void ApplyDamage(float damage) {
+            Debug.LogFormat("Ship ID {0} took {1} damage", ID, damage);
+
+            _health -= damage;
+            if (_health <= 0) {
+                Debug.LogFormat("Ship {0} is DEAD!!!!", ID);
+                // TODO: explodify ship, remove from game, etc.
+            }
+        }
+
+        /// <summary>
         /// Called by the server to begin a round.
         /// </summary>
         public void BeginRound(int round) {
@@ -312,6 +353,9 @@ namespace VoidWars {
             if (round > 0) {
                 _energy = Mathf.Clamp(_energy + (_class.RechargeRate - _powerDrain), 0f, _maxEnergy);
             }
+
+            // Hull temperature.
+            updateHullTemperature();
 
             updateSystemStatuses();
         }
@@ -391,6 +435,10 @@ namespace VoidWars {
                     _secondaryWeaponsOK = true;
                 }
             }
+        }
+
+        private void updateHullTemperature() {
+            // TODO
         }
 
         /// <summary>
@@ -490,6 +538,7 @@ namespace VoidWars {
             _maxEnergy = _energy;
             _powerDrain = _class.LifeSupportDrainRate;
             _shieldPercent = 100.0f;
+            _health = _class.MaxHealth;
 
             // Figure out the total mass from the constituent bits - weapons and equipment.
             _totalMass = _class.Mass;
@@ -604,6 +653,8 @@ namespace VoidWars {
         [SyncVar] private float _shieldEnergy;
         [SyncVar] private float _weaponsLevel;
         [SyncVar] private float _shieldPercent;
+        [SyncVar] private float _hullTemperature;
+        [SyncVar] private float _health;
         private bool _lifeSupportOK = true;
         private bool _primaryWeaponsOK = true;
         private bool _secondaryWeaponsOK = true;

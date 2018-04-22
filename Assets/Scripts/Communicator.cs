@@ -62,6 +62,7 @@ namespace VoidWars {
         /// <param name="weaponSlot">0=front, 1=rear</param>
         [Command]
         public void CmdPerformAttack(int sourceID, int targetID, int weaponSlot) {
+            // TODO remove energy from source ship.
             RpcPerformAttack(sourceID, targetID, weaponSlot);
         }
 
@@ -99,6 +100,18 @@ namespace VoidWars {
         void RpcNotifyActiveShip(int ownerID, int shipID) {
             Debug.LogFormat("RpcNotifyActiveShip({0}, {1}) (ID={2})", ownerID, shipID, ID);
             controller.NotifyActiveShip(ownerID, shipID);
+        }
+
+        [Command]
+        public void CmdApplyDamageToShip(int shipID, float damage) {
+            var ship = controller.GetShip(shipID);
+            ship.ApplyDamage(damage);
+            RpcApplyDamageToShip(shipID, damage);
+        }
+
+        [ClientRpc]
+        void RpcApplyDamageToShip(int shipID, float damage) {
+            controller.ShowDamage(shipID, damage);
         }
 
         /// <summary>
@@ -210,6 +223,9 @@ namespace VoidWars {
         /// </summary>
         /// <param name="newPhase">The new phase.</param>
         public void NotifyPlayPhaseChange(PlayPhase newPhase) {
+            if (!isServer) {
+                Debug.Log("Boo");
+            }
             Debug.Assert(isServer);
 
             RpcNotifyPlayPhaseChange(newPhase);

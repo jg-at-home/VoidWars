@@ -55,6 +55,7 @@ namespace VoidWars {
         public BoardBorderController BorderController;
         public TitleTextController TitleController;
         public StatusPanelController StatusPanelController;
+        public DamageIndicator DamageIndicator;
 
         [Header("Prefabs")]
         public GameObject MapPinPrefab;
@@ -291,7 +292,7 @@ namespace VoidWars {
             }
 
             // Check power requirements.
-            var weaponType = (_activeWeapon== 0) ? _activeShip.PrimaryWeaponType : _activeShip.SecondaryWeaponType;
+            var weaponType = _activeShip.GetWeaponType(_activeWeapon);
             var weaponClass = GetWeaponClass(weaponType);
             if (_activeShip.GetEnergyBudgetFor(EnergyConsumer.Weapons) < weaponClass.PowerUsage) {
                 return;
@@ -302,6 +303,13 @@ namespace VoidWars {
             performAttack();
         }
 
+        /// <summary>
+        /// Client attack routine.
+        /// </summary>
+        /// <param name="sourceID">The ID of the source ship.</param>
+        /// <param name="targetID">The ID of the target ship.</param>
+        /// <param name="weaponSlot">The weapon slot to use.</param>
+        /// <param name="applyDamage">If true, apply the damage.</param>
         public void PerformAttack(int sourceID, int targetID, int weaponSlot) {
             EnableDoneButton(false);
             StartCoroutine(attackCoroutine(sourceID, targetID, weaponSlot));
@@ -332,19 +340,21 @@ namespace VoidWars {
 
             // Zip the camera over there.
             Vector3 velocity = Vector3.zero;
-            while(Vector3.Distance(CameraRig.transform.position, cameraDestination) > 1.0e-1f) {
-                CameraRig.transform.position = Vector3.SmoothDamp(CameraRig.transform.position, cameraDestination, ref velocity, 1.0f);
+            while(Vector3.Distance(CameraRig.transform.position, cameraDestination) > 5.0e-1f) {
+                CameraRig.transform.position = Vector3.SmoothDamp(CameraRig.transform.position, cameraDestination, ref velocity, 0.75f);
                 yield return null;
             }
 
-            yield return sourceShip.Attack(targetShip, weaponSlot);
+            var weaponType = sourceShip.GetWeaponType(weaponSlot);
+            var weaponClass = GetWeaponClass(weaponType);
+            yield return sourceShip.Attack(targetShip, weaponSlot, weaponClass);
 
             // TODO: if target is wiped, do death stuff.
 
             // Restore the camera state.
             velocity = Vector3.zero;
-            while (Vector3.Distance(CameraRig.transform.position, oldCameraPos) > 1.0e-1f) {
-                CameraRig.transform.position = Vector3.SmoothDamp(CameraRig.transform.position, oldCameraPos, ref velocity, 1.0f);
+            while (Vector3.Distance(CameraRig.transform.position, oldCameraPos) > 5.0e-1f) {
+                CameraRig.transform.position = Vector3.SmoothDamp(CameraRig.transform.position, oldCameraPos, ref velocity, 0.75f);
                 yield return null;
             }
 
@@ -353,7 +363,10 @@ namespace VoidWars {
 
             // TODO: is this ok? The Done button should always be on for the attack panel.
             EnableDoneButton(true);
-            NextShip();
+
+            if (_communicator.isServer) {
+                NextShipServer();
+            }
         }
 
         /// <summary>
@@ -403,6 +416,21 @@ namespace VoidWars {
             }
 
             InfoPanel.NotifyTargetsChanged();
+        }
+
+        /// <summary>
+        /// Applies damage to a ship.
+        /// </summary>
+        /// <param name="shipID">The ID of the ship to damage.</param>
+        /// <param name="damage">The amount of damage to apply.</param>
+        public void ApplyDamageToShip(int shipID, float damage) {
+            // Do damage on server.
+            _communicator.CmdApplyDamageToShip(shipID, damage);
+        }
+
+        public void ShowDamage(int shipID, float damage) {
+            var ship = GetShip(shipID);
+            DamageIndicator.SetValue(ship.gameObject.transform.position, (int)damage);
         }
 
         /// <summary>
@@ -914,11 +942,11 @@ namespace VoidWars {
                 if (notify) {
                     _communicator.NotifyGameStateChange(_state);
                 }
-                onEnterState(newState);
+                onEnterState(newState, notify);
             }
         }
 
-        private void onEnterState(GameState newState) {
+        private void onEnterState(GameState newState, bool notify) {
             switch(newState) {
                 case GameState.LOBBY:
                     break;
@@ -932,7 +960,7 @@ namespace VoidWars {
                     var zoomControl = ControlPanel.GetComponentInChildren<ZoomButtonController>();
                     zoomControl.ZoomOut();
                     _selectedMoves.Clear();
-                    SetPlayPhase(PlayPhase.SELECTING_MOVES, true);
+                    SetPlayPhase(PlayPhase.SELECTING_MOVES, notify);
                     break;
 
                 default:
@@ -947,9 +975,10 @@ namespace VoidWars {
         /// <param name="notify">If true, all clients are notified of the change.</param>
         public void SetPlayPhase(PlayPhase newPhase, bool notify) {
             if (_playPhase != newPhase) {
-                onExitPhase(_playPhase);
                 Debug.LogFormat("GameController.SetPlayPhase({0})", newPhase);
+                onExitPhase(_playPhase);
                 _playPhase = newPhase;
+                _activeShipIndex = 0;
                 if (notify) {
                     _communicator.NotifyPlayPhaseChange(_playPhase);
                 }

@@ -12,13 +12,19 @@ MonoBehaviour:
   m_Name: HomingMissile
   m_EditorClassIdentifier: 
   Name: Homing Missile
+  Icon: {fileID: 0}
   Description: Homes in on an enemy over multiple turns
+  Detail: 
+  Cost: 3
+  Mass: 7
+  PowerUsage: 7
+  MaxTemperature: 80
+  Metadata: 
+  RepairCost: 3
   WeaponType: 4
   Cardinality: 2
   MaxDamage: 60
-  PowerUsage: 7
-  Mass: 7
-  Cost: 3
   Range: 0
   PrimaryAngle: 0
   SecondaryAngle: 0
+  RequiresLineOfSight: 0

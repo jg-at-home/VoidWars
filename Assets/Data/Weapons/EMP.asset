@@ -12,13 +12,19 @@ MonoBehaviour:
   m_Name: EMP
   m_EditorClassIdentifier: 
   Name: EMP-Gen
-  Description: Knocks out shields for miles around
+  Icon: {fileID: 0}
+  Description: Electromagnetic pulse weapon
+  Detail: Knocks out shields for miles around
+  Cost: 5
+  Mass: 15
+  PowerUsage: 20
+  MaxTemperature: 65
+  Metadata: 
+  RepairCost: 8
   WeaponType: 8
   Cardinality: 1
   MaxDamage: 100
-  PowerUsage: 25
-  Mass: 15
-  Cost: 0
-  Range: 0
+  Range: 10
   PrimaryAngle: 0
   SecondaryAngle: 0
+  RequiresLineOfSight: 0

@@ -12,13 +12,18 @@ MonoBehaviour:
   m_Name: StandardLaser
   m_EditorClassIdentifier: 
   Name: Standard Laser
+  Icon: {fileID: 0}
   Description: Thermal weapon
+  Detail: 
+  Cost: 3
+  Mass: 5
+  PowerUsage: 10
+  MaxTemperature: 80
+  Metadata: 
+  RepairCost: 2
   WeaponType: 1
   Cardinality: 0
   MaxDamage: 80
-  PowerUsage: 10
-  Mass: 5
-  Cost: 3
   Range: 50
   PrimaryAngle: 45
   SecondaryAngle: 30

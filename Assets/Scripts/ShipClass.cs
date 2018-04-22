@@ -5,15 +5,9 @@ namespace VoidWars {
     /// Static ship descriptor data.
     /// </summary>
     [CreateAssetMenu(menuName = "VoidWars/Ship Class")]
-    public class ShipClass : ScriptableObject {
+    public class ShipClass : ItemClass {
         [Tooltip("Who the ship class belongs to")]
         public Species Species;
-
-        [Tooltip("The name of the ship class")]
-        public string Name;
-
-        [Tooltip("Description of the ship")]
-        public string Description;
 
         [Tooltip("The name of the associated model")]
         public string ModelName;
@@ -24,11 +18,8 @@ namespace VoidWars {
         [Tooltip("If true, can move backwards")]
         public bool HasReverseThrust;
 
-        [Tooltip("Mass value (no real physics as such!)")]
-        public int Mass;
-
-        [Tooltip("Strength of the hull (higher is better)")]
-        public int HullStrength;
+        [Tooltip("Maximum health value.")]
+        public float MaxHealth;
 
         [Tooltip("The maximum amount of fuel the ship can hold")]
         public float MaxFuelLevel;
@@ -44,9 +35,6 @@ namespace VoidWars {
 
         [Tooltip("The number of actions the ship can take per turn")]
         public int ActionsPerTurn;
-
-        [Tooltip("Budget cost of the ship")]
-        public int Cost;
 
         /// <summary>
         /// 1: Forward, gentle turns

@@ -11,20 +11,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a91ac458d308ae04ea0ee95532cdf8b0, type: 3}
   m_Name: Human_Raptor
   m_EditorClassIdentifier: 
-  Species: 0
   Name: Raptor
+  Icon: {fileID: 0}
   Description: 
+  Detail: 
+  Cost: 5
+  Mass: 1
+  PowerUsage: 2
+  MaxTemperature: 0
+  Metadata: 
+  RepairCost: 0
+  Species: 0
   ModelName: SHIP_A_02
   HasSecondaryWeaponSlot: 0
   HasReverseThrust: 1
-  Mass: 1
-  HullStrength: 1
+  MaxHealth: 100
   MaxFuelLevel: 60
   NumAuxiliarySlots: 1
   Stealth: 0
   MaxSpeed: 15
   ActionsPerTurn: 1
-  Cost: 0
   Maneuverability: 1
   MaxEnergy: 100
   MoveDrainRate: 1

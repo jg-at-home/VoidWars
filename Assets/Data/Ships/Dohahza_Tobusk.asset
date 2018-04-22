@@ -11,20 +11,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a91ac458d308ae04ea0ee95532cdf8b0, type: 3}
   m_Name: Dohahza_Tobusk
   m_EditorClassIdentifier: 
-  Species: 2
   Name: Tobusk
+  Icon: {fileID: 0}
   Description: 
+  Detail: 
+  Cost: 5
+  Mass: 10
+  PowerUsage: 3
+  MaxTemperature: 0
+  Metadata: 
+  RepairCost: 0
+  Species: 2
   ModelName: SHIP_C_01
   HasSecondaryWeaponSlot: 1
   HasReverseThrust: 0
-  Mass: 10
-  HullStrength: 10
+  MaxHealth: 100
   MaxFuelLevel: 75
   NumAuxiliarySlots: 1
   Stealth: 0
   MaxSpeed: 11
   ActionsPerTurn: 2
-  Cost: 0
   Maneuverability: 1
   MaxEnergy: 100
   MoveDrainRate: 1

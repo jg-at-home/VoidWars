@@ -12,13 +12,18 @@ MonoBehaviour:
   m_Name: RailGun
   m_EditorClassIdentifier: 
   Name: Rail Gun
+  Icon: {fileID: 0}
   Description: 
-  WeaponType: 1
+  Detail: 
+  Cost: 0
+  Mass: 10
+  PowerUsage: 15
+  MaxTemperature: 90
+  Metadata: 
+  RepairCost: 4
+  WeaponType: 2
   Cardinality: 0
   MaxDamage: 90
-  PowerUsage: 15
-  Mass: 10
-  Cost: 0
   Range: 0
   PrimaryAngle: 0
   SecondaryAngle: 0
