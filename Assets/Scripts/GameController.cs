@@ -151,9 +151,9 @@ namespace VoidWars {
             InfoPanel.NotifyContent("EnableDoneButton", enable);
         }
 
-        private void refreshInfoPanel(bool isActive) {
+        private void refreshInfoPanel(bool isActive, bool doneOK) {
             InfoPanel.NotifyActiveShipChange(isActive);
-            EnableDoneButton(isActive);
+            EnableDoneButton(isActive && doneOK);
             EnableControlPanel(isActive);
             EnableStatusPanel(isActive);
         }
@@ -552,7 +552,7 @@ namespace VoidWars {
                 ActiveShipIndicator.SetActive(false);
                 _activeShip = null;
                 _activeShipID = shipID;
-                refreshInfoPanel(false);
+                refreshInfoPanel(false, false);
                 EnableActionPanel(false);
                 clearAttackTargets();
             }
@@ -579,6 +579,7 @@ namespace VoidWars {
         }
 
         private void updateUI(bool infoPanelStatus) {
+            bool doneOK = true;
             switch(_playPhase) {
                 case PlayPhase.TAKING_ACTION:
                     if (IsActiveShipLocal) {
@@ -590,18 +591,10 @@ namespace VoidWars {
                         InfoPanel.NotifyActiveShipChange(false);
                         EnableActionPanel(false);
                     }
-                    break;
-
-                case PlayPhase.SELECTING_ATTACK:
-                    if (IsActiveShipLocal) {
-
-                    }
-                    else {
-
-                    }
+                    doneOK = false;
                     break;
             }
-            refreshInfoPanel(infoPanelStatus);
+            refreshInfoPanel(infoPanelStatus, doneOK);
         }
 
         private void setActionPanelTitle() {
