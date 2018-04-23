@@ -54,6 +54,10 @@ namespace VoidWars {
             _current = panel.GetComponent<ActionDetailPanelController>();
             _current.Initialize(item, prefabInfoParts);
             _currentItem = item;
+
+            foreach(var view in _views) {
+                view.IsSelected = (view.Item == _currentItem);
+            }
         }
 
         private void OnEnable() {
@@ -72,6 +76,7 @@ namespace VoidWars {
                 control.transform.SetParent(_contentPanel, false);
                 var actionControl = control.GetComponent<ActionItemView>();
                 actionControl.Setup(action, this);
+                _views.Add(actionControl);
             }
         }
 
@@ -80,9 +85,12 @@ namespace VoidWars {
                 var item = _contentPanel.transform.GetChild(0).gameObject;
                 _buttonPool.ReturnObject(item);
             }
+
+            _views.Clear();
         }
 
         private List<ActionItem> _items;
+        private readonly List<ActionItemView> _views = new List<ActionItemView>();
         private ActionDetailPanelController _current;
         private ActionItem _currentItem;
     }
