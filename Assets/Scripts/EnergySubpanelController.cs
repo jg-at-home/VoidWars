@@ -9,6 +9,10 @@ namespace VoidWars {
         public Image PropulsionImage;
         public Image TotalEnergyImage;
 
+        protected override void initialize() {
+            refresh();
+        }
+
         protected override void updateInner() {            
             maybeUpdateLevel(ShieldImage, _shieldLevel);
             maybeUpdateLevel(WeaponsImage, _weaponsLevel);

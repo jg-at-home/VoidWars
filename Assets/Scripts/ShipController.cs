@@ -93,6 +93,13 @@ namespace VoidWars {
         }
 
         /// <summary>
+        /// Gets the ship's health level.
+        /// </summary>
+        public float Health {
+            get { return _health; }
+        }
+
+        /// <summary>
         /// Gets the ship's static class data.
         /// </summary>
         public ShipClass ShipClass {

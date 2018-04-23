@@ -7,6 +7,12 @@ namespace VoidWars {
         public Image ShieldLevelBar;
         public Text ShieldLevelText;
 
+        protected override void initialize() {
+            refresh();
+            ShieldPowerBar.fillAmount = _shieldPower;
+            ShieldLevelBar.fillAmount = _shieldLevel / 100f;
+        }
+
         protected override void refresh() {
             var activeShip = controller.GetActiveShip();
             _shieldPower = activeShip.ShieldEnergy / activeShip.MaxEnergy;

@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
 namespace VoidWars {
@@ -15,7 +13,7 @@ namespace VoidWars {
         }
 
         private void OnEnable() {
-            refresh();    
+            initialize();    
         }
 
         private void Update() {
@@ -45,6 +43,7 @@ namespace VoidWars {
             }
         }
 
+        protected abstract void initialize();
         protected abstract void refresh();
         protected abstract void updateInner();
 
