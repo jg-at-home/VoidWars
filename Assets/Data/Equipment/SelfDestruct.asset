@@ -12,8 +12,14 @@ MonoBehaviour:
   m_Name: SelfDestruct
   m_EditorClassIdentifier: 
   Name: Self destruct
+  Icon: {fileID: 0}
   Description: Auto-destructs the ship, damaging all others in vicinity
-  ItemType: 32
-  PowerUsage: 0
-  Mass: 1
+  Detail: Sacrifice one of your ships to save the others
   Cost: 4
+  Mass: 1
+  PowerUsage: 5
+  MaxTemperature: 100
+  Metadata: 
+  RepairCost: 0
+  ItemType: 32
+  Mode: 0

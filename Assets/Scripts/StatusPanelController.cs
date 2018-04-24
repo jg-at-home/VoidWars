@@ -14,7 +14,6 @@ namespace VoidWars {
         public Button NextButton;
         public Button PrevButton;
         public Text TitleText;
-        public Image FadePanel;
         public float PanelScrollDelay = 10f;
         public float PanelScrollInterval = 3f;
         public float FadeTime = 0.5f;
@@ -26,7 +25,7 @@ namespace VoidWars {
 
         public void OnPrevButton() {
             onButtonClicked();
-            var next = _currentPanel - 1;
+            var next = _currentPanelIndex - 1;
             if (next < 0) {
                 next = PanelPrefabs.Length-1;
             }
@@ -35,15 +34,15 @@ namespace VoidWars {
 
         private void onButtonClicked() {
             _timer = 0;
+            _currentPanel.SetAlpha(1f);
             if (_scrolling) {
-                StopCoroutine("scrollPanels");
-                FadePanel.color = Color.clear;
+                StopCoroutine("scrollPanels");                
                 _scrolling = false;
             }
         }
 
         private void nextPanel() {
-            var next = _currentPanel + 1;
+            var next = _currentPanelIndex + 1;
             if (next >= PanelPrefabs.Length) {
                 next = 0;
             }
@@ -75,32 +74,35 @@ namespace VoidWars {
             while (_scrolling) {
                 // Fade current panel out.
                 for (var t = 0f; t < FadeTime; t += Time.deltaTime) {
-                    var color = Color.Lerp(Color.clear, Color.black, t / FadeTime);
-                    FadePanel.color = color;
+                    var alpha = 1f - Mathf.Clamp01(t / FadeTime);
+                    _currentPanel.SetAlpha(1f - Mathf.Min(t, 1f));
                     yield return null;
                 }
 
+                // Move along.
                 nextPanel();
 
+                // Fade up.
                 for (var t = 0f; t < FadeTime; t += Time.deltaTime) {
-                    var color = Color.Lerp(Color.black, Color.clear, t / FadeTime);
-                    FadePanel.color = color;
+                    var alpha = Mathf.Clamp01(t / FadeTime);
+                    _currentPanel.SetAlpha(alpha);
                     yield return null;
                 }
 
+                // Wait.
                 yield return new WaitForSeconds(PanelScrollInterval);
             }
         }
 
         private void setCurrentPanel(int panel, bool force) {
-            if ((_currentPanel != panel) || force) {
-                var panelInstance = _panels[_currentPanel];
+            if ((_currentPanelIndex != panel) || force) {
+                var panelInstance = _panels[_currentPanelIndex];
                 if (panelInstance != null) {
                     panelInstance.OnDeactivation();
                     panelInstance.GetComponent<RectTransform>().SetParent(null, false);
                 }
 
-                _currentPanel = panel;
+                _currentPanelIndex = panel;
                 if (_panels[panel] == null) {
                     _panels[panel] = Instantiate(PanelPrefabs[panel]);
                 }
@@ -108,14 +110,16 @@ namespace VoidWars {
                 panelInstance = _panels[panel];
                 panelInstance.GetComponent<RectTransform>().SetParent(PanelRoot,false);
                 panelInstance.OnActivation();
+                _currentPanel = panelInstance;
 
                 TitleText.text = panelInstance.Name;
             }
         }
 
         private SubpanelController[] _panels;
-        private int _currentPanel;
+        private int _currentPanelIndex;
         private float _timer;
         private bool _scrolling;
+        private SubpanelController _currentPanel; 
     }
 }

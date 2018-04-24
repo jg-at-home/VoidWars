@@ -12,9 +12,14 @@ MonoBehaviour:
   m_Name: PowerCell
   m_EditorClassIdentifier: 
   Name: Power Cell
+  Icon: {fileID: 0}
   Description: Adds extra power to your ship
-  ItemType: 256
-  PowerUsage: -1
-  Mass: 2
+  Detail: Va-va voom!
   Cost: 2
+  Mass: 2
+  PowerUsage: -1
+  MaxTemperature: 0
   Metadata: 10
+  RepairCost: 0
+  ItemType: 256
+  Mode: 0

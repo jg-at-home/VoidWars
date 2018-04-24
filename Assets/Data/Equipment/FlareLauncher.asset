@@ -12,8 +12,14 @@ MonoBehaviour:
   m_Name: FlareLauncher
   m_EditorClassIdentifier: 
   Name: Flare Launcher
-  Description: 
-  ItemType: 2
-  PowerUsage: 2
-  Mass: 3
+  Icon: {fileID: 0}
+  Description: Allows you to see hidden ships
+  Detail: Allows you to see hidden ships for a short while
   Cost: 4
+  Mass: 3
+  PowerUsage: 2
+  MaxTemperature: 101
+  Metadata: 
+  RepairCost: 3
+  ItemType: 2
+  Mode: 0

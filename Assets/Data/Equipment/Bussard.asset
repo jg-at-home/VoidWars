@@ -12,8 +12,14 @@ MonoBehaviour:
   m_Name: Bussard
   m_EditorClassIdentifier: 
   Name: Bussard Collector
+  Icon: {fileID: 0}
   Description: Refuels the ship as you travel
-  ItemType: 1
-  PowerUsage: 0
-  Mass: 8
+  Detail: Hydrogen in, power out. Simples!
   Cost: 2
+  Mass: 8
+  PowerUsage: 0
+  MaxTemperature: 95
+  Metadata: 
+  RepairCost: 3
+  ItemType: 1
+  Mode: 0

@@ -12,8 +12,14 @@ MonoBehaviour:
   m_Name: Shinobi
   m_EditorClassIdentifier: 
   Name: Shinobi
+  Icon: {fileID: 0}
   Description: Gives your ship stealth capability
-  ItemType: 64
-  PowerUsage: 15
-  Mass: 5
+  Detail: Invisible in most circumstances
   Cost: 6
+  Mass: 5
+  PowerUsage: 15
+  MaxTemperature: 75
+  Metadata: 
+  RepairCost: 8
+  ItemType: 64
+  Mode: 0

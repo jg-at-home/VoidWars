@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace VoidWars {
@@ -10,6 +11,27 @@ namespace VoidWars {
 
         private void Awake() {
             _controller = Util.GetGameController();
+
+            var images = new List<MaskableGraphic>();
+            findComponents(gameObject.transform, images);
+            _images = images.ToArray();
+        }
+
+        private static void findComponents<T>(Transform element, List<T> items) {
+            foreach (Transform child in element) {
+                var comp = child.GetComponent<T>();
+                if (comp != null) {
+                    items.Add(comp);
+                }
+                findComponents(child, items);
+            }
+        }
+
+        public void SetAlpha(float alpha) {
+            _fadeColor.a = alpha;
+            foreach(var image in _images) {
+                image.color = _fadeColor;
+            }
         }
 
         private void OnEnable() {
@@ -62,5 +84,7 @@ namespace VoidWars {
 
         private GameController _controller;
         private float _timer;
+        private MaskableGraphic[] _images;
+        private Color _fadeColor = new Color(1, 1, 1, 1);
     }
 }

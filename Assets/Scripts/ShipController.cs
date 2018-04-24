@@ -100,6 +100,13 @@ namespace VoidWars {
         }
 
         /// <summary>
+        /// Gets the ship's hull temperature in arbitrary [0,100] range.
+        /// </summary>
+        public float HullTemperature {
+            get { return _hullTemperature; }
+        }
+
+        /// <summary>
         /// Gets the ship's static class data.
         /// </summary>
         public ShipClass ShipClass {
@@ -207,13 +214,6 @@ namespace VoidWars {
         /// </summary>
         public float ShieldPercent {
             get { return _shieldPercent; }
-        }
-
-        /// <summary>
-        /// Gets the hull temperature.
-        /// </summary>
-        public float HullTemperature {
-            get { return _hullTemperature; }
         }
 
         /// <summary>
@@ -445,7 +445,39 @@ namespace VoidWars {
         }
 
         private void updateHullTemperature() {
-            // TODO
+            var temperature = _hullTemperature;
+            var suns = GameObject.FindGameObjectsWithTag("Sun");
+            if (suns.Length > 0) {
+                var shieldFraction = _energyBudget.Available(EnergyConsumer.Shields);
+                var e = 0.8f * shieldFraction + 0.55f;
+                var a = ShieldsActive ? (1f - e * _shieldPercent / 100f) : 1f;
+                const float K = 175f;
+                const float R = 3f;
+                foreach (var sun in suns) {
+                    var r = Vector3.Distance(sun.transform.position, gameObject.transform.position);
+                    var dT = a * K / Mathf.Pow(r / R + 1f, 2);
+                    temperature += dT;
+                }
+            }
+
+            temperature -= _coolingRate;
+            _hullTemperature = Mathf.Clamp(temperature, 0f, 100f);  
+            
+            // Disable items above their max T (and re-enable those under it).
+            foreach(var auxItem in _equipment) {
+                if (auxItem.State == AuxState.Operational) {
+                    if (_hullTemperature >= auxItem.Class.MaxTemperature) {
+                        auxItem.State = AuxState.Overheated;
+                        unapplyAuxiliary(auxItem.Class);
+                    }
+                }
+                else if (auxItem.State == AuxState.Overheated) {
+                    if (_hullTemperature < auxItem.Class.MaxTemperature) {
+                        auxItem.State = AuxState.Operational;
+                        applyAuxiliary(auxItem.Class);
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -546,6 +578,7 @@ namespace VoidWars {
             _powerDrain = _class.LifeSupportDrainRate;
             _shieldPercent = 100.0f;
             _health = _class.MaxHealth;
+            _coolingRate = _class.CoolingRate;
 
             // Figure out the total mass from the constituent bits - weapons and equipment.
             _totalMass = _class.Mass;
@@ -562,10 +595,18 @@ namespace VoidWars {
                 if ((EquipmentMask & mask) != 0) {
                     // Auxiliary device is equipped.
                     var auxClass = controller.ItemClasses[i];
-                    _equipment.Add(new AuxiliaryItem(auxClass));
+                    var auxItem = new AuxiliaryItem(auxClass);
+                    _equipment.Add(auxItem);
                     _totalMass += auxClass.Mass;
+                    if (auxClass.Mode == AuxMode.Continuous) {
+                        auxItem.State = AuxState.Operational;
+                        applyAuxiliary(auxClass);
+                    }
                 }
             }
+
+            // Can set parameters affected by aux items now.
+            _energy = _maxEnergy;
 
             updateSystemStatuses();
         }
@@ -620,24 +661,47 @@ namespace VoidWars {
         }
 
         private void applyAuxiliary(AuxiliaryClass aux) {
-            // Everything adds a bit of mass.
-            _totalMass += aux.Mass;
-
             // Everything has an effect on power.
             _powerDrain += aux.PowerUsage;
 
             // Specific effects here.
             switch(aux.ItemType) {
                 case AuxType.PowerCell:
-                    _energy += float.Parse(aux.Metadata);
-                    _maxEnergy = _energy;
+                    _maxEnergy += float.Parse(aux.Metadata);
                     break;
 
                 case AuxType.DriveBoost:
                     _maxMoveSize = int.Parse(aux.Metadata);
                     break;
 
+                case AuxType.CoolingElement:
+                    _coolingRate += float.Parse(aux.Metadata);
+                    break;
                 // TODO: other stuff.
+            }
+        }
+
+        private void unapplyAuxiliary(AuxiliaryClass aux) {
+            // Everything has an effect on power.
+            _powerDrain -= aux.PowerUsage;
+
+            // Specific effects here.
+            switch (aux.ItemType) {
+                case AuxType.PowerCell:
+                    _maxEnergy -= float.Parse(aux.Metadata);
+                    if (_energy > _maxEnergy) {
+                        _energy = _maxEnergy;
+                    }
+                    break;
+
+                case AuxType.DriveBoost:
+                    _maxMoveSize -= int.Parse(aux.Metadata);
+                    break;
+
+                case AuxType.CoolingElement:
+                    _coolingRate -= float.Parse(aux.Metadata);
+                    break;
+                    // TODO: other stuff.
 
             }
         }
@@ -675,6 +739,7 @@ namespace VoidWars {
         private readonly List<AuxiliaryItem> _equipment = new List<AuxiliaryItem>();
         private int _totalMass;
         private float _powerDrain;
+        private float _coolingRate;
         private EnergyBudget _energyBudget;
         private int _maxMoveSize = 3;
         private bool _canRepairItems;

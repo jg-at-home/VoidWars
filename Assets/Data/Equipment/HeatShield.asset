@@ -12,8 +12,14 @@ MonoBehaviour:
   m_Name: HeatShield
   m_EditorClassIdentifier: 
   Name: Heatshields
+  Icon: {fileID: 0}
   Description: Provides proection from thermal stress
-  ItemType: 16
-  PowerUsage: 0
-  Mass: 7
+  Detail: Provides proection from thermal stress
   Cost: 3
+  Mass: 7
+  PowerUsage: 0
+  MaxTemperature: 101
+  Metadata: 
+  RepairCost: 1
+  ItemType: 16
+  Mode: 0

@@ -60,5 +60,8 @@ namespace VoidWars {
 
         [Tooltip("Recharge rate")]
         public float RechargeRate;
+
+        [Tooltip("Cooling rate")]
+        public float CoolingRate;
     }
 }
