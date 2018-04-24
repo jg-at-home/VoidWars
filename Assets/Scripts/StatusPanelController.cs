@@ -58,6 +58,10 @@ namespace VoidWars {
             }
         }
 
+        private void OnEnable() {
+            _scrolling = false;   
+        }
+
         private void Update() {
             GaugeFill.fillAmount = Mathf.Repeat(Time.time, GaugePeriod);
             if (!_scrolling) {

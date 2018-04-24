@@ -423,9 +423,10 @@ namespace VoidWars {
         /// </summary>
         /// <param name="shipID">The ID of the ship to damage.</param>
         /// <param name="damage">The amount of damage to apply.</param>
-        public void ApplyDamageToShip(int shipID, float damage) {
+        /// <param name="dT">Change in temerpature of the ship as a result of the attack.</param>
+        public void ApplyDamageToShip(int shipID, float damage, float dT) {
             // Do damage on server.
-            _communicator.CmdApplyDamageToShip(shipID, damage);
+            _communicator.CmdApplyDamageToShip(shipID, damage, dT);
         }
 
         public void ShowDamage(int shipID, float damage) {

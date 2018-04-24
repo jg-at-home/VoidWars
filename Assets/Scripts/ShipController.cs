@@ -337,17 +337,43 @@ namespace VoidWars {
         }
 
         /// <summary>
-        /// Does damage to the ship.
+        /// Computes and applies damage to the ship.
         /// </summary>
         /// <param name="damage">The amount of damage to apply.</param>
-        public void ApplyDamage(float damage) {
+        /// <param name="dT">The temperature effect/</param>
+        /// <returns>The amount of damage done</returns>
+        public float ComputeDamage(float damage, float dT) {
             Debug.LogFormat("Ship ID {0} took {1} damage", ID, damage);
 
+            // How much the shields reduce damage by at 100%
+            const float MaxShieldEfficiency = 0.5f;
+            if (ShieldsActive) {
+                var shieldFrac = _shieldPercent / 100f;
+                var shieldReduction = shieldFrac * MaxShieldEfficiency;
+                damage *= (1f - shieldReduction);
+                dT *= (1f - shieldReduction);
+                
+                _shieldPercent -= damage;
+                if (_shieldPercent <= 0) {
+                    Debug.LogFormat("Ship #{0}'s shields have -failed-", ID);
+                    // TODO: notify player shields have failed.
+                    _shieldsActive = false;
+                    damage = -_shieldPercent;
+                    _shieldPercent = 0;
+                }
+            }
+
+            // Apply any heat to the ship.
+            _hullTemperature = Mathf.Clamp(_hullTemperature + dT, 0f, 100f);
+
+            // Whatever damage is left after the shields goes into the hull.
             _health -= damage;
             if (_health <= 0) {
                 Debug.LogFormat("Ship {0} is DEAD!!!!", ID);
                 // TODO: explodify ship, remove from game, etc.
             }
+
+            return damage;
         }
 
         /// <summary>
@@ -461,18 +487,23 @@ namespace VoidWars {
             }
 
             temperature -= _coolingRate;
-            _hullTemperature = Mathf.Clamp(temperature, 0f, 100f);  
-            
+            _hullTemperature = Mathf.Clamp(temperature, 0f, 100f);              
+        }
+
+        private void onHullTemperatureChanged(float temperature) {
+            Debug.LogFormat("Ship #{0}: T_hull = {1}", ID, temperature);
             // Disable items above their max T (and re-enable those under it).
-            foreach(var auxItem in _equipment) {
+            foreach (var auxItem in _equipment) {
                 if (auxItem.State == AuxState.Operational) {
-                    if (_hullTemperature >= auxItem.Class.MaxTemperature) {
+                    if (temperature >= auxItem.Class.MaxTemperature) {
+                        // TODO: notification
                         auxItem.State = AuxState.Overheated;
                         unapplyAuxiliary(auxItem.Class);
                     }
                 }
                 else if (auxItem.State == AuxState.Overheated) {
-                    if (_hullTemperature < auxItem.Class.MaxTemperature) {
+                    if (temperature < auxItem.Class.MaxTemperature) {
+                        // TODO: notification
                         auxItem.State = AuxState.Operational;
                         applyAuxiliary(auxItem.Class);
                     }
@@ -724,7 +755,7 @@ namespace VoidWars {
         [SyncVar] private float _shieldEnergy;
         [SyncVar] private float _weaponsLevel;
         [SyncVar] private float _shieldPercent;
-        [SyncVar] private float _hullTemperature;
+        [SyncVar(hook="onHullTemperatureChanged")] private float _hullTemperature;
         [SyncVar] private float _health;
         private bool _lifeSupportOK = true;
         private bool _primaryWeaponsOK = true;

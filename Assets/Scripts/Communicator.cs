@@ -102,15 +102,21 @@ namespace VoidWars {
             controller.NotifyActiveShip(ownerID, shipID);
         }
 
+        /// <summary>
+        /// Applies damage to a ship on the server.
+        /// </summary>
+        /// <param name="shipID">The ship's ID</param>
+        /// <param name="damage">The amount of damage to do.</param>
+        /// <param name="dT">The temperature effect/</param>
         [Command]
-        public void CmdApplyDamageToShip(int shipID, float damage) {
+        public void CmdApplyDamageToShip(int shipID, float damage, float dT) {
             var ship = controller.GetShip(shipID);
-            ship.ApplyDamage(damage);
-            RpcApplyDamageToShip(shipID, damage);
+            damage = ship.ComputeDamage(damage, dT);
+            RpcShowDamagePopup(shipID, damage);
         }
 
         [ClientRpc]
-        void RpcApplyDamageToShip(int shipID, float damage) {
+        void RpcShowDamagePopup(int shipID, float damage) {
             controller.ShowDamage(shipID, damage);
         }
 
@@ -223,11 +229,7 @@ namespace VoidWars {
         /// </summary>
         /// <param name="newPhase">The new phase.</param>
         public void NotifyPlayPhaseChange(PlayPhase newPhase) {
-            if (!isServer) {
-                Debug.Log("Boo");
-            }
             Debug.Assert(isServer);
-
             RpcNotifyPlayPhaseChange(newPhase);
         }
 
