@@ -22,7 +22,7 @@ namespace VoidWars {
         }
 
         protected override void refresh() {
-            var shipController = controller.GetActiveShip();
+            var shipController = activeShip;
             if (shipController != null) {
                 var shieldEnergy = shipController.ShieldEnergy;
                 var weaponsEnergy = shipController.WeaponsEnergy;

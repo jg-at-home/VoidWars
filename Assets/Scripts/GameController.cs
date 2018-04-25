@@ -312,6 +312,7 @@ namespace VoidWars {
         /// <param name="applyDamage">If true, apply the damage.</param>
         public void PerformAttack(int sourceID, int targetID, int weaponSlot) {
             EnableDoneButton(false);
+            EnableStatusPanel(false);
             StartCoroutine(attackCoroutine(sourceID, targetID, weaponSlot));
         }
 

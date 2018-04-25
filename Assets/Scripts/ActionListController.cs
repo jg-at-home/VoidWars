@@ -44,11 +44,7 @@ namespace VoidWars {
             var prefabPath = "Prefabs/UI/" + prefabName;
             var panelPrefab = (GameObject)Resources.Load(prefabPath);
             var panel = Instantiate(panelPrefab);
-            if (_current != null) {
-                _current.transform.SetParent(null, false);
-                // TODO: cache?
-                Destroy(_current.gameObject);
-            }
+            clearDetailPanel();
 
             panel.transform.SetParent(_detailPanel, false);
             _current = panel.GetComponent<ActionDetailPanelController>();
@@ -60,7 +56,16 @@ namespace VoidWars {
             }
         }
 
+        private void clearDetailPanel() {
+            if (_current != null) {
+                _current.transform.SetParent(null, false);
+                Destroy(_current.gameObject);
+                _current = null;
+            }
+        }
+
         private void OnEnable() {
+            clearDetailPanel();
             Refresh();
         }
 

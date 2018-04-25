@@ -346,10 +346,11 @@ namespace VoidWars {
             Debug.LogFormat("Ship ID {0} took {1} damage", ID, damage);
 
             // How much the shields reduce damage by at 100%
-            const float MaxShieldEfficiency = 0.5f;
+            const float MaxShieldEfficiency = 0.95f;
             if (ShieldsActive) {
                 var shieldFrac = _shieldPercent / 100f;
-                var shieldReduction = shieldFrac * MaxShieldEfficiency;
+                var shieldEfficiency = MaxShieldEfficiency * (_energyBudget.Available(EnergyConsumer.Shields)/0.25f);
+                var shieldReduction = Mathf.Clamp01(shieldFrac * shieldEfficiency);
                 damage *= (1f - shieldReduction);
                 dT *= (1f - shieldReduction);
                 

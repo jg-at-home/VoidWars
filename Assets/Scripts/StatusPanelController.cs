@@ -18,6 +18,13 @@ namespace VoidWars {
         public float PanelScrollInterval = 3f;
         public float FadeTime = 0.5f;
 
+        /// <summary>
+        /// Gets the ship to show status for.
+        /// </summary>
+        public ShipController ActiveShip {
+            get { return _activeShip; }
+        }
+
         public void OnNextButton() {
             onButtonClicked();
             nextPanel();
@@ -59,7 +66,8 @@ namespace VoidWars {
         }
 
         private void OnEnable() {
-            _scrolling = false;   
+            _scrolling = false;
+            _activeShip = Util.GetGameController().GetActiveShip();
         }
 
         private void Update() {
@@ -113,7 +121,7 @@ namespace VoidWars {
 
                 panelInstance = _panels[panel];
                 panelInstance.GetComponent<RectTransform>().SetParent(PanelRoot,false);
-                panelInstance.OnActivation();
+                panelInstance.OnActivation(this);
                 _currentPanel = panelInstance;
 
                 TitleText.text = panelInstance.Name;
@@ -124,6 +132,7 @@ namespace VoidWars {
         private int _currentPanelIndex;
         private float _timer;
         private bool _scrolling;
-        private SubpanelController _currentPanel; 
+        private SubpanelController _currentPanel;
+        public ShipController _activeShip;
     }
 }

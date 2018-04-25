@@ -27,15 +27,20 @@ namespace VoidWars {
             }
         }
 
+        /// <summary>
+        /// Sets the transparency level for the panel/
+        /// </summary>
+        /// <param name="alpha">Transparency in [0,1]</param>
         public void SetAlpha(float alpha) {
-            _fadeColor.a = alpha;
             foreach(var image in _images) {
-                image.color = _fadeColor;
+                var color = image.color;
+                color.a = alpha;
+                image.color = color;
             }
         }
 
         private void OnEnable() {
-            initialize();    
+            initialize();
         }
 
         private void Update() {
@@ -52,11 +57,11 @@ namespace VoidWars {
             bool changed = false;
             var current = image.fillAmount;
             if (current < level) {
-                image.fillAmount = Mathf.Min(image.fillAmount + MeterSpeed * Time.deltaTime, level);
+                image.fillAmount = Mathf.Min(current + MeterSpeed * Time.deltaTime, level);
                 changed = true;
             }
             else if (current > level) {
-                image.fillAmount = Mathf.Max(image.fillAmount - MeterSpeed * Time.deltaTime, level);
+                image.fillAmount = Mathf.Max(current - MeterSpeed * Time.deltaTime, level);
                 changed = true;
             }
 
@@ -73,18 +78,31 @@ namespace VoidWars {
             get { return _controller; }
         }
 
-        public virtual void OnActivation() {
+        protected ShipController activeShip {
+            get {
+                if (_root != null) {
+                    return _root.ActiveShip;
+                }
+                else {
+                    return null;
+                }
+            }
+        }
+
+        public virtual void OnActivation(StatusPanelController root) {
             _timer = 0.0f;
             gameObject.SetActive(true);
+            _root = root;
         }
 
         public virtual void OnDeactivation() {
             gameObject.SetActive(false);
+            _root = null;
         }
 
         private GameController _controller;
+        private StatusPanelController _root;
         private float _timer;
         private MaskableGraphic[] _images;
-        private Color _fadeColor = new Color(1, 1, 1, 1);
     }
 }
