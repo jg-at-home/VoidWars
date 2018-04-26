@@ -2,6 +2,9 @@
 using UnityEngine.UI;
 
 namespace VoidWars {
+    /// <summary>
+    /// Panel showing the status of the life support systems.
+    /// </summary>
     public class LifeSupportSubpanelController : SubpanelController {
         public Text StatusText;
 

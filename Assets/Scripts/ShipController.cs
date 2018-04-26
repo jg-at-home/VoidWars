@@ -228,6 +228,23 @@ namespace VoidWars {
         public delegate void OnMoveFinished(int shipID);
 
         /// <summary>
+        /// Gets the number of auxiliary items equipped.
+        /// </summary>
+        /// <returns>The aux count.</returns>
+        public int GetAuxiliaryCount() {
+            return _equipment.Count;
+        }
+
+        /// <summary>
+        /// Gets an aux by index.
+        /// </summary>
+        /// <param name="index">The index.</param>
+        /// <returns>The requested aux.</returns>
+        public AuxiliaryItem GetAuxiliaryItem(int index) {
+            return _equipment[index];
+        }
+
+        /// <summary>
         /// Gets the weapon type for the slot (0=primary, 1 = secondary)
         /// </summary>
         /// <param name="slot">Slot index.</param>
