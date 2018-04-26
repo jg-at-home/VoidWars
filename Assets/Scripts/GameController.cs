@@ -62,6 +62,11 @@ namespace VoidWars {
         public GameObject TargetIndicatorPrefab;
         public GameObject LaserPrefab;
 
+        public void OnShieldsFailed(ShipController ship) {
+            Debug.Log("Shields failed");
+            _communicator.CmdSetShieldStatus(ship.ID, false);
+        }
+
         /// <summary>
         /// Gets the current game state.
         /// </summary>

@@ -33,7 +33,7 @@ namespace VoidWars {
             }
 
             // Shields.
-            if (_shieldsOK) {
+            if (_shieldsOK && (_shieldPercent > 0f)) {
                 if (_shieldsActive) {
                     // Disable shields.
                     actions.Add(new ActionItem {

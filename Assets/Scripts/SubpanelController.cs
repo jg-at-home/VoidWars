@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
 namespace VoidWars {
@@ -11,20 +10,7 @@ namespace VoidWars {
 
         private void Awake() {
             _controller = Util.GetGameController();
-
-            var images = new List<MaskableGraphic>();
-            findComponents(gameObject.transform, images);
-            _images = images.ToArray();
-        }
-
-        private static void findComponents<T>(Transform element, List<T> items) {
-            foreach (Transform child in element) {
-                var comp = child.GetComponent<T>();
-                if (comp != null) {
-                    items.Add(comp);
-                }
-                findComponents(child, items);
-            }
+            _images = GetComponentsInChildren<MaskableGraphic>();
         }
 
         /// <summary>

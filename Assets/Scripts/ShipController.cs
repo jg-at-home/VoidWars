@@ -206,7 +206,7 @@ namespace VoidWars {
         /// Shields working?
         /// </summary>
         public bool IsShieldsOK {
-            get { return _shieldEnergy >= _class.ShieldDrainRate; }
+            get { return (_shieldEnergy >= _class.ShieldDrainRate) && (_shieldPercent > 0); }
         }
 
         /// <summary>
@@ -345,8 +345,8 @@ namespace VoidWars {
         public float ComputeDamage(float damage, float dT) {
             Debug.LogFormat("Ship ID {0} took {1} damage", ID, damage);
 
-            // How much the shields reduce damage by at 100%
-            const float MaxShieldEfficiency = 0.95f;
+            // How much the shields reduce damage by at 100% when energy is nominally distributed (25%)
+            const float MaxShieldEfficiency = 0.8f;
             if (ShieldsActive) {
                 var shieldFrac = _shieldPercent / 100f;
                 var shieldEfficiency = MaxShieldEfficiency * (_energyBudget.Available(EnergyConsumer.Shields)/0.25f);
@@ -391,24 +391,27 @@ namespace VoidWars {
             // Hull temperature.
             updateHullTemperature();
 
+            // Other systems.
             updateSystemStatuses();
         }
 
         private void updateSystemStatuses() {
             // Check systems.
-            _shieldEnergy = GetEnergyBudgetFor(EnergyConsumer.Shields);
-            if (_shieldsOK) {
-                if (_shieldEnergy < _class.ShieldDrainRate) {
-                    // Shields have failed.
-                    Debug.Log("Shields failed.");
-                    _shieldsOK = false;
-                    // TODO: turn shields off.
+            if (_shieldPercent > 0f) {
+                _shieldEnergy = GetEnergyBudgetFor(EnergyConsumer.Shields);
+                if (_shieldsOK) {
+                    if (_shieldEnergy < _class.ShieldDrainRate) {
+                        // Shields have failed.
+                        _shieldsOK = false;
+                        var gameController = Util.GetGameController();
+                        gameController.OnShieldsFailed(this);
+                    }
                 }
-            }
-            else {
-                if (_shieldEnergy >= _class.ShieldDrainRate) {
-                    _shieldsOK = true;
-                    Debug.Log("Shields online");
+                else {
+                    if (_shieldEnergy >= _class.ShieldDrainRate) {
+                        _shieldsOK = true;
+                        Debug.Log("Shields online");
+                    }
                 }
             }
 

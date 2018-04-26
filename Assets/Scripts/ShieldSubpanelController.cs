@@ -6,6 +6,7 @@ namespace VoidWars {
         public Image ShieldPowerBar;
         public Image ShieldLevelBar;
         public Text ShieldLevelText;
+        public Image DisabledImage;
 
         protected override void initialize() {
             refresh();
@@ -16,6 +17,7 @@ namespace VoidWars {
         protected override void refresh() {
             var ship = activeShip;
             if (ship != null) {
+                DisabledImage.enabled = !ship.IsShieldsOK;
                 _shieldPower = activeShip.ShieldEnergy / activeShip.MaxEnergy;
                 if (activeShip.ShieldsActive) {
                     _shieldLevel = activeShip.ShieldPercent;
