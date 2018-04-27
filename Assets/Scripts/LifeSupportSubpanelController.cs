@@ -1,18 +1,21 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 namespace VoidWars {
     /// <summary>
     /// Panel showing the status of the life support systems.
     /// </summary>
     public class LifeSupportSubpanelController : SubpanelController {
-        public Text StatusText;
+        public TextMeshProUGUI StatusText;
+        public GraphSim[] Graphs;
 
         protected override void initialize() {
             refresh();
         }
 
         protected override void refresh() {
+            var failed = false;
             if (activeShip != null) {
                 if (activeShip.LifeSupportEnergy > 2f*activeShip.ShipClass.LifeSupportDrainRate) {
                     StatusText.color = Color.white;
@@ -25,6 +28,10 @@ namespace VoidWars {
                 else {
                     StatusText.color = Color.red;
                     StatusText.text = "FAILED";
+                    failed = true;
+                }
+                foreach (var graph in Graphs) {
+                    graph.FlatLine(failed);
                 }
             }
         }
