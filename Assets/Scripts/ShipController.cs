@@ -182,24 +182,12 @@ namespace VoidWars {
         }
 
         /// <summary>
-        /// Primary weapons working?
+        /// Gets the state of a weapon by slot.
         /// </summary>
-        public bool IsPrimaryWeaponOK {
-            get { return _weaponsLevel >= _primaryWeapon.PowerUsage; }
-        }
-
-        /// <summary>
-        /// Secondary weapons working (if fitted).
-        /// </summary>
-        public bool IsSecondaryWeaponOK {
-            get {
-                if (_secondaryWeapon == null) {
-                    return true;
-                }
-                else {
-                    return _weaponsLevel >= _secondaryWeapon.PowerUsage;
-                }
-            }
+        /// <param name="slot">The slot number {0,1}</param>
+        /// <returns>The state of the weapon.</returns>
+        public AuxState GetWeaponState(int slot) {
+            return (slot == 0) ? _primaryWeaponState : _secondaryWeaponState;
         }
 
         /// <summary>
@@ -418,6 +406,15 @@ namespace VoidWars {
 
             // Other systems.
             updateSystemStatuses();
+            updateWeapons();
+        }
+
+        private void updateWeapons() {
+            _weaponsLevel = GetEnergyBudgetFor(EnergyConsumer.Weapons);
+            updateWeaponState(_primaryWeapon, ref _primaryWeaponState);
+            if (_secondaryWeapon != null) {
+                updateWeaponState(_secondaryWeapon, ref _secondaryWeaponState);
+            }
         }
 
         private void updateSystemStatuses() {
@@ -473,29 +470,24 @@ namespace VoidWars {
                 Debug.Log("Propulsion online");
                 _propulsionOK = true;
             }
+        }
 
-            _weaponsLevel = GetEnergyBudgetFor(EnergyConsumer.Weapons);
-            if (_primaryWeaponsOK) {
-                if (_weaponsLevel < _primaryWeapon.PowerUsage) {
-                    _primaryWeaponsOK = false;
-                    Debug.LogWarning("Primary weapons unavailable");
-                }
-            }
-            else if (_weaponsLevel >= _primaryWeapon.PowerUsage) {
-                Debug.Log("Primary weapons online");
-                _primaryWeaponsOK = true;
-            }
-            if (_secondaryWeapon != null) {
-                if (_secondaryWeaponsOK) {
-                    if (_weaponsLevel < _secondaryWeapon.PowerUsage) {
-                        _secondaryWeaponsOK = false;
-                        Debug.LogWarning("Secondary weapons unavailable");
+        private void updateWeaponState(WeaponClass weaponClass, ref AuxState state) {
+            switch (state) {
+                case AuxState.Idle:
+                    if (_weaponsLevel >= weaponClass.PowerUsage) {                        
+                            state = AuxState.Operational;
                     }
-                }
-                else if (_weaponsLevel >= _secondaryWeapon.PowerUsage) {
-                    Debug.Log("Secondary weapons online");
-                    _secondaryWeaponsOK = true;
-                }
+                    break;
+
+                case AuxState.Operational:
+                    if (_weaponsLevel < weaponClass.PowerUsage) {
+                        state = AuxState.Idle;
+                    }
+                    break;
+
+                case AuxState.Overheated:
+                    break;
             }
         }
 
@@ -535,6 +527,31 @@ namespace VoidWars {
                         // TODO: notification
                         auxItem.State = AuxState.Operational;
                         applyAuxiliary(auxItem.Class);
+                    }
+                }
+            }
+
+            // Weapons, too.
+            checkWeaponTemperature(_primaryWeapon, ref _primaryWeaponState);
+            if (_secondaryWeapon != null) {
+                checkWeaponTemperature(_secondaryWeapon, ref _secondaryWeaponState);
+            }
+        }
+
+        private void checkWeaponTemperature(WeaponClass weaponClass, ref AuxState state) {
+            if (state == AuxState.Operational) {
+                if (_hullTemperature >= weaponClass.MaxTemperature) {
+                    Debug.LogWarningFormat("!!!Weapon '{0}' overheated", weaponClass.Name);
+                    state = AuxState.Overheated;
+                }
+            }
+            else if (state == AuxState.Overheated) {
+                if (_hullTemperature < weaponClass.MaxTemperature) {
+                    if (_weaponsLevel >= weaponClass.PowerUsage) {
+                        state = AuxState.Operational;
+                    }
+                    else {
+                        state = AuxState.Idle;
                     }
                 }
             }
@@ -651,10 +668,12 @@ namespace VoidWars {
             _totalMass = _class.Mass;
             Debug.Assert(PrimaryWeaponType != WeaponType.None);
             _primaryWeapon = controller.GetWeaponClass(PrimaryWeaponType);
+            _primaryWeaponState = AuxState.Operational;
             _totalMass += _primaryWeapon.Mass;
             if (SecondaryWeaponType != WeaponType.None) {
                 _secondaryWeapon = controller.GetWeaponClass(SecondaryWeaponType);
                 _totalMass += _secondaryWeapon.Mass;
+                _secondaryWeaponState = AuxState.Operational;
             }
 
             var mask = 1;
@@ -794,8 +813,10 @@ namespace VoidWars {
         [SyncVar(hook="onHullTemperatureChanged")] private float _hullTemperature;
         [SyncVar] private float _health;
         private bool _lifeSupportOK = true;
-        private bool _primaryWeaponsOK = true;
-        private bool _secondaryWeaponsOK = true;
+        private AuxState _primaryWeaponState;
+        private AuxState _secondaryWeaponState;
+        //private bool _primaryWeaponsOK = true;
+        //private bool _secondaryWeaponsOK = true;
         private bool _propulsionOK = true;
         private bool _shieldsOK = true;
         private int _roundsWithoutLifeSupport;

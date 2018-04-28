@@ -38,11 +38,20 @@ namespace VoidWars {
                 var gameController = Util.GetGameController();
                 row.gameObject.SetActive(true);
                 text.text = gameController.GetWeaponClass(type).Name;
-                if (ship.IsPrimaryWeaponOK) {
-                    icon.sprite = ActiveSprite;
-                }
-                else {
-                    icon.sprite = InactiveSprite;
+                switch(ship.GetWeaponState(slot)) {
+                    case AuxState.Broken:
+                        // TODO: consider the possibility of breaking weapons.
+                    case AuxState.Idle:
+                        icon.sprite = InactiveSprite;
+                        break;
+
+                    case AuxState.Operational:
+                        icon.sprite = ActiveSprite;
+                        break;
+
+                    case AuxState.Overheated:
+                        icon.sprite = OverheatSprite;
+                        break;
                 }
             }
         }
