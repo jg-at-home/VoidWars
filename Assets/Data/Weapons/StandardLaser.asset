@@ -28,3 +28,4 @@ MonoBehaviour:
   PrimaryAngle: 45
   SecondaryAngle: 30
   RequiresLineOfSight: 1
+  SoundEffect: {fileID: 8300000, guid: 6debb7ef153a2c744bf12d4697a71a96, type: 3}

@@ -12,7 +12,7 @@ namespace VoidWars {
         public override void OnDoneButtonClicked() {
             var gameController = Util.GetGameController();
             gameController.StoreSelectedMove();
-            gameController.NextShip();
+            base.OnDoneButtonClicked();
         }
 
         /// <summary>

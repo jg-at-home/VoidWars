@@ -26,10 +26,10 @@ namespace VoidWars {
             Physics.Raycast(ray, out hit, layer);
             var color = (weaponClass.WeaponType == WeaponType.Laser) ? Color.red : Color.magenta;
             laser.Run(color, sourcePoint, hit.point);
-
-            yield return new WaitForSeconds(laser.Duration);
-
+            source.AudioPlayer.PlayOneShot(weaponClass.SoundEffect);
+            yield return new WaitForSeconds(laser.Duration);            
             laser.Stop();
+            source.AudioPlayer.Stop();
 
             if (applyDamage) {
                 /* Compute the amount of damage to do and push that to the server. */

@@ -40,6 +40,7 @@ namespace VoidWars {
         }
 
         private void onButtonClicked() {
+            SendMessageUpwards("PlayButtonClick");
             _timer = 0;
             _currentPanel.SetAlpha(1f);
             if (_scrolling) {

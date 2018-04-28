@@ -18,6 +18,7 @@
         /// Called when the Done button is clicked.
         /// </summary>
         public override void OnDoneButtonClicked() {
+            SendMessageUpwards("PlayButtonClick");
             var gameController = Util.GetGameController();
             gameController.ActionPanel.SelectCurrentAction();
             gameController.NextAction();

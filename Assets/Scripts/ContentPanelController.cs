@@ -62,6 +62,7 @@ namespace VoidWars {
         /// Called when the Done button is clicked.
         /// </summary>
         public virtual void OnDoneButtonClicked() {
+            SendMessageUpwards("PlayButtonClick");
             var gameController = Util.GetGameController();
             gameController.NextShip();
         }

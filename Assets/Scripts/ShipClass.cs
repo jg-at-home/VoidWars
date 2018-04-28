@@ -63,5 +63,9 @@ namespace VoidWars {
 
         [Tooltip("Cooling rate")]
         public float CoolingRate;
+
+        [Header("Sound effects")]
+        public AudioClip EnginesClip;
+        public AudioClip ShieldsClip;
     }
 }

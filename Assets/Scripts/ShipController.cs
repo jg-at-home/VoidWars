@@ -300,6 +300,7 @@ namespace VoidWars {
                 _shieldsActive = enable;
                 if (enable) {
                     _powerDrain += _class.ShieldDrainRate;
+                    _audioSource.PlayOneShot(_class.ShieldsClip);
                 }
                 else {
                     _powerDrain -= _class.ShieldDrainRate;
@@ -324,6 +325,13 @@ namespace VoidWars {
             else {
                 shields.SetEffectOff();
             }
+        }
+
+        /// <summary>
+        /// Gets the ship's audio player.
+        /// </summary>
+        public AudioSource AudioPlayer {
+            get { return _audioSource; }
         }
 
         /// <summary>
@@ -560,6 +568,12 @@ namespace VoidWars {
         /// </summary>
         /// <param name="enable">Status flag.</param>
         public void EnableEngineFX(bool enable) {
+            if (enable) {
+                _audioSource.PlayOneShot(_class.EnginesClip);
+            }
+            else {
+                _audioSource.Stop();
+            }
             foreach(var engine in _engineFX) {
                 engine.SetActive(enable);
             }
@@ -612,6 +626,7 @@ namespace VoidWars {
         private void Awake() {
             _controlState = ControlState.UNINITIALIZED;
             _engineFX = Util.FindChildrenWithTag(gameObject, "Engine");
+            _audioSource = GetComponent<AudioSource>();
         }
 
         public override void OnStartClient() {
@@ -797,5 +812,6 @@ namespace VoidWars {
         private bool _canRepairItems;
         private int _actionsThisTurn = 1;
         private GameObject[] _engineFX;
+        private AudioSource _audioSource;
     }
 }

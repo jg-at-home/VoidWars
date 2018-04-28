@@ -23,12 +23,14 @@ namespace VoidWars {
         private void Update() {
             int next = _currentMove;
             if (Input.GetKeyDown(KeyCode.LeftArrow)) {
+                _gameController.UIAudioPlayer.PlayButtonClick();
                 next = _currentMove - 1;
                 if (next < 0) {
                     next = _legalMoves.Count - 1;
                 }
             }
             else if (Input.GetKeyDown(KeyCode.RightArrow)) {
+                _gameController.UIAudioPlayer.PlayButtonClick();
                 next = _currentMove + 1;
                 if (next == _legalMoves.Count) {
                     next = 0;

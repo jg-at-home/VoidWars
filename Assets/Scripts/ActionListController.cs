@@ -39,6 +39,7 @@ namespace VoidWars {
                 return;
             }
 
+            SendMessageUpwards("PlayButtonClick");
             var prefabInfoParts = item.EditorPrefabInfo.Split(' ');
             var prefabName = prefabInfoParts[0];
             var prefabPath = "Prefabs/UI/" + prefabName;

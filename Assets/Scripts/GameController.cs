@@ -56,6 +56,7 @@ namespace VoidWars {
         public TitleTextController TitleController;
         public StatusPanelController StatusPanelController;
         public DamageIndicator DamageIndicator;
+        public UIAudioPlayer UIAudioPlayer;
 
         [Header("Prefabs")]
         public GameObject MapPinPrefab;
@@ -298,6 +299,7 @@ namespace VoidWars {
             // If the ship is one of "ours", bail.
             var targetShip = target.GetComponent<ShipController>();
             if ((targetShip == null) || (targetShip.OwnerID == _communicator.ID)) {
+                UIAudioPlayer.PlayErrorSound();
                 return;
             }
 
@@ -309,6 +311,7 @@ namespace VoidWars {
             }
 
             // It's an enemy. Change phase to ATTACKING.
+            UIAudioPlayer.PlayButtonClick();
             _target = target;
             performAttack();
         }

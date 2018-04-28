@@ -51,5 +51,8 @@ namespace VoidWars {
 
         [Tooltip("If true, weapon requires direct line-of-sight to function")]
         public bool RequiresLineOfSight;
+
+        [Tooltip("The noise to make when invoked")]
+        public AudioClip SoundEffect;            
     }
 }
