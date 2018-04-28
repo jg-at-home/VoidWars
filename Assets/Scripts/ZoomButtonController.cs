@@ -6,50 +6,44 @@ namespace VoidWars {
     /// Controller for the zoom in/out button. Changes icons like a proper toggle.
     /// </summary>
     public class ZoomButtonController : MonoBehaviour {
-        [SerializeField] private Sprite _magPlusSprite;
-        [SerializeField] private Sprite _magMinusSprite;
-        private Image _icon;
-        private Text _text;
-
         private void Start() {
-            _icon = GetComponent<Image>();
-            _text = GetComponentInChildren<Text>();
             refreshUI();
+        }
+
+        public void ResetZoom() {
+            _zoomLevel = 0;
+            refreshUI();
+            var gameController = Util.GetGameController();
+            gameController.ResetZoom();
         }
 
         public void ZoomOut() {
-            if (_magnify) {
-                toggleZoom();
+            if (_zoomLevel > 0) {
+                --_zoomLevel;
+                refresh();                
             }
         }
 
-        public void OnButtonPressed() {
-            toggleZoom();
+        public void ZoomIn() {
+            if (_zoomLevel < 2) {
+                ++_zoomLevel;
+                refresh();
+            }
         }
 
-        private void toggleZoom() {
-            _magnify = !_magnify;
+        private void refresh() {
             refreshUI();
             var gameController = Util.GetGameController();
-            if (_magnify) {
-                gameController.ZoomIn();
-            }
-            else {
-                gameController.ZoomOut();
-            }
+            gameController.SetZoomLevel(_zoomLevel);
         }
 
         private void refreshUI() {
-            if (_magnify) {
-                _icon.sprite = _magMinusSprite;
-                _text.text = "Zoom out";
-            }
-            else {
-                _icon.sprite = _magPlusSprite;
-                _text.text = "Zoom in";
-            }
+            _inButton.interactable = _zoomLevel < 2;
+            _outButton.interactable = _zoomLevel > 0;
         }
 
-        private bool _magnify;
+        [SerializeField] private Button _inButton;
+        [SerializeField] private Button _outButton;
+        private int _zoomLevel;
     }
 }

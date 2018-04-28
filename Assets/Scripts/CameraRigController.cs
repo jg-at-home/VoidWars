@@ -7,26 +7,19 @@ namespace VoidWars {
     /// </summary>
     public class CameraRigController : MonoBehaviour {
         [SerializeField] private Transform _start;
-        [SerializeField] private Transform _zoomedOut;
-        [SerializeField] private Transform _zoomedIn;
         [SerializeField] private float _smoothTime = 1.0f;
         [SerializeField] private float _tolerance = 0.01f;
+        [SerializeField] private Transform[] _zoomPositions;
 
         private void Start() {
             gameObject.transform.position = _start.position;
         }
 
         /// <summary>
-        /// Zoom out to the zoomed out position.
-        /// </summary>
-        public void ZoomOut() {
-            StartCoroutine(moveCamera(_zoomedOut.position));
-        }
-
-        /// <summary>
         /// Zooms to the start position (pretty close to the sun, looks cool).
         /// </summary>
         public void ZoomToStart() {
+            StopAllCoroutines();
             StartCoroutine(moveCamera(_start.position));
         }
 
@@ -34,11 +27,12 @@ namespace VoidWars {
         /// Zooms to be above the target position.
         /// </summary>
         /// <param name="target"></param>
-        public void ZoomTo(Vector3 target) {
+        public void ZoomTo(Vector3 target, int level) {
             Vector3 actualTarget;
             actualTarget.x = target.x;
-            actualTarget.y = _zoomedIn.position.y;
+            actualTarget.y = _zoomPositions[level].position.y;
             actualTarget.z = target.z;
+            StopAllCoroutines();
             StartCoroutine(moveCamera(actualTarget));
         }
 

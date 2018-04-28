@@ -93,21 +93,26 @@ namespace VoidWars {
         /// Zooms the view in. If there's an active ship it will centre on that. Otherwise to
         /// the board centre.
         /// </summary>
-        public void ZoomIn() {
+        /// <param name="level">The level of zoom {0,1,2}</param>
+        public void SetZoomLevel(int level) {
+            Debug.LogFormat("GameController.SetZoomLevel({0})", level);
+
             if (_activeShip != null) {
-                CameraRig.ZoomTo(_activeShip.transform.position);
+                CameraRig.ZoomTo(_activeShip.transform.position, level);
             }
             else {
-                CameraRig.ZoomTo(Vector3.zero);
+                CameraRig.ZoomTo(Vector3.zero, level);
+
             }
         }
 
         /// <summary>
-        /// Zooms the camera out.
+        /// Zooms all the way out an centers the camera.
         /// </summary>
-        public void ZoomOut() {
-            CameraRig.ZoomOut();
+        public void ResetZoom() {
+            CameraRig.ZoomTo(Vector3.zero, 0);
         }
+
 
         /// <summary>
         /// Makes the info panel visible and sets its content up.
@@ -951,16 +956,17 @@ namespace VoidWars {
                 case GameState.LOBBY:
                     break;
 
-                case GameState.SETUP:
-                    TitleController.Stop();
-                    CameraRig.ZoomOut();
+                case GameState.SETUP: {
+                        TitleController.Stop();
+                        var zoomControl = ControlPanel.GetComponentInChildren<ZoomButtonController>();
+                        zoomControl.ResetZoom();
+                    }
                     break;
 
-                case GameState.IN_PLAY:
-                    var zoomControl = ControlPanel.GetComponentInChildren<ZoomButtonController>();
-                    zoomControl.ZoomOut();
-                    _selectedMoves.Clear();
-                    SetPlayPhase(PlayPhase.SELECTING_MOVES, notify);
+                case GameState.IN_PLAY: {
+                        _selectedMoves.Clear();
+                        SetPlayPhase(PlayPhase.SELECTING_MOVES, notify);
+                    }
                     break;
 
                 default:
@@ -988,11 +994,15 @@ namespace VoidWars {
 
         private void onEnterPhase(PlayPhase newPhase) {
             Debug.LogFormat("GameController.onEnterPhase{0})", newPhase);
-            
-            switch(newPhase) {
+
+            // TODO: Always reset zoom?
+            var zoomControl = ControlPanel.GetComponentInChildren<ZoomButtonController>();
+            zoomControl.ResetZoom();
+
+            switch (newPhase) {
                 case PlayPhase.SELECTING_MOVES:
                     // Reset the *local* action counter to 1.
-                    foreach(var ship in _ships) {
+                    foreach (var ship in _ships) {
                         ship.ResetActionsThisTurn();
                     }
                     break;
