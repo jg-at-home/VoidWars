@@ -508,7 +508,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 14ec0ba9769a2674aa5c56b1f6e46242, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  EnginesClip: {fileID: 8300000, guid: 0c4600c967b091a4691184cf5d2b70a5, type: 3}
   FrontNode: {fileID: 4556791272593114}
   RearNode: {fileID: 4558906575268874}
   ControlType: 0
@@ -520,3 +519,4 @@ MonoBehaviour:
   SecondaryWeaponType: 0
   EquipmentMask: 0
   MoveDuration: 1
+  _renderer: {fileID: 2300000}

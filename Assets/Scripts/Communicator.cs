@@ -176,9 +176,18 @@ namespace VoidWars {
                     shipController.OwnerID = ShipController.AI_OWNER;
                     shipController.ClassID = className;
                     shipController.PrimaryWeaponType = shipConfig.PrimaryWeapon;
+                    shipController.EquipmentMask = makeEquipmentMask(shipConfig.Equipment);
                     NetworkServer.Spawn(ship);
                 }
             }
+        }
+
+        private static int makeEquipmentMask(AuxType[] equipment) {
+            var mask = 0;
+            foreach(var item in equipment) {
+                mask |= (int)item;
+            }
+            return mask;
         }
 
         [ClientRpc]
@@ -205,6 +214,7 @@ namespace VoidWars {
             shipController.OwnerID = ownerID;
             shipController.ClassID = config.ClassName;
             shipController.PrimaryWeaponType = config.PrimaryWeapon;
+            shipController.EquipmentMask = makeEquipmentMask(config.Equipment);
             var player = controller.GetPlayer(ownerID);
             NetworkServer.SpawnWithClientAuthority(ship, player.Connection);
         }
@@ -284,6 +294,17 @@ namespace VoidWars {
         public void CmdSetShieldStatus(int shipID, bool enable) {
             var shipController = controller.GetShip(shipID);
             shipController.EnableShields(enable);
+        }
+
+        [Command]
+        public void CmdSetCloakStatus(int shipID, bool enable) {
+            RpcEnableCloaking(shipID, enable);
+        }
+
+        [ClientRpc]
+        void RpcEnableCloaking(int shipID, bool enable) {
+            var shipController = controller.GetShip(shipID);
+            shipController.EnableCloaking(enable);
         }
 
         #region UI

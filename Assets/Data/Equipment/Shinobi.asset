@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Name: Shinobi
   m_EditorClassIdentifier: 
   Name: Shinobi
-  Icon: {fileID: 0}
-  Description: Gives your ship stealth capability
-  Detail: Invisible in most circumstances
+  Icon: {fileID: 21300000, guid: 7506364e125f91649bb0a200184bc6f6, type: 3}
+  Description: stealth mode
+  Detail: Makes ship invisible in most circumstances
   Cost: 6
   Mass: 5
   PowerUsage: 15
@@ -22,4 +22,4 @@ MonoBehaviour:
   Metadata: 
   RepairCost: 8
   ItemType: 64
-  Mode: 0
+  Mode: 1

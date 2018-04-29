@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -205,6 +206,13 @@ namespace VoidWars {
         }
 
         /// <summary>
+        /// Is the ship in stealth mode?
+        /// </summary>
+        public bool IsCloaked {
+            get { return _cloakActive; }
+        }
+
+        /// <summary>
         /// How long it takes to move a single unit.
         /// </summary>
         public float MoveDuration = 1.0f;
@@ -227,9 +235,18 @@ namespace VoidWars {
         /// Gets an aux by index.
         /// </summary>
         /// <param name="index">The index.</param>
-        /// <returns>The requested aux.</returns>
-        public AuxiliaryItem GetAuxiliaryItem(int index) {
+        /// <returns>The requested aux class.</returns>
+        public AuxiliaryClass GetAuxiliaryItemClass(int index) {
             return _equipment[index];
+        }
+
+        /// <summary>
+        /// Gets the state of an equipped aux item by index.
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        public AuxState GetAuxiliaryItemState(int index) {
+            return _equipmentState[index];
         }
 
         /// <summary>
@@ -278,6 +295,76 @@ namespace VoidWars {
         }
 
         /// <summary>
+        /// Enables cloaking - yes, I'll use the ST reference as I keep forgetting wtf 'Shinobi'
+        /// means :-) Call server-side.
+        /// </summary>
+        public void EnableCloaking(bool enable) {
+            Debug.LogFormat("ShipController.EnableCloaking({0})", enable);
+
+            Debug.Assert(!_shieldsActive, "Needs to be caught in the UI");
+
+            var cloakIndex = _equipment.FindIndex(e => e.ItemType == AuxType.Shinobi);
+            Debug.Assert(cloakIndex >= 0, "No cloak?");
+
+            var cloakClass = _equipment[cloakIndex];
+            var cloakState = _equipmentState[cloakIndex];
+            Debug.Assert(cloakState != AuxState.Overheated, "Needs to be caught in the UI");
+
+            bool cloakActive = (cloakState == AuxState.Operational);
+            if (enable != cloakActive) {
+                if (enable) {
+                    // Turn the thing on.
+                    _equipmentState[cloakIndex] = AuxState.Operational;
+                    applyAuxiliary(cloakClass);
+                }
+                else {
+                    // Switch off.
+                    _equipmentState[cloakIndex] = AuxState.Idle;
+                    unapplyAuxiliary(cloakClass);
+                }
+            }
+        }
+
+        private void onCloakStateChanged(bool state) {
+            _cloakActive = state;
+            // We only want to apply the cloaking effect on machines where the ship is NOT owned by
+            // the host player.
+            var gameController = Util.GetGameController();
+            var shield = gameObject.GetComponent<ForceField3Y3>();
+            shield.effect = _class.CloakEffect;
+            if (gameController.IsOwner(OwnerID)) {
+                // If I own the ship, give me an outline so I can still see my ship.
+                if (state) {
+                    _renderer.enabled = false;
+                    shield.SetEffectOn();
+                }
+                else {
+                    _renderer.enabled = true;
+                    shield.SetEffectOff();
+                }
+            }
+            else {
+                // If I don't own the ship, make me invisible.
+                StartCoroutine(cloak(state, shield));
+            }
+        }
+
+        private IEnumerator cloak(bool enable, ForceField3Y3 shield) {
+            if (enable) {
+                _renderer.enabled = false;
+                shield.SetEffectOn();
+                yield return new WaitForSeconds(3f);
+                shield.SetEffectOff();
+            }
+            else {
+                shield.SetEffectOn();
+                yield return new WaitForSeconds(3f);
+                shield.SetEffectOff();
+                _renderer.enabled = true;
+            }
+        }
+
+        /// <summary>
         /// Called server-side to change the shield status.
         /// </summary>
         /// <param name="enable">Enable / disable the shields.</param>
@@ -288,7 +375,6 @@ namespace VoidWars {
                 _shieldsActive = enable;
                 if (enable) {
                     _powerDrain += _class.ShieldDrainRate;
-                    _audioSource.PlayOneShot(_class.ShieldsClip);
                 }
                 else {
                     _powerDrain -= _class.ShieldDrainRate;
@@ -306,7 +392,9 @@ namespace VoidWars {
         private void onShieldStatusChanged(bool status) {
             Debug.LogFormat("ShipController.onShieldStatusChanged({0})", status);
 
+            _shieldsActive = status;
             var shields = gameObject.GetComponent<ForceField3Y3>();
+            shields.effect = _class.ShieldEffect;
             if (status) {
                 shields.SetEffectOn();
             }
@@ -508,25 +596,30 @@ namespace VoidWars {
             }
 
             temperature -= _coolingRate;
-            _hullTemperature = Mathf.Clamp(temperature, 0f, 100f);              
+            temperature = Mathf.Clamp(temperature, 0f, 100f);
+            if (Mathf.Abs(_hullTemperature-temperature) > 0.1f) {
+                onHullTemperatureChanged(temperature);
+            }
         }
 
         private void onHullTemperatureChanged(float temperature) {
             Debug.LogFormat("Ship #{0}: T_hull = {1}", ID, temperature);
             // Disable items above their max T (and re-enable those under it).
-            foreach (var auxItem in _equipment) {
-                if (auxItem.State == AuxState.Operational) {
-                    if (temperature >= auxItem.Class.MaxTemperature) {
+            for(var i = 0; i < _equipment.Count; ++i) {
+                var auxClass = _equipment[i];
+                var auxState = _equipmentState[i];
+                if (auxState == AuxState.Operational) {
+                    if (temperature >= auxClass.MaxTemperature) {
                         // TODO: notification
-                        auxItem.State = AuxState.Overheated;
-                        unapplyAuxiliary(auxItem.Class);
+                        _equipmentState[i] = AuxState.Overheated;
+                        unapplyAuxiliary(auxClass);
                     }
                 }
-                else if (auxItem.State == AuxState.Overheated) {
-                    if (temperature < auxItem.Class.MaxTemperature) {
+                else if (auxState == AuxState.Overheated) {
+                    if (temperature < auxClass.MaxTemperature) {
                         // TODO: notification
-                        auxItem.State = AuxState.Operational;
-                        applyAuxiliary(auxItem.Class);
+                        _equipmentState[i]= AuxState.Operational;
+                        applyAuxiliary(auxClass);
                     }
                 }
             }
@@ -591,8 +684,12 @@ namespace VoidWars {
             else {
                 _audioSource.Stop();
             }
-            foreach(var engine in _engineFX) {
-                engine.SetActive(enable);
+
+            // If we're cloaked, don't give away our position!
+            if (!_cloakActive) {
+                foreach (var engine in _engineFX) {
+                    engine.SetActive(enable);
+                }
             }
         }
 
@@ -654,6 +751,7 @@ namespace VoidWars {
             controller.RegisterShip(this);
             _controlState = ControlState.IDLE;
             _class = controller.GetShipClassByName(ClassID);
+            //_equipmentState.Callback = onAuxStateChanged;
 
             // Set initial values from class.
             _energyBudget = new EnergyBudget();
@@ -677,24 +775,29 @@ namespace VoidWars {
             }
 
             var mask = 1;
-            for(int i = 0; i < sizeof(int)*8; ++i) {
+            for (int i = 0; i < sizeof(int) * 8; ++i) {
                 if ((EquipmentMask & mask) != 0) {
                     // Auxiliary device is equipped.
                     var auxClass = controller.ItemClasses[i];
-                    var auxItem = new AuxiliaryItem(auxClass);
-                    _equipment.Add(auxItem);
+                    _equipment.Add(auxClass);
                     _totalMass += auxClass.Mass;
                     if (auxClass.Mode == AuxMode.Continuous) {
-                        auxItem.State = AuxState.Operational;
+                        _equipmentState.Add(AuxState.Operational);
                         applyAuxiliary(auxClass);
                     }
+                    else {
+                        _equipmentState.Add(AuxState.Idle);
+                    }
                 }
+
+                mask <<= 1;
             }
 
             // Can set parameters affected by aux items now.
             _energy = _maxEnergy;
 
             updateSystemStatuses();
+            updateWeapons();
         }
 
         private void Update() {
@@ -746,7 +849,13 @@ namespace VoidWars {
             }
         }
 
+        private void onAuxStateChanged(SyncListAux.Operation op, int itemIndex) {
+            Debug.LogFormat("Aux state {0} changed", itemIndex);
+        }
+
         private void applyAuxiliary(AuxiliaryClass aux) {
+            Debug.LogFormat("Applying auxiliary '{0}'", aux.Name);
+
             // Everything has an effect on power.
             _powerDrain += aux.PowerUsage;
 
@@ -763,11 +872,16 @@ namespace VoidWars {
                 case AuxType.CoolingElement:
                     _coolingRate += float.Parse(aux.Metadata);
                     break;
-                // TODO: other stuff.
+
+                case AuxType.Shinobi:
+                    _cloakActive = true;
+                    break;
             }
         }
 
         private void unapplyAuxiliary(AuxiliaryClass aux) {
+            Debug.LogFormat("Unapplying auxiliary '{0}'", aux.Name);
+
             // Everything has an effect on power.
             _powerDrain -= aux.PowerUsage;
 
@@ -787,6 +901,11 @@ namespace VoidWars {
                 case AuxType.CoolingElement:
                     _coolingRate -= float.Parse(aux.Metadata);
                     break;
+
+                case AuxType.Shinobi:
+                    _cloakActive = false;
+                    break;
+
                     // TODO: other stuff.
 
             }
@@ -804,19 +923,18 @@ namespace VoidWars {
         [SyncVar] private float _energy;
         [SyncVar] private float _maxEnergy;
         [SyncVar(hook="onShieldStatusChanged")] private bool _shieldsActive;
-        [SyncVar] private bool _cloakActive;
+        [SyncVar(hook="onCloakStateChanged")] private bool _cloakActive;
         [SyncVar] private float _lifeSupportLevel;
         [SyncVar] private float _propulsionLevel;
         [SyncVar] private float _shieldEnergy;
         [SyncVar] private float _weaponsLevel;
         [SyncVar] private float _shieldPercent;
-        [SyncVar(hook="onHullTemperatureChanged")] private float _hullTemperature;
+        //[SyncVar(hook="onHullTemperatureChanged")]
+        [SyncVar] private float _hullTemperature;
         [SyncVar] private float _health;
         private bool _lifeSupportOK = true;
         private AuxState _primaryWeaponState;
         private AuxState _secondaryWeaponState;
-        //private bool _primaryWeaponsOK = true;
-        //private bool _secondaryWeaponsOK = true;
         private bool _propulsionOK = true;
         private bool _shieldsOK = true;
         private int _roundsWithoutLifeSupport;
@@ -824,7 +942,10 @@ namespace VoidWars {
         private ShipClass _class;
         private WeaponClass _primaryWeapon;
         private WeaponClass _secondaryWeapon;
-        private readonly List<AuxiliaryItem> _equipment = new List<AuxiliaryItem>();
+        // Due to network sync limitations, we need to separate the static and dynamic equipment state.
+        private readonly List<AuxiliaryClass> _equipment = new List<AuxiliaryClass>();
+        //private SyncListAux _equipmentState = new SyncListAux();
+        private List<AuxState> _equipmentState = new List<AuxState>();
         private int _totalMass;
         private float _powerDrain;
         private float _coolingRate;
@@ -834,5 +955,6 @@ namespace VoidWars {
         private int _actionsThisTurn = 1;
         private GameObject[] _engineFX;
         private AudioSource _audioSource;
+        [SerializeField] private MeshRenderer _renderer;
     }
 }

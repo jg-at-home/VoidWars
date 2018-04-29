@@ -291,6 +291,15 @@ namespace VoidWars {
             _communicator = communicator;
         }
 
+        /// <summary>
+        /// Is the supplied owner the one for the local machine?
+        /// </summary>
+        /// <param name="ownerID">An owner ID (usually of a ship).</param>
+        /// <returns>True if the (ship's) owner is the communicator (ie player).</returns>
+        public bool IsOwner(int ownerID) {
+            return (ownerID == _communicator.ID);
+        }
+
         #region Client Code
         /// <summary>
         /// Ses the selected target for something.
@@ -412,23 +421,33 @@ namespace VoidWars {
 
             // Find max range of the weapons.
             var shipController = GetActiveShip();
-            var weapon = _activeWeapon == 0 ? shipController.PrimaryWeaponType : shipController.SecondaryWeaponType;
-            var weaponClass = GetWeaponClass(weapon);
-            var range = weaponClass.Range;
-            var position = shipController.gameObject.transform.position;
-            var objectsInRange = Physics.OverlapSphere(position, range);
-            foreach (var target in objectsInRange) {
-                if ((target.gameObject != shipController.gameObject) &&
-                    (target.gameObject.CompareTag("Targetable"))) {
-                    if (checkTargetGeometry(shipController, target.gameObject, weaponClass)) {
-                        var indicatorGO = Instantiate(TargetIndicatorPrefab);
-                        var indicator = indicatorGO.GetComponent<TargetIndicator>();
-                        indicator.Initialize(shipController.gameObject, target.gameObject);
-                        _attackTargets.Add(indicator);
+
+            // Can't fire if you're cloaked!
+            if (!shipController.IsCloaked) {
+                var weapon = _activeWeapon == 0 ? shipController.PrimaryWeaponType : shipController.SecondaryWeaponType;
+                var weaponClass = GetWeaponClass(weapon);
+                var range = weaponClass.Range;
+                var position = shipController.gameObject.transform.position;
+                var objectsInRange = Physics.OverlapSphere(position, range);
+                foreach (var target in objectsInRange) {
+                    if ((target.gameObject != shipController.gameObject) &&
+                        (target.gameObject.CompareTag("Targetable"))) {
+                        // Can't target cloaked vessels.
+                        var targetShip = target.GetComponent<ShipController>();
+                        if ((targetShip != null) && targetShip.IsCloaked) {
+                            continue;
+                        }
+
+                        // Target in range, but we need to check the angles.
+                        if (checkTargetGeometry(shipController, target.gameObject, weaponClass)) {
+                            var indicatorGO = Instantiate(TargetIndicatorPrefab);
+                            var indicator = indicatorGO.GetComponent<TargetIndicator>();
+                            indicator.Initialize(shipController.gameObject, target.gameObject);
+                            _attackTargets.Add(indicator);
+                        }
                     }
                 }
             }
-
             InfoPanel.NotifyTargetsChanged();
         }
 

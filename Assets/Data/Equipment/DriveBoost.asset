@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Name: DriveBoost
   m_EditorClassIdentifier: 
   Name: Drive Boost
-  Icon: {fileID: 0}
+  Icon: {fileID: 21300000, guid: ad446f800c4de184fabc64bc767b9ae1, type: 3}
   Description: Additional range for the ship
   Detail: Increases the maximum move range of the ship
   Cost: 7
@@ -21,5 +21,5 @@ MonoBehaviour:
   MaxTemperature: 101
   Metadata: 4
   RepairCost: 5
-  ItemType: 4
+  ItemType: 8
   Mode: 0

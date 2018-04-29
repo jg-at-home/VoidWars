@@ -67,5 +67,12 @@ namespace VoidWars {
         [Header("Sound effects")]
         public AudioClip EnginesClip;
         public AudioClip ShieldsClip;
+
+        [Header("Visual Effects")]
+        /// <summary>
+        /// Effects.
+        /// </summary>
+        public Material CloakEffect;
+        public Material ShieldEffect;
     }
 }

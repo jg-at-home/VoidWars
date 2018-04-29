@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Name: ERBInducer
   m_EditorClassIdentifier: 
   Name: Einstein-Rosen Bridge Inducer
-  Icon: {fileID: 0}
-  Description: A means of escape
+  Icon: {fileID: 21300000, guid: 625a6489b8fb453429ef6bb28c673c91, type: 3}
+  Description: ERB generator
   Detail: Teleport your ship away from danger
   Cost: 5
   Mass: 10
@@ -21,5 +21,5 @@ MonoBehaviour:
   MaxTemperature: 95
   Metadata: 
   RepairCost: 5
-  ItemType: 8
-  Mode: 0
+  ItemType: 2
+  Mode: 2

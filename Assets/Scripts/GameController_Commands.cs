@@ -4,6 +4,8 @@ using UnityEngine;
 
 namespace VoidWars {
     public partial class GameController {
+        private delegate void ActionFunc(ShipController ship, bool status);
+
         /// <summary>
         /// Executes the command string provided.
         /// </summary>
@@ -11,7 +13,7 @@ namespace VoidWars {
         public void ExecuteCommand(string command) {
             Debug.LogFormat("GameController.ExecuteCommand{0})", command);
 
-            var parts = command.Split(' ');
+            var parts = command.ToLower().Split(' ');
             switch (parts[0]) {
                 case "pass":
                     // Nothing to do, carry on.
@@ -19,15 +21,61 @@ namespace VoidWars {
 
                 case "shields": {
                         var status = bool.Parse(parts[1]);
-                        StartCoroutine(executeShields(_activeShipID, status));
+                        StartCoroutine(executeCloseup(_activeShipID, status, executeShields, 1f));
                     }
+                    break;
+
+                case "aux":
+                    handleAuxCommand(parts);
                     break;
 
                 // TODO: everything else
             }
         }
 
-        private IEnumerator executeShields(int shipID, bool status) {
+        private void handleAuxCommand(string[] parts) {
+            switch(parts[1].ToLower()) {
+                case "shinobi": {
+                        var status = bool.Parse(parts[2]);
+                        executeCloak(_activeShip, status);
+                    }
+                    break;
+
+                    // TODO: everything else
+            }
+        }
+
+        private void executeCloak(ShipController shipController, bool status) {
+            // TODO: sound fx.
+            //if (status) {
+
+            //}
+            //else {
+
+            //}
+            _communicator.CmdSetCloakStatus(shipController.ID, status);
+        }
+
+        private void executeShields(ShipController shipController, bool status) {
+            if (status) {
+                shipController.AudioPlayer.PlayOneShot(shipController.ShipClass.ShieldsClip);
+            }
+            else {
+                // TODO: shields down.
+            }
+            _communicator.CmdSetShieldStatus(shipController.ID, status);
+        }
+
+        /// <summary>
+        /// Provides a means of briefly focusing the 3D view on a ship to see a status change.
+        /// </summary>
+        /// <param name="shipID">The ship's ID.</param>
+        /// <param name="duration">The duration of the close-up in s.</param>
+        public void ZoomCloseUp(int shipID, float duration) {
+            StartCoroutine(executeCloseup(shipID, false, null, duration));
+        }
+
+        private IEnumerator executeCloseup(int shipID, bool status, ActionFunc actionFunc, float holdTime) {
             // Stash the current camera transform.
             var oldCameraPos = CameraRig.transform.position;
             var oldCameraRot = CameraRig.transform.rotation;
@@ -43,14 +91,16 @@ namespace VoidWars {
             // Wait a frame for the move.
             yield return null;
 
-            // Enable the shields.
-            _communicator.CmdSetShieldStatus(shipID, status);
+            // Do the thing.
+            if (actionFunc != null) {
+                actionFunc(shipController, status);
+            }
 
             // Wait a little.
-            yield return new WaitForSeconds(1.0f);
+            yield return new WaitForSeconds(holdTime);
 
             // Restore camera.
             CameraRig.transform.SetPositionAndRotation(oldCameraPos, oldCameraRot);
-        }
+        }    
     }
 }

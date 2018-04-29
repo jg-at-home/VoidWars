@@ -37,6 +37,8 @@ namespace VoidWars {
 
         [Tooltip("Bitmask indicating the equipment fitted to the ship.")]
         public int EquipmentMask;
+
+        public AuxType[] Equipment;
     }
 
     [Serializable]

@@ -28,23 +28,24 @@ namespace VoidWars {
                 int i = 0;
                 for(; i < numAux; ++i) {
                     _rows[i].gameObject.SetActive(true);
-                    var aux = ship.GetAuxiliaryItem(i);
-                    _text[i].text = aux.Class.Name;
-                    if (aux.State == AuxState.Broken) {
+                    var auxClass = ship.GetAuxiliaryItemClass(i);
+                    _text[i].text = auxClass.Name;
+                    var auxState = ship.GetAuxiliaryItemState(i);
+                    if (auxState == AuxState.Broken) {
                         _icons[i].sprite = BrokenImage;
                     }
-                    else if (aux.State == AuxState.Overheated) {
+                    else if (auxState == AuxState.Overheated) {
                         _icons[i].sprite = OverheatImage;
                     }
                     else {
-                        switch (aux.Class.Mode) {
+                        switch (auxClass.Mode) {
                             case AuxMode.OneShot:
                             case AuxMode.Continuous:
                                 _icons[i].sprite = OkImage;
                                 break;
 
                             case AuxMode.Switchable:
-                                if (aux.State == AuxState.Operational) {
+                                if (auxState == AuxState.Operational) {
                                     _icons[i].sprite = OnImage;
                                 }
                                 else {

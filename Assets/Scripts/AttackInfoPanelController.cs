@@ -20,7 +20,11 @@ namespace VoidWars {
                 // It's the local ship.
                 var gameController = Util.GetGameController();
                 var shipController = gameController.GetActiveShip();
-                if (shipController.PrimaryWeaponType == WeaponType.None &&
+                if (shipController.IsCloaked) {
+                    text = "You cannot attack whilst in stealth mode";
+                    WeaponText.text = "---";
+                }
+                else if (shipController.PrimaryWeaponType == WeaponType.None &&
                     shipController.SecondaryWeaponType == WeaponType.None) {
                     text = "You have no active weapons; attack is going to be tricky, no?";
                     WeaponText.text = "---";

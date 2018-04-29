@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Networking;
 
 namespace VoidWars {
     /// <summary>
@@ -7,15 +8,14 @@ namespace VoidWars {
     public enum AuxType {
         None = 0,
         BussardCollector = 1,
-        FlareLauncher = 2,
-        DriveBoost = 4,
-        ERBInducer = 8,
-        HeatShield = 16,
+        ERBInducer = 2,
+        FlareLauncher = 4,
+        DriveBoost = 8,
+        Scanners = 16,
         SelfDestruct = 32,
         Shinobi = 64,
-        Scanners = 128,
-        PowerCell = 256,
-        CoolingElement = 512,
+        PowerCell = 128,
+        CoolingElement = 256,
 
         // New items above here.
         NumTypes
@@ -61,11 +61,24 @@ namespace VoidWars {
     }
 
     /// <summary>
-    /// Instance of an auxiliary item.
+    /// Network sync for aux states.
     /// </summary>
-    public class AuxiliaryItem {
+    public class SyncListAux : SyncList<AuxState> {
+        protected override AuxState DeserializeItem(NetworkReader reader) {
+            return (AuxState)reader.ReadInt32();
+        }
+
+        protected override void SerializeItem(NetworkWriter writer, AuxState item) {
+            writer.Write((int)item);
+        }
+    }
+
+    /// <summary>
+    /// Descriptor for an auxiliary item.
+    /// </summary>
+    public class AuxItem {
         /// <summary>
-        /// The item class.
+        /// The item's class.
         /// </summary>
         public AuxiliaryClass Class;
 
@@ -73,16 +86,5 @@ namespace VoidWars {
         /// The item's state.
         /// </summary>
         public AuxState State;
-
-        /// <summary>
-        /// Construct an item.
-        /// </summary>
-        /// <param name="auxClass">TGhe item's class.</param>
-        public AuxiliaryItem(AuxiliaryClass auxClass) {
-            Class = auxClass;
-            State = AuxState.Idle;
-        }
-
-
     }
 }
