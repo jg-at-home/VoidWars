@@ -25,10 +25,6 @@ namespace VoidWars {
             }
         }
 
-        private void OnEnable() {
-            initialize();
-        }
-
         private void Update() {
             _timer += Time.deltaTime;
             if (_timer >= RefreshPeriod) {
@@ -79,6 +75,7 @@ namespace VoidWars {
             _timer = 0.0f;
             gameObject.SetActive(true);
             _root = root;
+            initialize();
         }
 
         public virtual void OnDeactivation() {
