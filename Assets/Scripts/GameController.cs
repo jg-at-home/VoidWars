@@ -57,6 +57,7 @@ namespace VoidWars {
         public StatusPanelController StatusPanelController;
         public DamageIndicator DamageIndicator;
         public UIAudioPlayer UIAudioPlayer;
+        public MessagePanelController MessagePanelController;
 
         [Header("Prefabs")]
         public GameObject MapPinPrefab;
@@ -301,6 +302,10 @@ namespace VoidWars {
         }
 
         #region Client Code
+        public void ShowMessage(string message) {
+            MessagePanelController.ShowMessage(message);
+        }
+
         /// <summary>
         /// Ses the selected target for something.
         /// </summary>

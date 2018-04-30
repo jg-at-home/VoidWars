@@ -305,6 +305,10 @@ namespace VoidWars {
         void RpcEnableCloaking(int shipID, bool enable) {
             var shipController = controller.GetShip(shipID);
             shipController.EnableCloaking(enable);
+            if (!isLocalPlayer) {
+                var msg = string.Format("Ship '{0}' has stealthed", shipController.ShipClass.Name);
+                controller.ShowMessage(msg);
+            }
         }
 
         #region UI
