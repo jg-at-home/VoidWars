@@ -56,8 +56,8 @@ namespace VoidWars {
 
             // Auxiliary items.
             for(var i = 0; i < _equipment.Count; ++i) {
-                var auxClass = _equipment[i];
-                var auxState = _equipmentState[i];
+                var auxClass = _equipment[i].Class;
+                var auxState = _equipment[i].State;
                 if (auxClass.Mode == AuxMode.Switchable) {
                     if (auxState == AuxState.Operational) {
                         actions.Add(new ActionItem {

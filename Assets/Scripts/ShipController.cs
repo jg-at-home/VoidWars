@@ -237,7 +237,7 @@ namespace VoidWars {
         /// <param name="index">The index.</param>
         /// <returns>The requested aux class.</returns>
         public AuxiliaryClass GetAuxiliaryItemClass(int index) {
-            return _equipment[index];
+            return _equipment[index].Class;
         }
 
         /// <summary>
@@ -246,7 +246,7 @@ namespace VoidWars {
         /// <param name="index"></param>
         /// <returns></returns>
         public AuxState GetAuxiliaryItemState(int index) {
-            return _equipmentState[index];
+            return _equipment[index].State;
         }
 
         /// <summary>
@@ -303,23 +303,23 @@ namespace VoidWars {
 
             Debug.Assert(!_shieldsActive, "Needs to be caught in the UI");
 
-            var cloakIndex = _equipment.FindIndex(e => e.ItemType == AuxType.Shinobi);
+            var cloakIndex = _equipment.FindIndex(e => e.Class.ItemType == AuxType.Shinobi);
             Debug.Assert(cloakIndex >= 0, "No cloak?");
 
-            var cloakClass = _equipment[cloakIndex];
-            var cloakState = _equipmentState[cloakIndex];
+            var cloakClass = _equipment[cloakIndex].Class;
+            var cloakState = _equipment[cloakIndex].State;
             Debug.Assert(cloakState != AuxState.Overheated, "Needs to be caught in the UI");
 
             bool cloakActive = (cloakState == AuxState.Operational);
             if (enable != cloakActive) {
                 if (enable) {
                     // Turn the thing on.
-                    _equipmentState[cloakIndex] = AuxState.Operational;
+                    _equipment[cloakIndex].State = AuxState.Operational;
                     applyAuxiliary(cloakClass);
                 }
                 else {
                     // Switch off.
-                    _equipmentState[cloakIndex] = AuxState.Idle;
+                    _equipment[cloakIndex].State = AuxState.Idle;
                     unapplyAuxiliary(cloakClass);
                 }
             }
@@ -606,19 +606,19 @@ namespace VoidWars {
             Debug.LogFormat("Ship #{0}: T_hull = {1}", ID, temperature);
             // Disable items above their max T (and re-enable those under it).
             for(var i = 0; i < _equipment.Count; ++i) {
-                var auxClass = _equipment[i];
-                var auxState = _equipmentState[i];
+                var auxClass = _equipment[i].Class;
+                var auxState = _equipment[i].State;
                 if (auxState == AuxState.Operational) {
                     if (temperature >= auxClass.MaxTemperature) {
                         // TODO: notification
-                        _equipmentState[i] = AuxState.Overheated;
+                        _equipment[i].State = AuxState.Overheated;
                         unapplyAuxiliary(auxClass);
                     }
                 }
                 else if (auxState == AuxState.Overheated) {
                     if (temperature < auxClass.MaxTemperature) {
                         // TODO: notification
-                        _equipmentState[i]= AuxState.Operational;
+                        _equipment[i].State = AuxState.Operational;
                         applyAuxiliary(auxClass);
                     }
                 }
@@ -743,7 +743,7 @@ namespace VoidWars {
             _audioSource = GetComponent<AudioSource>();
         }
 
-        public override void OnStartClient() {
+         public override void OnStartClient() {
             base.OnStartClient();
 
             // SyncVars should be good now.
@@ -751,7 +751,6 @@ namespace VoidWars {
             controller.RegisterShip(this);
             _controlState = ControlState.IDLE;
             _class = controller.GetShipClassByName(ClassID);
-            //_equipmentState.Callback = onAuxStateChanged;
 
             // Set initial values from class.
             _energyBudget = new EnergyBudget();
@@ -779,14 +778,12 @@ namespace VoidWars {
                 if ((EquipmentMask & mask) != 0) {
                     // Auxiliary device is equipped.
                     var auxClass = controller.ItemClasses[i];
-                    _equipment.Add(auxClass);
+                    var auxItem = new AuxItem(auxClass);
                     _totalMass += auxClass.Mass;
+                    _equipment.Add(auxItem);
                     if (auxClass.Mode == AuxMode.Continuous) {
-                        _equipmentState.Add(AuxState.Operational);
+                        auxItem.State = AuxState.Operational;
                         applyAuxiliary(auxClass);
-                    }
-                    else {
-                        _equipmentState.Add(AuxState.Idle);
                     }
                 }
 
@@ -942,10 +939,7 @@ namespace VoidWars {
         private ShipClass _class;
         private WeaponClass _primaryWeapon;
         private WeaponClass _secondaryWeapon;
-        // Due to network sync limitations, we need to separate the static and dynamic equipment state.
-        private readonly List<AuxiliaryClass> _equipment = new List<AuxiliaryClass>();
-        //private SyncListAux _equipmentState = new SyncListAux();
-        private List<AuxState> _equipmentState = new List<AuxState>();
+        private readonly List<AuxItem> _equipment = new List<AuxItem>();
         private int _totalMass;
         private float _powerDrain;
         private float _coolingRate;

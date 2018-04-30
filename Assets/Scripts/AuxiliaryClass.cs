@@ -80,11 +80,20 @@ namespace VoidWars {
         /// <summary>
         /// The item's class.
         /// </summary>
-        public AuxiliaryClass Class;
+        public readonly AuxiliaryClass Class;
 
         /// <summary>
         /// The item's state.
         /// </summary>
         public AuxState State;
+
+        /// <summary>
+        /// Construct an item.
+        /// </summary>
+        /// <param name="itemClass">The item's class</param>
+        public AuxItem(AuxiliaryClass itemClass) {
+            Class = itemClass;
+            State = AuxState.Idle;
+        }
     }
 }
