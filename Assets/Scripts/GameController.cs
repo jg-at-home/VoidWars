@@ -467,6 +467,11 @@ namespace VoidWars {
             _communicator.CmdApplyDamageToShip(shipID, damage, dT);
         }
 
+        /// <summary>
+        /// Creates a damage indicator sprite.
+        /// </summary>
+        /// <param name="shipID">The ID of the damaged ship.</param>
+        /// <param name="damage">The amount of damage.</param>
         public void ShowDamage(int shipID, float damage) {
             var ship = GetShip(shipID);
             DamageIndicator.SetValue(ship.gameObject.transform.position, (int)damage);

@@ -294,6 +294,11 @@ namespace VoidWars {
         public void CmdSetShieldStatus(int shipID, bool enable) {
             var shipController = controller.GetShip(shipID);
             shipController.EnableShields(enable);
+            if (!isLocalPlayer) {
+                var msg = string.Format("Ship <color=orange>'{0}'</color> has {1}ed shields", 
+                    shipController.ShipClass.Name, enable ? "rais" : "lower");
+                controller.ShowMessage(msg);
+            }
         }
 
         [Command]
@@ -306,7 +311,8 @@ namespace VoidWars {
             var shipController = controller.GetShip(shipID);
             shipController.EnableCloaking(enable);
             if (!isLocalPlayer) {
-                var msg = string.Format("Ship '{0}' has stealthed", shipController.ShipClass.Name);
+                var msg = string.Format("Ship <color=orange>'{0}'</color> has {1}stealthed", 
+                    shipController.ShipClass.Name, enable ? "" : "de-");
                 controller.ShowMessage(msg);
             }
         }

@@ -34,5 +34,8 @@ namespace VoidWars {
 
         [Tooltip("How much energy it takes to repair the item")]
         public float RepairCost;
+
+        [Tooltip("How many turns it takes to repair an item")]
+        public int RepairTurns;
     }
 }

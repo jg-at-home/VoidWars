@@ -21,6 +21,7 @@ MonoBehaviour:
   MaxTemperature: 0
   Metadata: 
   RepairCost: 0
+  RepairTurns: 3
   Species: 1
   ModelName: SHIP_B_02
   HasSecondaryWeaponSlot: 0
