@@ -176,6 +176,7 @@ namespace VoidWars {
                     shipController.OwnerID = ShipController.AI_OWNER;
                     shipController.ClassID = className;
                     shipController.PrimaryWeaponType = shipConfig.PrimaryWeapon;
+                    shipController.SecondaryWeaponType = shipConfig.SecondaryWeapon;
                     shipController.EquipmentMask = makeEquipmentMask(shipConfig.Equipment);
                     NetworkServer.Spawn(ship);
                 }
@@ -214,6 +215,7 @@ namespace VoidWars {
             shipController.OwnerID = ownerID;
             shipController.ClassID = config.ClassName;
             shipController.PrimaryWeaponType = config.PrimaryWeapon;
+            shipController.SecondaryWeaponType = config.SecondaryWeapon;
             shipController.EquipmentMask = makeEquipmentMask(config.Equipment);
             var player = controller.GetPlayer(ownerID);
             NetworkServer.SpawnWithClientAuthority(ship, player.Connection);
@@ -301,6 +303,11 @@ namespace VoidWars {
             }
         }
 
+        /// <summary>
+        /// Sets the cloaking (Shinobi) status of the ship.
+        /// </summary>
+        /// <param name="shipID">The ID of the ship to affect.</param>
+        /// <param name="enable">Control flag.</param>
         [Command]
         public void CmdSetCloakStatus(int shipID, bool enable) {
             RpcEnableCloaking(shipID, enable);

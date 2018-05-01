@@ -21,10 +21,12 @@ MonoBehaviour:
   MaxTemperature: 65
   Metadata: 
   RepairCost: 8
-  WeaponType: 8
+  RepairTurns: 2
+  WeaponType: 4
   Cardinality: 1
   MaxDamage: 100
-  Range: 10
+  Range: 50
   PrimaryAngle: 0
   SecondaryAngle: 0
   RequiresLineOfSight: 0
+  SoundEffect: {fileID: 8300000, guid: fe6e090fae301324e8e114b58819389d, type: 3}

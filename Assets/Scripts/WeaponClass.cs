@@ -5,16 +5,16 @@ namespace VoidWars {
     /// Types of weapon.
     /// </summary>
     public enum WeaponType {
-        None = 0,
-        Laser = 1,
-        RailGun = 2,
-        HomingMissile = 4,
-        EMP = 8,
-        UVLaser = 16,
-        ProximityMine = 32,
+        None,
+        Laser,
+        RailGun,
+        HomingMissile,
+        EMP,
+        UVLaser,
+        ProximityMine,
 
         // More above here.
-
+        NumTypes
     }
 
     /// <summary>

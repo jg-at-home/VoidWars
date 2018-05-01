@@ -5,7 +5,9 @@ namespace VoidWars {
     /// <summary>
     /// Helper class for laser attacks. Yes, it ought to be more OO. It's in the backlog.
     /// </summary>
-    public static class Laser {
+    public static class Weapons {
+        private const float EmpDuration = 2f;
+
         /// <summary>
         /// Performs a laser attack.
         /// </summary>
@@ -14,7 +16,7 @@ namespace VoidWars {
         /// <param name="source">The ship firing.</param>
         /// <param name="target">The ship getting burnt.</param>
         /// <returns>Enumerator</returns>
-        public static IEnumerator Attack(Vector3 sourcePoint, WeaponClass weaponClass, ShipController source, ShipController target, bool applyDamage) {
+        public static IEnumerator LaserAttack(Vector3 sourcePoint, WeaponClass weaponClass, ShipController source, ShipController target, bool applyDamage) {
             var gameController = Util.GetGameController();
             var laserGob = Object.Instantiate(gameController.LaserPrefab);
             var laser = laserGob.GetComponent<LaserController>();
@@ -61,6 +63,16 @@ namespace VoidWars {
 
                 // Push to server.               
                 gameController.ApplyDamageToShip(target.ID, damage, dT);
+            }
+        }
+
+        public static IEnumerator EmpAttack(ShipController source, WeaponClass weaponClass, bool applyDamage) {
+            source.AudioPlayer.PlayOneShot(weaponClass.SoundEffect);
+            var effect = Object.Instantiate(source.ShipClass.EmpPrefab, source.transform.position, Quaternion.identity);
+            yield return new WaitForSeconds(EmpDuration);
+            Object.Destroy(effect);
+            if (applyDamage) {
+                // TODO.
             }
         }
     }

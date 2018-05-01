@@ -316,6 +316,10 @@ namespace VoidWars {
                     // Turn the thing on.
                     _equipment[cloakIndex].State = AuxState.Operational;
                     applyAuxiliary(cloakClass);
+
+                    // Use some power up now.
+                    _energy -= cloakClass.PowerUsage;
+                    Debug.Assert(_energy >= 0);
                 }
                 else {
                     // Switch off.
@@ -509,6 +513,7 @@ namespace VoidWars {
             // Check systems.
             if (_shieldPercent > 0f) {
                 _shieldEnergy = GetEnergyBudgetFor(EnergyConsumer.Shields);
+                // TODO: replace _sheildsOK with AuxState _shieldState
                 if (_shieldsOK) {
                     if (_shieldEnergy < _class.ShieldDrainRate) {
                         // Shields have failed.
@@ -769,8 +774,8 @@ namespace VoidWars {
             _totalMass += _primaryWeapon.Mass;
             if (SecondaryWeaponType != WeaponType.None) {
                 _secondaryWeapon = controller.GetWeaponClass(SecondaryWeaponType);
-                _totalMass += _secondaryWeapon.Mass;
                 _secondaryWeaponState = AuxState.Operational;
+                _totalMass += _secondaryWeapon.Mass;
             }
 
             var mask = 1;

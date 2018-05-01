@@ -34,14 +34,14 @@ namespace VoidWars {
         }
 
         private void handleAuxCommand(string[] parts) {
-            switch(parts[1].ToLower()) {
+            switch(parts[1]) {
                 case "shinobi": {
                         var status = bool.Parse(parts[2]);
                         executeCloak(_activeShip, status);
                     }
                     break;
 
-                    // TODO: everything else
+                // TODO: everything else
             }
         }
 

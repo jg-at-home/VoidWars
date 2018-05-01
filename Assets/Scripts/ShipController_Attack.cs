@@ -20,7 +20,11 @@ namespace VoidWars {
             switch(weaponType) {
                 case WeaponType.Laser:
                 case WeaponType.UVLaser:
-                    yield return Laser.Attack(node.position, weaponClass, this, target, isServer);
+                    yield return Weapons.LaserAttack(node.position, weaponClass, this, target, isServer);
+                    break;
+
+                case WeaponType.EMP:
+                    yield return Weapons.EmpAttack(this, weaponClass, isServer);
                     break;
 
                 default:

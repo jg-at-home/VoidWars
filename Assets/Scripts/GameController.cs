@@ -499,6 +499,11 @@ namespace VoidWars {
                 angle = Mathf.Deg2Rad * weapon.SecondaryAngle / 2;
             }
 
+            // Zero angle => it's not an issue.
+            if (Mathf.Abs(angle) < 1.0e-4f) {
+                return true;
+            }
+
             var nodeToTargetDir = (target.transform.position - node.position).normalized;
             var cosAngle = Vector3.Dot(nodeToTargetDir, node.forward);
             if (cosAngle <= 0f) {

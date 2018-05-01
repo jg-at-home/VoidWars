@@ -69,10 +69,8 @@ namespace VoidWars {
         public AudioClip ShieldsClip;
 
         [Header("Visual Effects")]
-        /// <summary>
-        /// Effects.
-        /// </summary>
         public Material CloakEffect;
         public Material ShieldEffect;
+        public GameObject EmpPrefab;
     }
 }
