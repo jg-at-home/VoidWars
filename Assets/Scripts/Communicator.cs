@@ -272,6 +272,20 @@ namespace VoidWars {
         }
 
         /// <summary>
+        /// Shows message on all clients.
+        /// </summary>
+        /// <param name="msg">The message to show.</param>
+        [Command]
+        public void CmdBroadcastMessage(string msg) {
+            RpcBroadcastMessage(msg);
+        }
+
+        [ClientRpc]
+        void RpcBroadcastMessage(string message) {
+            controller.ShowMsg(message);
+        }
+
+        /// <summary>
         ///  Called when a ship has finished its motion.
         /// </summary>
         /// <param name="shipID">The ship ID.</param>
@@ -296,10 +310,15 @@ namespace VoidWars {
         public void CmdSetShieldStatus(int shipID, bool enable) {
             var shipController = controller.GetShip(shipID);
             shipController.EnableShields(enable);
-            if (!isLocalPlayer) {
-                var msg = string.Format("Ship <color=orange>'{0}'</color> has {1}ed shields", 
-                    shipController.ShipClass.Name, enable ? "rais" : "lower");
-                controller.ShowMessage(msg);
+            var msg = string.Format("Ship <color=orange>'{0}'</color> has {1}ed shields",
+                shipController.ShipClass.Name, enable ? "rais" : "lower");
+            RpcShowMessageToOtherPlayers(shipController.OwnerID, msg);
+        }
+
+        [ClientRpc]
+        void RpcShowMessageToOtherPlayers(int ownerID, string msg) {
+            if (!controller.IsOwner(ownerID)) {
+                controller.ShowMsg(msg);
             }
         }
 
@@ -317,11 +336,9 @@ namespace VoidWars {
         void RpcEnableCloaking(int shipID, bool enable) {
             var shipController = controller.GetShip(shipID);
             shipController.EnableCloaking(enable);
-            if (!isLocalPlayer) {
-                var msg = string.Format("Ship <color=orange>'{0}'</color> has {1}stealthed", 
-                    shipController.ShipClass.Name, enable ? "" : "de-");
-                controller.ShowMessage(msg);
-            }
+            var msg = string.Format("Ship <color=orange>'{0}'</color> has {1}stealthed",
+                shipController.ShipClass.Name, enable ? "" : "de-");
+            RpcShowMessageToOtherPlayers(shipController.OwnerID, msg);
         }
 
         #region UI

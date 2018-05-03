@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Networking;
 
 namespace VoidWars {
     /// <summary>
@@ -46,6 +47,7 @@ namespace VoidWars {
         public GameConfig Configuration;
 
         [Header("Controls")]
+        public VoidNetworkManager NetworkManager;
         public GameObject Board;
         public GameObject ActiveShipIndicator;
         public InfoPanelController InfoPanel;
@@ -284,6 +286,24 @@ namespace VoidWars {
         #endregion Database
 
         /// <summary>
+        /// Called by action panel to execute the currently selected action.
+        /// </summary>
+        public void ExecuteSelectedAction() {
+            EnableActionPanel(false);
+            _actionComplete = false;
+            ActionPanel.SelectCurrentAction();
+            StartCoroutine(waitForActionCompletion());
+        }
+
+        private IEnumerator waitForActionCompletion() {
+            while (!_actionComplete) {
+                yield return null;
+            }
+
+            NextAction();
+        }
+
+        /// <summary>
         /// Sets the local communicator instance so the game controller can perform network
         /// operations with the correct authority.
         /// </summary>
@@ -302,8 +322,20 @@ namespace VoidWars {
         }
 
         #region Client Code
-        public void ShowMessage(string message) {
+        /// <summary>
+        /// Shows a message popup.
+        /// </summary>
+        /// <param name="message">The message to show.</param>
+        public void ShowMsg(string message) {
             MessagePanelController.ShowMessage(message);
+        }
+
+        /// <summary>
+        /// Shows everyone a popup message.
+        /// </summary>
+        /// <param name="message">The message to show.</param>
+        public void BroadcastMsg(string message) {
+            _communicator.CmdBroadcastMessage(message);
         }
 
         /// <summary>
@@ -344,7 +376,7 @@ namespace VoidWars {
         }
 
         private IEnumerator attackCoroutine(int sourceID, int targetID, int weaponSlot) {
-            const float margin = 1f;
+            const float margin = 2f;
 
             // Stash the current camera state.
             var oldCameraPos = CameraRig.transform.position;
@@ -668,6 +700,7 @@ namespace VoidWars {
                 NextShip();
             }
             else {
+                EnableActionPanel(true);
                 ActionPanel.Refresh();
             }
         }
@@ -994,6 +1027,7 @@ namespace VoidWars {
                     break;
 
                 case GameState.SETUP: {
+                        NetworkManager.GetComponent<NetworkManagerHUD>().showGUI = false;
                         TitleController.Stop();
                         var zoomControl = ControlPanel.GetComponentInChildren<ZoomButtonController>();
                         zoomControl.ResetZoom();
@@ -1137,6 +1171,7 @@ namespace VoidWars {
         private int _actionCount;
         private int _activeWeapon;
         private GameObject _target;
+        private bool _actionComplete;
 
         private static readonly int[] s_p1StartPositions1 = new[] { 3 };
         private static readonly int[] s_p1StartPositions2 = new[] { 0, 1 };

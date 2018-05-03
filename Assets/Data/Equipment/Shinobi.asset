@@ -17,9 +17,10 @@ MonoBehaviour:
   Detail: Makes ship invisible in most circumstances
   Cost: 6
   Mass: 5
-  PowerUsage: 15
+  PowerUsage: 10
   MaxTemperature: 75
   Metadata: 
   RepairCost: 8
+  RepairTurns: 0
   ItemType: 64
   Mode: 1

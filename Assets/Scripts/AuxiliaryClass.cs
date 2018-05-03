@@ -57,7 +57,8 @@ namespace VoidWars {
         Idle,
         Operational,
         Overheated,
-        Broken
+        Broken,
+        Disabled
     }
 
     /// <summary>

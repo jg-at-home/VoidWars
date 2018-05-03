@@ -27,7 +27,7 @@ namespace VoidWars {
         /// <summary>
         /// GeneraL scale for movement cost.
         /// </summary>
-        private const float CostScale = 2f;
+        private const float CostScale = 1.5f;
 
         /// <summary>
         /// What we're going to do.

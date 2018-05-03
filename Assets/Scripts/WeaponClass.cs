@@ -53,6 +53,9 @@ namespace VoidWars {
         public bool RequiresLineOfSight;
 
         [Tooltip("The noise to make when invoked")]
-        public AudioClip SoundEffect;            
+        public AudioClip SoundEffect;
+
+        [Tooltip("Metadata for the weapon type encoded as a string")]
+        public string MetaData;
     }
 }

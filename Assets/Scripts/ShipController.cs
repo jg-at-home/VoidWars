@@ -298,10 +298,11 @@ namespace VoidWars {
         /// Enables cloaking - yes, I'll use the ST reference as I keep forgetting wtf 'Shinobi'
         /// means :-) Call server-side.
         /// </summary>
+        [Server]
         public void EnableCloaking(bool enable) {
             Debug.LogFormat("ShipController.EnableCloaking({0})", enable);
 
-            Debug.Assert(!_shieldsActive, "Needs to be caught in the UI");
+            Debug.Assert(_shieldState != AuxState.Operational, "Needs to be caught in the UI");
 
             var cloakIndex = _equipment.FindIndex(e => e.Class.ItemType == AuxType.Shinobi);
             Debug.Assert(cloakIndex >= 0, "No cloak?");
@@ -368,38 +369,64 @@ namespace VoidWars {
             }
         }
 
+        [Server]
+        public void RespondToEmp(int numTurns) {
+            Debug.Assert(isServer);
+            if (_shieldState == AuxState.Operational) {
+                _shieldState = AuxState.Disabled;
+                var restoreTask = new Task(numTurns, restoreShields);
+                _tasks.Add(restoreTask);
+                var controller = Util.GetGameController();
+                var msg = string.Format("Ship <color=orange>{0}</color>'s shields have been disabled", _class.Name);
+                controller.BroadcastMsg(msg);
+            }
+        }
+
+        private void restoreShields() {
+            _shieldState = AuxState.Idle;
+            var controller = Util.GetGameController();
+            var msg = string.Format("Ship <color=orange>{0}</color>'s shields have been restored", _class.Name);
+            controller.BroadcastMsg(msg);
+        }
+
         /// <summary>
         /// Called server-side to change the shield status.
         /// </summary>
         /// <param name="enable">Enable / disable the shields.</param>
+        [Server]
         public void EnableShields(bool enable) {
             Debug.LogFormat("ShipController.EnableShields({0})", enable);
 
-            if (_shieldsActive != enable) {
-                _shieldsActive = enable;
-                if (enable) {
+            Debug.Assert(!_cloakActive, "Need to catch this in the UI");
+
+            if (enable) {
+                if (_shieldState == AuxState.Idle) {
+                    _shieldState = AuxState.Operational;
                     _powerDrain += _class.ShieldDrainRate;
                 }
-                else {
+            }
+            else {
+                if (_shieldState == AuxState.Operational) {
+                    _shieldState = AuxState.Idle;
                     _powerDrain -= _class.ShieldDrainRate;
                 }
-            }            
+            }
         }
 
         /// <summary>
         /// Are the shields active?
         /// </summary>
         public bool ShieldsActive {
-            get { return _shieldsActive; }
+            get { return _shieldState == AuxState.Operational; }
         }
 
-        private void onShieldStatusChanged(bool status) {
+        private void onShieldStatusChanged(AuxState status) {
             Debug.LogFormat("ShipController.onShieldStatusChanged({0})", status);
 
-            _shieldsActive = status;
+            _shieldState = status;
             var shields = gameObject.GetComponent<ForceField3Y3>();
             shields.effect = _class.ShieldEffect;
-            if (status) {
+            if (status == AuxState.Operational) {
                 shields.SetEffectOn();
             }
             else {
@@ -463,7 +490,7 @@ namespace VoidWars {
                 if (_shieldPercent <= 0) {
                     Debug.LogFormat("Ship #{0}'s shields have -failed-", ID);
                     // TODO: notify player shields have failed.
-                    _shieldsActive = false;
+                    _shieldState = AuxState.Idle;
                     damage = -_shieldPercent;
                     _shieldPercent = 0;
                 }
@@ -485,8 +512,12 @@ namespace VoidWars {
         /// <summary>
         /// Called by the server to begin a round.
         /// </summary>
+        [Server]
         public void BeginRound(int round) {
             Debug.Log("ShipController.BeginRound()");
+
+            // Run tasks.
+            serviceTasks();
 
             // Drain some power, recharge some power.
             if (round > 0) {
@@ -501,6 +532,18 @@ namespace VoidWars {
             updateWeapons();
         }
 
+        [Server]
+        private void serviceTasks() {
+            for(var i = _tasks.Count-1; i >= 0; --i) {
+                var task = _tasks[i];
+                task.OnTurnStart();
+                if (task.HasExpired) {
+                    _tasks.RemoveAt(i);
+                }
+            }
+        }
+
+        [Server]
         private void updateWeapons() {
             _weaponsLevel = GetEnergyBudgetFor(EnergyConsumer.Weapons);
             updateWeaponState(_primaryWeapon, ref _primaryWeaponState);
@@ -509,23 +552,17 @@ namespace VoidWars {
             }
         }
 
+        [Server]
         private void updateSystemStatuses() {
             // Check systems.
             if (_shieldPercent > 0f) {
                 _shieldEnergy = GetEnergyBudgetFor(EnergyConsumer.Shields);
-                // TODO: replace _sheildsOK with AuxState _shieldState
-                if (_shieldsOK) {
+                if (_shieldState == AuxState.Operational) {
                     if (_shieldEnergy < _class.ShieldDrainRate) {
                         // Shields have failed.
-                        _shieldsOK = false;
+                        _shieldState = AuxState.Idle;
                         var gameController = Util.GetGameController();
                         gameController.OnShieldsFailed(this);
-                    }
-                }
-                else {
-                    if (_shieldEnergy >= _class.ShieldDrainRate) {
-                        _shieldsOK = true;
-                        Debug.Log("Shields online");
                     }
                 }
             }
@@ -565,6 +602,7 @@ namespace VoidWars {
             }
         }
 
+        [Server]
         private void updateWeaponState(WeaponClass weaponClass, ref AuxState state) {
             switch (state) {
                 case AuxState.Idle:
@@ -584,6 +622,7 @@ namespace VoidWars {
             }
         }
 
+        [Server]
         private void updateHullTemperature() {
             var temperature = _hullTemperature;
             var suns = GameObject.FindGameObjectsWithTag("Sun");
@@ -607,6 +646,7 @@ namespace VoidWars {
             }
         }
 
+        [Client]
         private void onHullTemperatureChanged(float temperature) {
             Debug.LogFormat("Ship #{0}: T_hull = {1}", ID, temperature);
             // Disable items above their max T (and re-enable those under it).
@@ -659,8 +699,11 @@ namespace VoidWars {
         /// Called server-side when a ship is about to make a move.
         /// </summary>
         /// <param name="move">The move to make.</param>
+        [Server]
         public void BeginMove(ShipMove move) {
-            _energy -= GetEnergyForMove(move);
+            var energyForMove = GetEnergyForMove(move);
+            Debug.LogFormat("Energy for move = {0}", energyForMove);
+            _energy -= energyForMove;
             Debug.Assert(_energy >= 0f, "Energy negative?");
             if (_energy < 0f) {
                 _energy = 0f;
@@ -682,6 +725,7 @@ namespace VoidWars {
         /// Enable / disable the engine FX.
         /// </summary>
         /// <param name="enable">Status flag.</param>
+        [Client]
         public void EnableEngineFX(bool enable) {
             if (enable) {
                 _audioSource.PlayOneShot(_class.EnginesClip);
@@ -702,6 +746,7 @@ namespace VoidWars {
         /// Enacts a move for the ship. Called client-side.
         /// </summary>
         /// <param name="move">The move to execute.</param>
+        [Client]
         public void EnactMove(ShipMoveInstance move, OnMoveFinished finishedHandler) {
             StartCoroutine(enactMove(move, finishedHandler));
         }
@@ -740,6 +785,9 @@ namespace VoidWars {
 
             // Notify we're done.
             finishedHandler(ID);
+
+            // Dump some stats.
+            Debug.LogFormat("Ship ID: {0}; energy = {1}", ID, _energy);
         }
 
         private void Awake() {
@@ -748,7 +796,13 @@ namespace VoidWars {
             _audioSource = GetComponent<AudioSource>();
         }
 
-         public override void OnStartClient() {
+        public override void OnStartServer() {
+            base.OnStartServer();
+
+            _tasks = new List<Task>();
+        }
+
+        public override void OnStartClient() {
             base.OnStartClient();
 
             // SyncVars should be good now.
@@ -924,7 +978,7 @@ namespace VoidWars {
         [SyncVar] private ControlState _controlState;
         [SyncVar] private float _energy;
         [SyncVar] private float _maxEnergy;
-        [SyncVar(hook="onShieldStatusChanged")] private bool _shieldsActive;
+        [SyncVar(hook="onShieldStatusChanged")] private AuxState _shieldState;
         [SyncVar(hook="onCloakStateChanged")] private bool _cloakActive;
         [SyncVar] private float _lifeSupportLevel;
         [SyncVar] private float _propulsionLevel;
@@ -938,7 +992,6 @@ namespace VoidWars {
         private AuxState _primaryWeaponState;
         private AuxState _secondaryWeaponState;
         private bool _propulsionOK = true;
-        private bool _shieldsOK = true;
         private int _roundsWithoutLifeSupport;
         private Pilot _pilot;
         private ShipClass _class;
@@ -955,5 +1008,6 @@ namespace VoidWars {
         private GameObject[] _engineFX;
         private AudioSource _audioSource;
         [SerializeField] private MeshRenderer _renderer;
+        private List<Task> _tasks;
     }
 }

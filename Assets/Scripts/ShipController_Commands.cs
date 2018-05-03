@@ -32,8 +32,8 @@ namespace VoidWars {
             }
 
             // Shields.
-            if (_shieldsOK && (_shieldPercent > 0f)) {
-                if (_shieldsActive) {
+            if (_shieldPercent > 0f) {
+                if (_shieldState == AuxState.Operational) {
                     // Disable shields.
                     actions.Add(new ActionItem {
                         Action = "shields false",
@@ -43,7 +43,7 @@ namespace VoidWars {
                         EditorPrefabInfo = "ImageDetailPanel ShieldsImage"
                     });
                 }
-                else if (ShieldEnergy >= _class.ShieldDrainRate) {
+                else if ((_shieldState == AuxState.Idle) && (ShieldEnergy >= _class.ShieldDrainRate)) {
                     actions.Add(new ActionItem {
                         Action = "shields true",
                         Description = "Raise shields",

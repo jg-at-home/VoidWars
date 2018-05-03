@@ -135,8 +135,8 @@ namespace VoidWars {
             var collider = gameObject.GetComponent<Collider>();
             var colliderSize = collider.bounds.size;
             var radius = Mathf.Max(colliderSize.x, colliderSize.y, colliderSize.z) / 2f;
-            var layer = LayerMask.NameToLayer("ActiveObjects");
-            var overlaps = Physics.OverlapSphere(worldEndPosition, radius, layer);
+            var layerMask = 1 << LayerMask.NameToLayer("ActiveObjects");
+            var overlaps = Physics.OverlapSphere(worldEndPosition, radius, layerMask);
             if ((overlaps != null) && (overlaps.Length > 0)) {
                 // Colliding with something - discount oneself, though.
                 foreach(var overlap in overlaps) {

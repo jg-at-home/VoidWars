@@ -88,7 +88,7 @@ namespace VoidWars {
                 // Fade current panel out.
                 for (var t = 0f; t < FadeTime; t += Time.deltaTime) {
                     var alpha = 1f - Mathf.Clamp01(t / FadeTime);
-                    _currentPanel.SetAlpha(1f - Mathf.Min(t, 1f));
+                    _currentPanel.SetAlpha(alpha);
                     yield return null;
                 }
 

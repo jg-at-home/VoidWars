@@ -33,14 +33,15 @@ MonoBehaviour:
   MaxSpeed: 10
   ActionsPerTurn: 1
   Maneuverability: 1
-  MaxEnergy: 100
+  MaxEnergy: 200
   MoveDrainRate: 1
   LifeSupportDrainRate: 1
   ShieldDrainRate: 1
   RechargeRate: 5
-  CoolingRate: 0
+  CoolingRate: 1
   EnginesClip: {fileID: 8300000, guid: 0c4600c967b091a4691184cf5d2b70a5, type: 3}
   ShieldsClip: {fileID: 8300000, guid: 2107713c3479c714aae06a0b628da212, type: 3}
+  CloakClip: {fileID: 8300000, guid: c8e3bc4da9f59ed40a1e2bf58339eeca, type: 3}
   CloakEffect: {fileID: 2100000, guid: 4bac4e1ec2feefd448aa7465e1cd431e, type: 2}
   ShieldEffect: {fileID: 2100000, guid: d63ce50eafcabfe40a10047373449e80, type: 2}
   EmpPrefab: {fileID: 135402, guid: 998ef3fe491ebd34f892fe6a98ad74f5, type: 2}

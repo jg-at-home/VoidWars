@@ -30,3 +30,4 @@ MonoBehaviour:
   SecondaryAngle: 0
   RequiresLineOfSight: 0
   SoundEffect: {fileID: 8300000, guid: fe6e090fae301324e8e114b58819389d, type: 3}
+  MetaData: 2

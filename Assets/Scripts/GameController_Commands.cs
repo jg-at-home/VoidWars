@@ -17,6 +17,7 @@ namespace VoidWars {
             switch (parts[0]) {
                 case "pass":
                     // Nothing to do, carry on.
+                    _actionComplete = true;
                     break;
 
                 case "shields": {
@@ -27,6 +28,7 @@ namespace VoidWars {
 
                 case "aux":
                     handleAuxCommand(parts);
+                    _actionComplete = true;
                     break;
 
                 // TODO: everything else
@@ -46,13 +48,12 @@ namespace VoidWars {
         }
 
         private void executeCloak(ShipController shipController, bool status) {
-            // TODO: sound fx.
-            //if (status) {
-
-            //}
-            //else {
-
-            //}
+            if (status) {
+                shipController.AudioPlayer.PlayOneShot(shipController.ShipClass.CloakClip);
+            }
+            else {
+                // TODO: uncloak
+            }
             _communicator.CmdSetCloakStatus(shipController.ID, status);
         }
 
@@ -101,6 +102,9 @@ namespace VoidWars {
 
             // Restore camera.
             CameraRig.transform.SetPositionAndRotation(oldCameraPos, oldCameraRot);
+
+            // Signal finished.
+            _actionComplete = true;
         }    
     }
 }

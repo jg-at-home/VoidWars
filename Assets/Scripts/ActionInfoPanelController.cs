@@ -1,4 +1,6 @@
-﻿namespace VoidWars {
+﻿using System.Collections;
+
+namespace VoidWars {
     public class ActionInfoPanelController : ContentPanelController {
         public void OnActiveShipChanged(bool active) {
             string text;
@@ -18,11 +20,10 @@
         /// Called when the Done button is clicked.
         /// </summary>
         public override void OnDoneButtonClicked() {
+            EnableDoneButton(false);
             SendMessageUpwards("PlayButtonClick");
             var gameController = Util.GetGameController();
-            gameController.ActionPanel.SelectCurrentAction();
-            gameController.NextAction();
+            gameController.ExecuteSelectedAction();
         }
-
     }
 }

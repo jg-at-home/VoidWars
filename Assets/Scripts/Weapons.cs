@@ -66,13 +66,30 @@ namespace VoidWars {
             }
         }
 
-        public static IEnumerator EmpAttack(ShipController source, WeaponClass weaponClass, bool applyDamage) {
-            source.AudioPlayer.PlayOneShot(weaponClass.SoundEffect);
+        /// <summary>
+        /// EMP attack.
+        /// </summary>
+        /// <param name="source">The ship generating the pulse.</param>
+        /// <param name="empClass">Weapon data.</param>
+        /// <param name="applyDamage">If true, apply damage.</param>
+        /// <returns></returns>
+        public static IEnumerator EmpAttack(ShipController source, WeaponClass empClass, bool applyDamage) {
+            source.AudioPlayer.PlayOneShot(empClass.SoundEffect);
             var effect = Object.Instantiate(source.ShipClass.EmpPrefab, source.transform.position, Quaternion.identity);
             yield return new WaitForSeconds(EmpDuration);
             Object.Destroy(effect);
             if (applyDamage) {
-                // TODO.
+                var gameController = Util.GetGameController();
+                var layerMask = 1 << LayerMask.NameToLayer("ActiveObjects");
+                var overlaps = Physics.OverlapSphere(source.transform.position, empClass.Range, layerMask);
+                // TODO: randomise a bit.
+                var empData = int.Parse(empClass.MetaData); 
+                for (int i = 0; i < overlaps.Length; ++i) {
+                    var gob = overlaps[i].gameObject;
+                    if (!ReferenceEquals(gob, source.gameObject)) {
+                        gob.SendMessage("RespondToEmp", empData, SendMessageOptions.DontRequireReceiver);
+                    }
+                }
             }
         }
     }
