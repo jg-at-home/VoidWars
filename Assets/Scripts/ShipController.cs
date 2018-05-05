@@ -131,6 +131,13 @@ namespace VoidWars {
         }
 
         /// <summary>
+        /// How lithe our ship is.
+        /// </summary>
+        public int Maneuverability {
+            get { return _maneuverability; }
+        }
+
+        /// <summary>
         /// Gets the number of actions the ship can perform this turn.
         /// </summary>
         public int ActionsThisTurn { get { return _actionsThisTurn; } }
@@ -603,7 +610,7 @@ namespace VoidWars {
         }
 
         [Server]
-        private void updateWeaponState(WeaponClass weaponClass, ref AuxState state) {
+        private void updateWeaponState(WeaponInstance weaponClass, ref AuxState state) {
             switch (state) {
                 case AuxState.Idle:
                     if (_weaponsLevel >= weaponClass.PowerUsage) {                        
@@ -676,16 +683,16 @@ namespace VoidWars {
             }
         }
 
-        private void checkWeaponTemperature(WeaponClass weaponClass, ref AuxState state) {
+        private void checkWeaponTemperature(WeaponInstance weapon, ref AuxState state) {
             if (state == AuxState.Operational) {
-                if (_hullTemperature >= weaponClass.MaxTemperature) {
-                    Debug.LogWarningFormat("!!!Weapon '{0}' overheated", weaponClass.Name);
+                if (_hullTemperature >= weapon.MaxTemperature) {
+                    Debug.LogWarningFormat("!!!Weapon '{0}' overheated", weapon.Name);
                     state = AuxState.Overheated;
                 }
             }
             else if (state == AuxState.Overheated) {
-                if (_hullTemperature < weaponClass.MaxTemperature) {
-                    if (_weaponsLevel >= weaponClass.PowerUsage) {
+                if (_hullTemperature < weapon.MaxTemperature) {
+                    if (_weaponsLevel >= weapon.PowerUsage) {
                         state = AuxState.Operational;
                     }
                     else {
@@ -813,21 +820,23 @@ namespace VoidWars {
 
             // Set initial values from class.
             _energyBudget = new EnergyBudget();
-            _energy = _class.MaxEnergy;
-            _maxEnergy = _energy;
+            _maxEnergy = _class.MaxEnergy;
             _powerDrain = _class.LifeSupportDrainRate;
             _shieldPercent = 100.0f;
             _health = _class.MaxHealth;
             _coolingRate = _class.CoolingRate;
+            _maneuverability = _class.Maneuverability;
 
             // Figure out the total mass from the constituent bits - weapons and equipment.
             _totalMass = _class.Mass;
             Debug.Assert(PrimaryWeaponType != WeaponType.None);
-            _primaryWeapon = controller.GetWeaponClass(PrimaryWeaponType);
+            var primaryWeaponClass = controller.GetWeaponClass(PrimaryWeaponType);
+            _primaryWeapon = new WeaponInstance(primaryWeaponClass);
             _primaryWeaponState = AuxState.Operational;
             _totalMass += _primaryWeapon.Mass;
             if (SecondaryWeaponType != WeaponType.None) {
-                _secondaryWeapon = controller.GetWeaponClass(SecondaryWeaponType);
+                 var secondaryWeaponClass = controller.GetWeaponClass(SecondaryWeaponType);
+                _secondaryWeapon = new WeaponInstance(secondaryWeaponClass);
                 _secondaryWeaponState = AuxState.Operational;
                 _totalMass += _secondaryWeapon.Mass;
             }
@@ -995,8 +1004,8 @@ namespace VoidWars {
         private int _roundsWithoutLifeSupport;
         private Pilot _pilot;
         private ShipClass _class;
-        private WeaponClass _primaryWeapon;
-        private WeaponClass _secondaryWeapon;
+        private WeaponInstance _primaryWeapon;
+        private WeaponInstance _secondaryWeapon;
         private readonly List<AuxItem> _equipment = new List<AuxItem>();
         private int _totalMass;
         private float _powerDrain;
@@ -1009,5 +1018,6 @@ namespace VoidWars {
         private AudioSource _audioSource;
         [SerializeField] private MeshRenderer _renderer;
         private List<Task> _tasks;
+        private int _maneuverability;
     }
 }

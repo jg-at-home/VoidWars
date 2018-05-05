@@ -17,8 +17,7 @@ namespace VoidWars {
         /// <param name="target">The ship getting burnt.</param>
         /// <returns>Enumerator</returns>
         public static IEnumerator LaserAttack(Vector3 sourcePoint, WeaponClass weaponClass, ShipController source, ShipController target, bool applyDamage) {
-            var gameController = Util.GetGameController();
-            var laserGob = Object.Instantiate(gameController.LaserPrefab);
+            var laserGob = Object.Instantiate(weaponClass.Prefab);
             var laser = laserGob.GetComponent<LaserController>();
             var targetPoint = target.gameObject.transform.position;
             var direction = (targetPoint - sourcePoint).normalized;
@@ -62,6 +61,7 @@ namespace VoidWars {
                 var damage = weaponClass.MaxDamage * luckFactor * distanceScalar * temperatureScalar;
 
                 // Push to server.               
+                var gameController = Util.GetGameController();
                 gameController.ApplyDamageToShip(target.ID, damage, dT);
             }
         }
@@ -72,10 +72,10 @@ namespace VoidWars {
         /// <param name="source">The ship generating the pulse.</param>
         /// <param name="empClass">Weapon data.</param>
         /// <param name="applyDamage">If true, apply damage.</param>
-        /// <returns></returns>
+        /// <returns>Enumerator></returns>
         public static IEnumerator EmpAttack(ShipController source, WeaponClass empClass, bool applyDamage) {
             source.AudioPlayer.PlayOneShot(empClass.SoundEffect);
-            var effect = Object.Instantiate(source.ShipClass.EmpPrefab, source.transform.position, Quaternion.identity);
+            var effect = Object.Instantiate(empClass.Prefab, source.transform.position, Quaternion.identity);
             yield return new WaitForSeconds(EmpDuration);
             Object.Destroy(effect);
             if (applyDamage) {
@@ -92,5 +92,37 @@ namespace VoidWars {
                 }
             }
         }
+
+        public static IEnumerator RailGunAttack(ShipController source, Vector3 start, ShipController target, WeaponClass gunClass, bool applyDamage) {
+            source.AudioPlayer.PlayOneShot(gunClass.SoundEffect);
+            var projectile = Object.Instantiate(gunClass.Prefab, start, Quaternion.identity);
+            var rb = projectile.GetComponent<Rigidbody>();
+
+            // Depending on the accuracy of the source ship, the defensive stats of the target, and (TODO) crew buffs,
+            // determine if we'll hit or not and create a suitable trajectory.
+
+            // Set the projectile on its way. If it collides, do some damage. 
+
+            s_collided = false;
+            while(!s_collided) {
+                if (Vector3.Distance(rb.position, start) > gunClass.Range) {
+                    // Hasn't hit. We're done.
+                    break;
+                }
+                yield return null;
+            }
+
+            Object.Destroy(projectile);
+            if (s_collided && applyDamage) {
+                // Compute damage.
+            }
+        }
+
+        private static void onShipProjectileCollision() {
+            Debug.Log("Projectile-ship collision!");
+            s_collided = true;
+        }
+
+        private static bool s_collided;
     }
 }

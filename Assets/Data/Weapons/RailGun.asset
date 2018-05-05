@@ -13,18 +13,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Name: Rail Gun
   Icon: {fileID: 0}
-  Description: 
-  Detail: 
-  Cost: 0
+  Description: Projectile weapon
+  Detail: Shoots a high-energy bolt of something delicious, I mean deadly
+  Cost: 2
   Mass: 10
-  PowerUsage: 15
+  PowerUsage: 12
   MaxTemperature: 90
   Metadata: 
   RepairCost: 4
+  RepairTurns: 3
   WeaponType: 2
-  Cardinality: 0
+  Cardinality: 2
   MaxDamage: 90
   Range: 0
-  PrimaryAngle: 0
+  PrimaryAngle: 60
   SecondaryAngle: 0
   RequiresLineOfSight: 1
+  SoundEffect: {fileID: 8300000, guid: 85ba6b0f0aacba643bac4b551bbac29c, type: 3}
+  MetaData: 
+  Prefab: {fileID: 1302190830545550, guid: 6252aef34f9eb544cbf6f5e696694f39, type: 2}

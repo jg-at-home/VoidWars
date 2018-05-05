@@ -31,3 +31,4 @@ MonoBehaviour:
   RequiresLineOfSight: 1
   SoundEffect: {fileID: 8300000, guid: 6debb7ef153a2c744bf12d4697a71a96, type: 3}
   MetaData: 
+  Prefab: {fileID: 1600612731010136, guid: bcf326d026fc2c44096f5fdb4332dc57, type: 2}

@@ -65,6 +65,7 @@ namespace VoidWars {
                     node = gameObject.transform.Find("NodeFront");
                 }
 
+                // TODO: cache templates.
                 _moveTemplate = Instantiate(templatePrefab, node.transform.position, node.transform.rotation);
                 moveInstance.Position = _moveTemplate.EndPoint.transform.position;
                 moveInstance.Rotation = _moveTemplate.EndPoint.transform.rotation;
@@ -100,11 +101,11 @@ namespace VoidWars {
                 return false;
             }
 
-            if ((type == MoveType.SharpTurnLeft || type == MoveType.SharpTurnRight) && (shipClass.Maneuverability == 1)) {
+            if ((type == MoveType.SharpTurnLeft || type == MoveType.SharpTurnRight) && (_shipController.Maneuverability == 1)) {
                 return false;
             }
 
-            if ((type == MoveType.TurnAbout ) && (shipClass.Maneuverability != 3)) {
+            if ((type == MoveType.TurnAbout ) && (_shipController.Maneuverability != 3)) {
                 return false;
             }
 

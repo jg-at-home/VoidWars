@@ -64,7 +64,6 @@ namespace VoidWars {
         [Header("Prefabs")]
         public GameObject MapPinPrefab;
         public GameObject TargetIndicatorPrefab;
-        public GameObject LaserPrefab;
 
         public void OnShieldsFailed(ShipController ship) {
             Debug.Log("Shields failed");
