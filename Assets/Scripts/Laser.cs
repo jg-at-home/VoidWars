@@ -2,7 +2,14 @@
 using System.Collections;
 
 namespace VoidWars {
+    /// <summary>
+    /// Laser weapon. 
+    /// </summary>
     public class Laser : WeaponInstance {
+        /// <summary>
+        /// Constructs an instance.
+        /// </summary>
+        /// <param name="weaponClass">Weapon data.</param>
         public Laser(WeaponClass weaponClass) : base(weaponClass) {
         }
 
@@ -51,7 +58,7 @@ namespace VoidWars {
                 // Total.
                 var damage = MaxDamage * luckFactor * distanceScalar * temperatureScalar;
 
-                // Push to server.               
+                // Push to server.
                 var gameController = Util.GetGameController();
                 gameController.ApplyDamageToShip(target.ID, damage, dT);
             }

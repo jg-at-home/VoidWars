@@ -2,9 +2,18 @@
 using System.Collections;
 
 namespace VoidWars {
+    /// <summary>
+    /// Projectile weapon. Looks and sounds oddly familiar in some respects.
+    /// </summary>
     public class RailGun : WeaponInstance {
+        /// <summary>
+        /// Constructs an instance.
+        /// </summary>
+        /// <param name="weaponClass">Weapon data.</param>
         public RailGun(WeaponClass weaponClass) : base(weaponClass) {
-
+            if (s_explosionPrefab == null) {
+                s_explosionPrefab = (GameObject)Resources.Load("Prefabs/FX/" + GetString("ExplosionPrefab"));
+            }
         }
 
         public override IEnumerator Attack(ShipController ship, int slot, ShipController target, bool applyDamage) {
@@ -33,26 +42,32 @@ namespace VoidWars {
             rb.velocity = direction * speed;
 
             _collided = false;
-            while (!_collided) {
-                if (Vector3.Distance(rb.position, start) > Range) {
-                    // Hasn't hit. We're done.
-                    break;
-                }
+            while (!_collided && (Vector3.Distance(rb.position, start) <= Range)) {
                 yield return null;
             }
 
-            // TODO: explosion.
             Object.Destroy(projectile);
             if (_collided && applyDamage) {
+                var explosion = Object.Instantiate(s_explosionPrefab, _collisionPoint, Quaternion.identity);
+                Object.Destroy(explosion, 3f);
+
                 // Compute damage.
+                var luckFactor = Random.Range(0.85f, 1.05f);
+                var damage = luckFactor * MaxDamage;
+
+                // Push to clients.
+                var gameController = Util.GetGameController();
+                gameController.ApplyDamageToShip(target.ID, damage, 0f);
             }
         }
 
-        private void onShipProjectileCollision(GameObject collider) {
-            Debug.Log("Projectile-ship collision!");
+        private void onShipProjectileCollision(GameObject collider, Vector3 position) {
             _collided = true;
+            _collisionPoint = position;
         }
 
         private bool _collided;
+        private Vector3 _collisionPoint;
+        private static GameObject s_explosionPrefab;
     }
 }

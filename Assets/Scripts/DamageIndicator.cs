@@ -17,6 +17,7 @@ namespace VoidWars {
             _myRT = GetComponent<RectTransform>();
             _canvas = GetComponentInParent<Canvas>();
             _canvasRT = _canvas.GetComponent<RectTransform>();
+            _text.enabled = false;
         }
 
         public void SetValue(Vector3 position, int value) {

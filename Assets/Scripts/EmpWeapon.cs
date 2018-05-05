@@ -2,7 +2,14 @@
 using System.Collections;
 
 namespace VoidWars {
+    /// <summary>
+    /// ElectroMagnetic Pulse weapon.
+    /// </summary>
     public class EmpWeapon : WeaponInstance {
+        /// <summary>
+        /// Constructs an instance.
+        /// </summary>
+        /// <param name="weaponClass">Weapon data.</param>
         public EmpWeapon(WeaponClass weaponClass) : base(weaponClass) {
             _duration = GetFloat("Duration");
         }

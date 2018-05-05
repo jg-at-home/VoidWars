@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 
 namespace VoidWars {
-    public delegate void CollisionHandler(GameObject collider);
+    public delegate void CollisionHandler(GameObject collider, Vector3 position);
 
     public class ProjectileController : MonoBehaviour {
         public CollisionHandler CollisionHandler;
@@ -12,7 +12,7 @@ namespace VoidWars {
             if (!ReferenceEquals(collision.gameObject, SourceShip)) {
                 gameObject.SetActive(false);
                 if (CollisionHandler != null) {
-                    CollisionHandler(collision.gameObject);
+                    CollisionHandler(collision.gameObject, collision.contacts[0].point);
                 }
             }
         }

@@ -25,6 +25,9 @@ MonoBehaviour:
   - Name: Speed
     Type: 2
     Value: 8
+  - Name: ExplosionPrefab
+    Type: 0
+    Value: ExplosionSmall
   WeaponType: 2
   Cardinality: 2
   MaxDamage: 90
