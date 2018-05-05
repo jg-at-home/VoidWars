@@ -19,7 +19,11 @@ MonoBehaviour:
   Mass: 5
   PowerUsage: 5
   MaxTemperature: 101
-  Metadata: 4
   RepairCost: 5
+  RepairTurns: 0
+  MetaItems:
+  - Name: Range
+    Type: 1
+    Value: 4
   ItemType: 8
   Mode: 0

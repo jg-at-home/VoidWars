@@ -19,9 +19,15 @@ MonoBehaviour:
   Mass: 15
   PowerUsage: 20
   MaxTemperature: 65
-  Metadata: 
   RepairCost: 8
   RepairTurns: 2
+  MetaItems:
+  - Name: Duration
+    Type: 2
+    Value: 2
+  - Name: LastsForTurns
+    Type: 1
+    Value: 2
   WeaponType: 4
   Cardinality: 1
   MaxDamage: 100
@@ -29,5 +35,6 @@ MonoBehaviour:
   PrimaryAngle: 0
   SecondaryAngle: 0
   RequiresLineOfSight: 0
+  Accuracy: 1
   SoundEffect: {fileID: 8300000, guid: fe6e090fae301324e8e114b58819389d, type: 3}
-  MetaData: 2
+  Prefab: {fileID: 0}

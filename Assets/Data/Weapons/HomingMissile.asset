@@ -21,6 +21,7 @@ MonoBehaviour:
   MaxTemperature: 80
   Metadata: 
   RepairCost: 3
+  RepairTurns: 0
   WeaponType: 4
   Cardinality: 2
   MaxDamage: 60
@@ -28,3 +29,7 @@ MonoBehaviour:
   PrimaryAngle: 0
   SecondaryAngle: 0
   RequiresLineOfSight: 0
+  Accuracy: 1
+  SoundEffect: {fileID: 0}
+  MetaData: 
+  Prefab: {fileID: 0}

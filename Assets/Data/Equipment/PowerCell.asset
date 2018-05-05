@@ -19,7 +19,11 @@ MonoBehaviour:
   Mass: 2
   PowerUsage: -1
   MaxTemperature: 0
-  Metadata: 10
   RepairCost: 0
+  RepairTurns: 0
+  MetaItems:
+  - Name: Boost
+    Type: 2
+    Value: 10
   ItemType: 128
   Mode: 0

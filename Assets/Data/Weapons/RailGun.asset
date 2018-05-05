@@ -19,16 +19,19 @@ MonoBehaviour:
   Mass: 10
   PowerUsage: 12
   MaxTemperature: 90
-  Metadata: 
   RepairCost: 4
   RepairTurns: 3
+  MetaItems:
+  - Name: Speed
+    Type: 2
+    Value: 8
   WeaponType: 2
   Cardinality: 2
   MaxDamage: 90
-  Range: 0
+  Range: 55
   PrimaryAngle: 60
-  SecondaryAngle: 0
+  SecondaryAngle: 40
   RequiresLineOfSight: 1
+  Accuracy: 0.7
   SoundEffect: {fileID: 8300000, guid: 85ba6b0f0aacba643bac4b551bbac29c, type: 3}
-  MetaData: 
   Prefab: {fileID: 1302190830545550, guid: 6252aef34f9eb544cbf6f5e696694f39, type: 2}

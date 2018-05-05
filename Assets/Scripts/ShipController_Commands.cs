@@ -56,44 +56,44 @@ namespace VoidWars {
 
             // Auxiliary items.
             for(var i = 0; i < _equipment.Count; ++i) {
-                var auxClass = _equipment[i].Class;
-                var auxState = _equipment[i].State;
-                if (auxClass.Mode == AuxMode.Switchable) {
+                var auxItem = _equipment[i];
+                var auxState = auxItem.State;
+                if (auxItem.Mode == AuxMode.Switchable) {
                     if (auxState == AuxState.Operational) {
                         actions.Add(new ActionItem {
-                            Action = string.Format("aux {0} false", auxClass.ItemType),
-                            Description = string.Format("Disable {0}", auxClass.Description),
-                            Detail = auxClass.Detail,
-                            Icon = auxClass.Icon,
-                            EditorPrefabInfo = string.Format("ImageDetailPanel {0}Image", auxClass.ItemType)
+                            Action = string.Format("aux {0} false", auxItem.ItemType),
+                            Description = string.Format("Disable {0}", auxItem.Description),
+                            Detail = auxItem.Detail,
+                            Icon = auxItem.Icon,
+                            EditorPrefabInfo = string.Format("ImageDetailPanel {0}Image", auxItem.ItemType)
                         });
                     }
-                    else if ((auxState == AuxState.Idle) && (_energy >= auxClass.PowerUsage)) {
+                    else if ((auxState == AuxState.Idle) && (_energy >= auxItem.PowerUsage)) {
                         actions.Add(new ActionItem {
-                            Action = string.Format("aux {0} true", auxClass.ItemType),
-                            Description = string.Format("Enable {0}", auxClass.Description),
-                            Detail = auxClass.Detail,
-                            Icon = auxClass.Icon,
-                            EditorPrefabInfo = string.Format("ImageDetailPanel {0}Image", auxClass.ItemType)
+                            Action = string.Format("aux {0} true", auxItem.ItemType),
+                            Description = string.Format("Enable {0}", auxItem.Description),
+                            Detail = auxItem.Detail,
+                            Icon = auxItem.Icon,
+                            EditorPrefabInfo = string.Format("ImageDetailPanel {0}Image", auxItem.ItemType)
                         });
                     }
                 }
-                else if (auxClass.Mode == AuxMode.OneShot) {
-                    if (_energy >= auxClass.PowerUsage) {
+                else if (auxItem.Mode == AuxMode.OneShot) {
+                    if (_energy >= auxItem.PowerUsage) {
                         actions.Add(new ActionItem {
-                            Action = string.Format("aux {0} true", auxClass.ItemType),
-                            Description = string.Format("Use {0}", auxClass.Description),
-                            Detail = auxClass.Detail,
-                            Icon = auxClass.Icon,
-                            EditorPrefabInfo = string.Format("ImageDetailPanel {0}Image", auxClass.ItemType)
+                            Action = string.Format("aux {0} true", auxItem.ItemType),
+                            Description = string.Format("Use {0}", auxItem.Description),
+                            Detail = auxItem.Detail,
+                            Icon = auxItem.Icon,
+                            EditorPrefabInfo = string.Format("ImageDetailPanel {0}Image", auxItem.ItemType)
                         });
                     }
                 }
                 else if (auxState == AuxState.Broken) {
-                    if (_canRepairItems && (_energy >= auxClass.RepairCost)) {
+                    if (_canRepairItems && (_energy >= auxItem.RepairCost)) {
                         actions.Add(new ActionItem {
-                            Action = string.Format("repair {0}", auxClass.ItemType),
-                            Description = string.Format("Repair {0}", auxClass.ItemType),
+                            Action = string.Format("repair {0}", auxItem.ItemType),
+                            Description = string.Format("Repair {0}", auxItem.ItemType),
                             Detail = "Restore function of this device at some cost to your energy",
                             Icon = ImageManager.GetImage("RepairIcon"),
                             EditorPrefabInfo = "ImageDetailPanel RepairImage"

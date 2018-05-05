@@ -19,9 +19,12 @@ MonoBehaviour:
   Mass: 5
   PowerUsage: 10
   MaxTemperature: 80
-  Metadata: 
   RepairCost: 2
   RepairTurns: 0
+  MetaItems:
+  - Name: ThermalDamage
+    Type: 2
+    Value: 10
   WeaponType: 1
   Cardinality: 0
   MaxDamage: 60
@@ -29,6 +32,6 @@ MonoBehaviour:
   PrimaryAngle: 45
   SecondaryAngle: 30
   RequiresLineOfSight: 1
+  Accuracy: 1
   SoundEffect: {fileID: 8300000, guid: 6debb7ef153a2c744bf12d4697a71a96, type: 3}
-  MetaData: 
   Prefab: {fileID: 1600612731010136, guid: bcf326d026fc2c44096f5fdb4332dc57, type: 2}

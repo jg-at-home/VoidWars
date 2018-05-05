@@ -62,27 +62,9 @@ namespace VoidWars {
     }
 
     /// <summary>
-    /// Network sync for aux states.
-    /// </summary>
-    public class SyncListAux : SyncList<AuxState> {
-        protected override AuxState DeserializeItem(NetworkReader reader) {
-            return (AuxState)reader.ReadInt32();
-        }
-
-        protected override void SerializeItem(NetworkWriter writer, AuxState item) {
-            writer.Write((int)item);
-        }
-    }
-
-    /// <summary>
     /// Descriptor for an auxiliary item.
     /// </summary>
-    public class AuxItem {
-        /// <summary>
-        /// The item's class.
-        /// </summary>
-        public readonly AuxiliaryClass Class;
-
+    public class AuxItem : ItemInstance {
         /// <summary>
         /// The item's state.
         /// </summary>
@@ -92,9 +74,14 @@ namespace VoidWars {
         /// Construct an item.
         /// </summary>
         /// <param name="itemClass">The item's class</param>
-        public AuxItem(AuxiliaryClass itemClass) {
-            Class = itemClass;
+        public AuxItem(AuxiliaryClass itemClass) : base(itemClass) {
+            _class = itemClass;
             State = AuxState.Idle;
         }
+
+        public AuxMode Mode {  get { return _class.Mode; } }
+        public AuxType ItemType {  get { return _class.ItemType; } }
+
+        private readonly AuxiliaryClass _class;
     }
 }

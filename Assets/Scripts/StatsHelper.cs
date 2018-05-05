@@ -1,8 +1,7 @@
 ﻿using UnityEngine;
-using System.Collections;
 
 namespace VoidWars { 
-    public static class Stats {
+    public static class StatsHelper {
         /// <summary>
         /// Gets the efficiency of a thing which has a maximum temperature at the current temperature.
         /// </summary>

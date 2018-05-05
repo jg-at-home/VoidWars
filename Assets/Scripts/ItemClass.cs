@@ -1,6 +1,21 @@
-﻿using UnityEngine;
+﻿using System;
+using System.Collections.Generic;
+using UnityEngine;
 
 namespace VoidWars {
+    public enum MetaType {
+        String,
+        Int,
+        Float
+    }
+
+    [Serializable]
+    public struct MetaItem {
+        public string Name;
+        public MetaType Type;
+        public string Value;
+    }
+
     /// <summary>
     /// Base class for weapons, auxiliaries etc.
     /// </summary>
@@ -29,30 +44,32 @@ namespace VoidWars {
         [Tooltip("Maximum temperature above which the device will not function")]
         public float MaxTemperature;
 
-        [Tooltip("Metadata for the item held as a string")]
-        public string Metadata;
-
         [Tooltip("How much energy it takes to repair the item")]
         public float RepairCost;
 
         [Tooltip("How many turns it takes to repair an item")]
         public int RepairTurns;
+
+        [Tooltip("Leaf data")]
+        public MetaItem[] MetaItems;
     }
 
     public class ItemInstance : Buffable {
         public ItemInstance(ItemClass itemClass) {
             _class = itemClass;
+            PowerUsage = _class.PowerUsage;
+            RepairTurns = _class.RepairTurns;
+            buildMetaData(_class.MetaItems);
         }
 
         public string Name { get { return _class.Name; } }
-        public Sprite Icon {  get { return _class.Icon; } }
-        public string Description {  get { return _class.Description; } }
-        public string Detail {  get { return _class.Detail; } }
-        public int Cost {  get { return _class.Cost; } }
-        public int Mass {  get { return _class.Mass; } }
-        public float MaxTemperature {  get { return _class.MaxTemperature; } }
-        public string Metadata {  get { return _class.Metadata; } }
-        public float RepairCost {  get { return _class.RepairCost; } }
+        public Sprite Icon { get { return _class.Icon; } }
+        public string Description { get { return _class.Description; } }
+        public string Detail { get { return _class.Detail; } }
+        public int Cost { get { return _class.Cost; } }
+        public int Mass { get { return _class.Mass; } }
+        public float MaxTemperature { get { return _class.MaxTemperature; } }
+        public float RepairCost { get { return _class.RepairCost; } }
 
         [Stat]
         public int PowerUsage {
@@ -66,6 +83,41 @@ namespace VoidWars {
             set { setValue("RepairTurns", value); }
         }
 
-        private ItemClass _class;
+        public float GetFloat(string field) {
+            return (float)_metaData[field];
+        }
+
+        public int GetInt(string field) {
+            return (int)_metaData[field];
+        }
+
+        public string GetString(string field) {
+            return (string)_metaData[field];
+        }
+
+        private void buildMetaData(MetaItem[] items) {
+            foreach(var item in items) {
+                switch(item.Type) {
+                    case MetaType.String:
+                        _metaData[item.Name] = item.Value;
+                        break;
+
+                    case MetaType.Int:
+                        _metaData[item.Name] = int.Parse(item.Value);
+                        break;
+
+                    case MetaType.Float:
+                        _metaData[item.Name] = float.Parse(item.Value);
+                        break;
+
+                    default:
+                        Debug.Assert(false);
+                        break;
+                }
+            }
+        }
+
+        private readonly ItemClass _class;
+        private readonly Dictionary<string, object> _metaData = new Dictionary<string, object>();
     }
 }

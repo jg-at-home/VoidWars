@@ -62,12 +62,16 @@ namespace VoidWars {
         /// <param name="weaponSlot">0=front, 1=rear</param>
         [Command]
         public void CmdPerformAttack(int sourceID, int targetID, int weaponSlot) {
-            // TODO remove energy from source ship.
-            RpcPerformAttack(sourceID, targetID, weaponSlot);
+            // Generate a random seed. All client must agree on what will happen next, so all
+            // the stochastic bits of calculations must be identical. This seed then is used
+            // to init the .NET rng on all clients to get the desired result.
+            var rngSeed = (int)Time.time;
+            RpcPerformAttack(sourceID, targetID, weaponSlot, rngSeed);
         }
 
         [ClientRpc]
-        void RpcPerformAttack(int sourceID, int targetID, int weaponSlot) {
+        void RpcPerformAttack(int sourceID, int targetID, int weaponSlot, int rngSeed) {
+            Statistics.Reseed(rngSeed);
             controller.PerformAttack(sourceID, targetID, weaponSlot);
         }
 

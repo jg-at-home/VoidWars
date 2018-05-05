@@ -14,23 +14,13 @@ namespace VoidWars {
         /// <param name="weaponClass">The weapon class.</param>
         /// <param name="applyDamage">If true, apply the damage.</param>
         /// <returns>Enumerator</returns>
-        public IEnumerator Attack(ShipController target, int weaponSlot, WeaponClass weaponClass) {
-            Transform node = GetWeaponNode(weaponSlot);
-            WeaponType weaponType = weaponClass.WeaponType;
-            switch(weaponType) {
-                case WeaponType.Laser:
-                case WeaponType.UVLaser:
-                    yield return Weapons.LaserAttack(node.position, weaponClass, this, target, isServer);
-                    break;
+        public IEnumerator Attack(ShipController target, int weaponSlot, WeaponInstance weapon) {
+            // Use up some juice.
+            _energy -= weapon.PowerUsage;
+            Debug.Assert(_energy >= 0f);
 
-                case WeaponType.EMP:
-                    yield return Weapons.EmpAttack(this, weaponClass, isServer);
-                    break;
-
-                default:
-                    yield return null;
-                    break;
-            }
+            // Do the attack.
+            yield return weapon.Attack(this, weaponSlot, target, isServer);
         }
     }
 }

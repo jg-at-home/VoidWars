@@ -405,8 +405,8 @@ namespace VoidWars {
             }
 
             var weaponType = sourceShip.GetWeaponType(weaponSlot);
-            var weaponClass = GetWeaponClass(weaponType);
-            yield return sourceShip.Attack(targetShip, weaponSlot, weaponClass);
+            var weapon = sourceShip.GetWeapon(weaponSlot);
+            yield return sourceShip.Attack(targetShip, weaponSlot, weapon);
 
             // TODO: if target is wiped, do death stuff.
 

@@ -19,7 +19,11 @@ MonoBehaviour:
   Mass: 2
   PowerUsage: 4
   MaxTemperature: 101
-  Metadata: 3
   RepairCost: 2
+  RepairTurns: 0
+  MetaItems:
+  - Name: DeltaT
+    Type: 2
+    Value: 3
   ItemType: 256
   Mode: 0

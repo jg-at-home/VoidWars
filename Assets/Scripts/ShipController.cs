@@ -195,7 +195,17 @@ namespace VoidWars {
         /// <param name="slot">The slot number {0,1}</param>
         /// <returns>The state of the weapon.</returns>
         public AuxState GetWeaponState(int slot) {
+            // TODO: merge state into weapon instance class.
             return (slot == 0) ? _primaryWeaponState : _secondaryWeaponState;
+        }
+
+        /// <summary>
+        /// Gets the weapon for a given slot.
+        /// </summary>
+        /// <param name="slot">The weapon slot.</param>
+        /// <returns>The weapon.</returns>
+        public WeaponInstance GetWeapon(int slot) {
+            return (slot == 0) ? _primaryWeapon : _secondaryWeapon;
         }
 
         /// <summary>
@@ -243,8 +253,8 @@ namespace VoidWars {
         /// </summary>
         /// <param name="index">The index.</param>
         /// <returns>The requested aux class.</returns>
-        public AuxiliaryClass GetAuxiliaryItemClass(int index) {
-            return _equipment[index].Class;
+        public AuxItem GetAuxiliaryItemC(int index) {
+            return _equipment[index];
         }
 
         /// <summary>
@@ -311,11 +321,11 @@ namespace VoidWars {
 
             Debug.Assert(_shieldState != AuxState.Operational, "Needs to be caught in the UI");
 
-            var cloakIndex = _equipment.FindIndex(e => e.Class.ItemType == AuxType.Shinobi);
+            var cloakIndex = _equipment.FindIndex(e => e.ItemType == AuxType.Shinobi);
             Debug.Assert(cloakIndex >= 0, "No cloak?");
 
-            var cloakClass = _equipment[cloakIndex].Class;
-            var cloakState = _equipment[cloakIndex].State;
+            var cloakItem = _equipment[cloakIndex];
+            var cloakState = cloakItem.State;
             Debug.Assert(cloakState != AuxState.Overheated, "Needs to be caught in the UI");
 
             bool cloakActive = (cloakState == AuxState.Operational);
@@ -323,16 +333,16 @@ namespace VoidWars {
                 if (enable) {
                     // Turn the thing on.
                     _equipment[cloakIndex].State = AuxState.Operational;
-                    applyAuxiliary(cloakClass);
+                    applyAuxiliary(cloakItem);
 
                     // Use some power up now.
-                    _energy -= cloakClass.PowerUsage;
+                    _energy -= cloakItem.PowerUsage;
                     Debug.Assert(_energy >= 0);
                 }
                 else {
                     // Switch off.
                     _equipment[cloakIndex].State = AuxState.Idle;
-                    unapplyAuxiliary(cloakClass);
+                    unapplyAuxiliary(cloakItem);
                 }
             }
         }
@@ -658,20 +668,20 @@ namespace VoidWars {
             Debug.LogFormat("Ship #{0}: T_hull = {1}", ID, temperature);
             // Disable items above their max T (and re-enable those under it).
             for(var i = 0; i < _equipment.Count; ++i) {
-                var auxClass = _equipment[i].Class;
-                var auxState = _equipment[i].State;
+                var auxItem = _equipment[i];
+                var auxState = auxItem.State;
                 if (auxState == AuxState.Operational) {
-                    if (temperature >= auxClass.MaxTemperature) {
+                    if (temperature >= auxItem.MaxTemperature) {
                         // TODO: notification
                         _equipment[i].State = AuxState.Overheated;
-                        unapplyAuxiliary(auxClass);
+                        unapplyAuxiliary(auxItem);
                     }
                 }
                 else if (auxState == AuxState.Overheated) {
-                    if (temperature < auxClass.MaxTemperature) {
+                    if (temperature < auxItem.MaxTemperature) {
                         // TODO: notification
                         _equipment[i].State = AuxState.Operational;
-                        applyAuxiliary(auxClass);
+                        applyAuxiliary(auxItem);
                     }
                 }
             }
@@ -831,12 +841,12 @@ namespace VoidWars {
             _totalMass = _class.Mass;
             Debug.Assert(PrimaryWeaponType != WeaponType.None);
             var primaryWeaponClass = controller.GetWeaponClass(PrimaryWeaponType);
-            _primaryWeapon = new WeaponInstance(primaryWeaponClass);
+            _primaryWeapon = Weapons.CreateWeapon(primaryWeaponClass);
             _primaryWeaponState = AuxState.Operational;
             _totalMass += _primaryWeapon.Mass;
             if (SecondaryWeaponType != WeaponType.None) {
                  var secondaryWeaponClass = controller.GetWeaponClass(SecondaryWeaponType);
-                _secondaryWeapon = new WeaponInstance(secondaryWeaponClass);
+                _secondaryWeapon = Weapons.CreateWeapon(secondaryWeaponClass);
                 _secondaryWeaponState = AuxState.Operational;
                 _totalMass += _secondaryWeapon.Mass;
             }
@@ -851,7 +861,7 @@ namespace VoidWars {
                     _equipment.Add(auxItem);
                     if (auxClass.Mode == AuxMode.Continuous) {
                         auxItem.State = AuxState.Operational;
-                        applyAuxiliary(auxClass);
+                        applyAuxiliary(auxItem);
                     }
                 }
 
@@ -868,6 +878,19 @@ namespace VoidWars {
         private void Update() {
             if (hasAuthority) {
                 updateInner();
+            }
+
+            if (isClient) {
+                var frontWeaponAngle = _primaryWeapon.PrimaryAngle / 2;
+                var start = FrontNode.transform.position;
+                var leftRot = Quaternion.Euler(0, -frontWeaponAngle, 0);
+                var dir1 = leftRot * FrontNode.transform.forward;
+                var end1 = start + dir1 * Mathf.Max(_primaryWeapon.Range, 1f);
+                Debug.DrawLine(start, end1, Color.yellow);
+                var rightRot = Quaternion.Euler(0, frontWeaponAngle, 0);
+                var dir2 = rightRot * FrontNode.transform.forward;
+                var end2 = start + dir2 * Mathf.Max(_primaryWeapon.Range, 1f);
+                Debug.DrawLine(start, end2, Color.yellow);
             }
         }
 
@@ -914,11 +937,7 @@ namespace VoidWars {
             }
         }
 
-        private void onAuxStateChanged(SyncListAux.Operation op, int itemIndex) {
-            Debug.LogFormat("Aux state {0} changed", itemIndex);
-        }
-
-        private void applyAuxiliary(AuxiliaryClass aux) {
+        private void applyAuxiliary(AuxItem aux) {
             Debug.LogFormat("Applying auxiliary '{0}'", aux.Name);
 
             // Everything has an effect on power.
@@ -927,15 +946,15 @@ namespace VoidWars {
             // Specific effects here.
             switch(aux.ItemType) {
                 case AuxType.PowerCell:
-                    _maxEnergy += float.Parse(aux.Metadata);
+                    _maxEnergy += aux.GetFloat("Boost");
                     break;
 
                 case AuxType.DriveBoost:
-                    _maxMoveSize = int.Parse(aux.Metadata);
+                    _maxMoveSize += aux.GetInt("Range");
                     break;
 
                 case AuxType.CoolingElement:
-                    _coolingRate += float.Parse(aux.Metadata);
+                    _coolingRate += aux.GetFloat("DeltaT");
                     break;
 
                 case AuxType.Shinobi:
@@ -944,7 +963,7 @@ namespace VoidWars {
             }
         }
 
-        private void unapplyAuxiliary(AuxiliaryClass aux) {
+        private void unapplyAuxiliary(AuxItem aux) {
             Debug.LogFormat("Unapplying auxiliary '{0}'", aux.Name);
 
             // Everything has an effect on power.
@@ -953,18 +972,18 @@ namespace VoidWars {
             // Specific effects here.
             switch (aux.ItemType) {
                 case AuxType.PowerCell:
-                    _maxEnergy -= float.Parse(aux.Metadata);
+                    _maxEnergy -= aux.GetFloat("Boost");
                     if (_energy > _maxEnergy) {
                         _energy = _maxEnergy;
                     }
                     break;
 
                 case AuxType.DriveBoost:
-                    _maxMoveSize -= int.Parse(aux.Metadata);
+                    _maxMoveSize -= aux.GetInt("Range");
                     break;
 
                 case AuxType.CoolingElement:
-                    _coolingRate -= float.Parse(aux.Metadata);
+                    _coolingRate -= aux.GetFloat("DeltaT");
                     break;
 
                 case AuxType.Shinobi:

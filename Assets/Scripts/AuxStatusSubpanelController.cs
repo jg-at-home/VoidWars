@@ -28,8 +28,8 @@ namespace VoidWars {
                 int i = 0;
                 for(; i < numAux; ++i) {
                     _rows[i].gameObject.SetActive(true);
-                    var auxClass = ship.GetAuxiliaryItemClass(i);
-                    _text[i].text = auxClass.Name;
+                    var auxItem = ship.GetAuxiliaryItemC(i);
+                    _text[i].text = auxItem.Name;
                     var auxState = ship.GetAuxiliaryItemState(i);
                     if (auxState == AuxState.Broken) {
                         _icons[i].sprite = BrokenImage;
@@ -38,7 +38,7 @@ namespace VoidWars {
                         _icons[i].sprite = OverheatImage;
                     }
                     else {
-                        switch (auxClass.Mode) {
+                        switch (auxItem.Mode) {
                             case AuxMode.OneShot:
                             case AuxMode.Continuous:
                                 _icons[i].sprite = OkImage;
