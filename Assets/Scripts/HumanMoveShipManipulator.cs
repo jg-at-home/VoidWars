@@ -96,16 +96,16 @@ namespace VoidWars {
             var size = template.Size;
 
             // Can the ship do this?
-            var shipClass = _shipController.ShipClass;
+            var shipClass = _shipController.ShipData;
             if ((type == MoveType.Reverse) && !shipClass.HasReverseThrust) {
                 return false;
             }
 
-            if ((type == MoveType.SharpTurnLeft || type == MoveType.SharpTurnRight) && (_shipController.Maneuverability == 1)) {
+            if ((type == MoveType.SharpTurnLeft || type == MoveType.SharpTurnRight) && (_shipController.ShipData.Maneuverability == 1)) {
                 return false;
             }
 
-            if ((type == MoveType.TurnAbout ) && (_shipController.Maneuverability != 3)) {
+            if ((type == MoveType.TurnAbout ) && (_shipController.ShipData.Maneuverability != 3)) {
                 return false;
             }
 

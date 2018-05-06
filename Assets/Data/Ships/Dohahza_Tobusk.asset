@@ -19,9 +19,9 @@ MonoBehaviour:
   Mass: 10
   PowerUsage: 3
   MaxTemperature: 0
-  Metadata: 
   RepairCost: 0
   RepairTurns: 3
+  MetaItems: []
   Species: 2
   ModelName: SHIP_C_01
   HasSecondaryWeaponSlot: 1
@@ -31,7 +31,8 @@ MonoBehaviour:
   NumAuxiliarySlots: 1
   Stealth: 0
   MaxSpeed: 11
-  ActionsPerTurn: 2
+  ActionsPerTurn: 1
+  MaxMoveSize: 4
   Maneuverability: 1
   MaxEnergy: 200
   MoveDrainRate: 1
@@ -39,6 +40,7 @@ MonoBehaviour:
   ShieldDrainRate: 1
   RechargeRate: 5
   CoolingRate: 1
+  MaxShieldEfficiency: 0
   EnginesClip: {fileID: 8300000, guid: 0c4600c967b091a4691184cf5d2b70a5, type: 3}
   ShieldsClip: {fileID: 8300000, guid: 2107713c3479c714aae06a0b628da212, type: 3}
   CloakClip: {fileID: 8300000, guid: c8e3bc4da9f59ed40a1e2bf58339eeca, type: 3}

@@ -31,10 +31,20 @@ namespace VoidWars {
     }
 
     /// <summary>
+    /// The things a buff can change.
+    /// </summary>
+    public enum BuffTarget {
+        Ship,
+        Auxiliary,
+        Weapon
+    }
+
+    /// <summary>
     /// Editor buff descriptor.
     /// </summary>
     [Serializable]
     public struct BuffInfo {
+        public BuffTarget Target;
         public string Property;
         public BuffType BuffType;
         public float Value;
@@ -127,13 +137,17 @@ namespace VoidWars {
         /// Removes all buffs with the given owner.
         /// </summary>
         /// <param name="owner">The buff owner.</param>
-        public void RemoveBuffsWithOwner(object owner) {
+        /// <returns>The number of buffs removed.</returns>
+        public int RemoveBuffsWithOwner(object owner) {
+            var count = 0;
             for(int i = _buffs.Count-1; i >= 0; --i) {
                 if (_buffs[i].Owner == owner) {
                     _buffs.RemoveAt(i);
                     _dirty = true;
+                    ++count;
                 }
             }
+            return count;
         }
 
         private void evaluate() {
@@ -203,7 +217,6 @@ namespace VoidWars {
         internal readonly float MaxValue;
     }
 
-
     /// <summary>
     /// Base class for buffable entities.
     /// </summary>
@@ -239,12 +252,22 @@ namespace VoidWars {
         }
 
         /// <summary>
-        /// Adds a buff to the entity.
+        /// Gets the total number of buffs.
+        /// </summary>
+        public int BuffCount {
+            get { return _count; }
+        }
+
+        /// <summary>
+        /// Adds a buff to the entity. Will only be added if it binds to a property.
         /// </summary>
         /// <param name="buff">The buff to add.</param>
         public void AddBuff(Buff buff) {
-            var stat = _values[buff.Property];
-            stat.AddBuff(buff);
+            Stat stat;
+            if (_values.TryGetValue(buff.Property, out stat)) {
+                stat.AddBuff(buff);
+                ++_count;
+            }
         }
 
         /// <summary>
@@ -252,8 +275,11 @@ namespace VoidWars {
         /// </summary>
         /// <param name="buff">The buff to remove.</param>
         public void RemoveBuff(Buff buff) {
-            var stat = _values[buff.Property];
-            stat.RemoveBuff(buff);
+            Stat stat;
+            if (_values.TryGetValue(buff.Property, out stat)) {
+                stat.RemoveBuff(buff);
+                --_count;
+            }
         }
 
         /// <summary>
@@ -262,7 +288,7 @@ namespace VoidWars {
         /// <param name="owner">The buff owner.</param>
         public void RemoveBuffsWithOwner(object owner) {
             foreach(var stat in _values.Values) {
-                stat.RemoveBuffsWithOwner(owner);
+                _count -= stat.RemoveBuffsWithOwner(owner);
             }
         }
 
@@ -276,6 +302,7 @@ namespace VoidWars {
             stat.SetBaseValue(value);
         }
 
-        private readonly Dictionary<string, Stat> _values = new Dictionary<string, Stat>();    
+        private readonly Dictionary<string, Stat> _values = new Dictionary<string, Stat>();
+        private int _count;
     }
 }

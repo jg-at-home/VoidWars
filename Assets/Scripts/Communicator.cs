@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -182,6 +183,9 @@ namespace VoidWars {
                     shipController.PrimaryWeaponType = shipConfig.PrimaryWeapon;
                     shipController.SecondaryWeaponType = shipConfig.SecondaryWeapon;
                     shipController.EquipmentMask = makeEquipmentMask(shipConfig.Equipment);
+                    shipController.CrewNames.Add(shipConfig.Captain);
+                    shipController.CrewNames.Add(shipConfig.FirstOfficer);
+                    shipController.CrewNames.Add(shipConfig.Engineer);
                     NetworkServer.Spawn(ship);
                 }
             }
@@ -221,6 +225,9 @@ namespace VoidWars {
             shipController.PrimaryWeaponType = config.PrimaryWeapon;
             shipController.SecondaryWeaponType = config.SecondaryWeapon;
             shipController.EquipmentMask = makeEquipmentMask(config.Equipment);
+            shipController.CrewNames.Add(config.Captain);
+            shipController.CrewNames.Add(config.FirstOfficer);
+            shipController.CrewNames.Add(config.Engineer);
             var player = controller.GetPlayer(ownerID);
             NetworkServer.SpawnWithClientAuthority(ship, player.Connection);
         }
@@ -315,7 +322,7 @@ namespace VoidWars {
             var shipController = controller.GetShip(shipID);
             shipController.EnableShields(enable);
             var msg = string.Format("Ship <color=orange>'{0}'</color> has {1}ed shields",
-                shipController.ShipClass.Name, enable ? "rais" : "lower");
+                shipController.ShipData.Name, enable ? "rais" : "lower");
             RpcShowMessageToOtherPlayers(shipController.OwnerID, msg);
         }
 
@@ -341,7 +348,7 @@ namespace VoidWars {
             var shipController = controller.GetShip(shipID);
             shipController.EnableCloaking(enable);
             var msg = string.Format("Ship <color=orange>'{0}'</color> has {1}stealthed",
-                shipController.ShipClass.Name, enable ? "" : "de-");
+                shipController.ShipData.Name, enable ? "" : "de-");
             RpcShowMessageToOtherPlayers(shipController.OwnerID, msg);
         }
 

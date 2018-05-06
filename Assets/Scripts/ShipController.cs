@@ -79,6 +79,11 @@ namespace VoidWars {
         public int EquipmentMask;
 
         /// <summary>
+        /// Names of the crew members.
+        /// </summary>
+        public SyncListString CrewNames = new SyncListString();
+
+        /// <summary>
         /// Gets the amount of energy the ship has.
         /// </summary>
         public float Energy {
@@ -109,8 +114,8 @@ namespace VoidWars {
         /// <summary>
         /// Gets the ship's static class data.
         /// </summary>
-        public ShipClass ShipClass {
-            get { return _class; }
+        public ShipInstance ShipData {
+            get { return _data; }
         }
 
         /// <summary>
@@ -118,7 +123,7 @@ namespace VoidWars {
         /// </summary>
         public float MassRatio {
             get {
-                return( _totalMass / _class.Mass );
+                return( _totalMass / _data.Mass );
             }
         }
 
@@ -127,13 +132,6 @@ namespace VoidWars {
         /// </summary>
         public int MaxMoveSize {
             get { return _maxMoveSize; }
-        }
-
-        /// <summary>
-        /// How lithe our ship is.
-        /// </summary>
-        public int Maneuverability {
-            get { return _maneuverability; }
         }
 
         /// <summary>
@@ -178,14 +176,14 @@ namespace VoidWars {
         /// Life support working?
         /// </summary>
         public bool IsLifeSupportOK {
-            get { return _lifeSupportLevel >= _class.LifeSupportDrainRate; }
+            get { return _lifeSupportLevel >= _data.LifeSupportDrainRate; }
         }
 
         /// <summary>
         /// Drive working?
         /// </summary>
         public bool IsPropulsionOK {
-            get { return _propulsionLevel >= MassRatio * _class.MoveDrainRate; }
+            get { return _propulsionLevel >= MassRatio * _data.MoveDrainRate; }
         }
 
         /// <summary>
@@ -211,7 +209,7 @@ namespace VoidWars {
         /// Shields working?
         /// </summary>
         public bool IsShieldsOK {
-            get { return (_shieldEnergy >= _class.ShieldDrainRate) && (_shieldPercent > 0); }
+            get { return (_shieldEnergy >= _data.ShieldDrainRate) && (_shieldPercent > 0); }
         }
 
         /// <summary>
@@ -352,7 +350,7 @@ namespace VoidWars {
             // the host player.
             var gameController = Util.GetGameController();
             var shield = gameObject.GetComponent<ForceField3Y3>();
-            shield.effect = _class.CloakEffect;
+            shield.effect = _data.CloakEffect;
             if (gameController.IsOwner(OwnerID)) {
                 // If I own the ship, give me an outline so I can still see my ship.
                 if (state) {
@@ -393,7 +391,7 @@ namespace VoidWars {
                 var restoreTask = new Task(numTurns, restoreShields);
                 _tasks.Add(restoreTask);
                 var controller = Util.GetGameController();
-                var msg = string.Format("Ship <color=orange>{0}</color>'s shields have been disabled", _class.Name);
+                var msg = string.Format("Ship <color=orange>{0}</color>'s shields have been disabled", _data.Name);
                 controller.BroadcastMsg(msg);
             }
         }
@@ -401,7 +399,7 @@ namespace VoidWars {
         private void restoreShields() {
             _shieldState = AuxState.Idle;
             var controller = Util.GetGameController();
-            var msg = string.Format("Ship <color=orange>{0}</color>'s shields have been restored", _class.Name);
+            var msg = string.Format("Ship <color=orange>{0}</color>'s shields have been restored", _data.Name);
             controller.BroadcastMsg(msg);
         }
 
@@ -418,13 +416,13 @@ namespace VoidWars {
             if (enable) {
                 if (_shieldState == AuxState.Idle) {
                     _shieldState = AuxState.Operational;
-                    _powerDrain += _class.ShieldDrainRate;
+                    _powerDrain += _data.ShieldDrainRate;
                 }
             }
             else {
                 if (_shieldState == AuxState.Operational) {
                     _shieldState = AuxState.Idle;
-                    _powerDrain -= _class.ShieldDrainRate;
+                    _powerDrain -= _data.ShieldDrainRate;
                 }
             }
         }
@@ -441,7 +439,7 @@ namespace VoidWars {
 
             _shieldState = status;
             var shields = gameObject.GetComponent<ForceField3Y3>();
-            shields.effect = _class.ShieldEffect;
+            shields.effect = _data.ShieldEffect;
             if (status == AuxState.Operational) {
                 shields.SetEffectOn();
             }
@@ -494,10 +492,9 @@ namespace VoidWars {
             Debug.LogFormat("Ship ID {0} took {1} damage", ID, damage);
 
             // How much the shields reduce damage by at 100% when energy is nominally distributed (25%)
-            const float MaxShieldEfficiency = 0.8f;
             if (ShieldsActive) {
                 var shieldFrac = _shieldPercent / 100f;
-                var shieldEfficiency = MaxShieldEfficiency * (_energyBudget.Available(EnergyConsumer.Shields)/0.25f);
+                var shieldEfficiency = Mathf.Min(_maxShieldEfficiency, 1f) * (_energyBudget.Available(EnergyConsumer.Shields)/0.25f);
                 var shieldReduction = Mathf.Clamp01(shieldFrac * shieldEfficiency);
                 damage *= (1f - shieldReduction);
                 dT *= (1f - shieldReduction);
@@ -537,7 +534,7 @@ namespace VoidWars {
 
             // Drain some power, recharge some power.
             if (round > 0) {
-                _energy = Mathf.Clamp(_energy + (_class.RechargeRate - _powerDrain), 0f, _maxEnergy);
+                _energy = Mathf.Clamp(_energy + (_data.RechargeRate - _powerDrain), 0f, _maxEnergy);
             }
 
             // Hull temperature.
@@ -574,7 +571,7 @@ namespace VoidWars {
             if (_shieldPercent > 0f) {
                 _shieldEnergy = GetEnergyBudgetFor(EnergyConsumer.Shields);
                 if (_shieldState == AuxState.Operational) {
-                    if (_shieldEnergy < _class.ShieldDrainRate) {
+                    if (_shieldEnergy < _data.ShieldDrainRate) {
                         // Shields have failed.
                         _shieldState = AuxState.Idle;
                         var gameController = Util.GetGameController();
@@ -585,7 +582,7 @@ namespace VoidWars {
 
            _lifeSupportLevel = GetEnergyBudgetFor(EnergyConsumer.LifeSupport);
             if (_lifeSupportOK) {
-                if (_lifeSupportLevel < _class.LifeSupportDrainRate) {
+                if (_lifeSupportLevel < _data.LifeSupportDrainRate) {
                     // Life support failed.
                     Debug.LogWarning("Life support failed!");
                     _roundsWithoutLifeSupport = 0;
@@ -593,7 +590,7 @@ namespace VoidWars {
                 }
             }
             else {
-                if (_lifeSupportLevel >= _class.LifeSupportDrainRate) {
+                if (_lifeSupportLevel >= _data.LifeSupportDrainRate) {
                     _lifeSupportOK = true;
                     Debug.Log("Life support online");
                 }
@@ -605,7 +602,7 @@ namespace VoidWars {
             }
 
             _propulsionLevel = GetEnergyBudgetFor(EnergyConsumer.Propulsion);
-            var minEnergyForMove = MassRatio * _class.MoveDrainRate;
+            var minEnergyForMove = MassRatio * _data.MoveDrainRate;
             if (_propulsionOK) {
                 if (_propulsionLevel < minEnergyForMove) {
                     _propulsionOK = false;
@@ -734,7 +731,7 @@ namespace VoidWars {
         /// <param name="move">The move to make.</param>
         /// <returns>The energy required.</returns>
         public float GetEnergyForMove(ShipMove move) {
-            return MassRatio * _class.MoveDrainRate * move.EnergyScale;
+            return MassRatio * _data.MoveDrainRate * move.EnergyScale;
         }
 
         /// <summary>
@@ -744,7 +741,7 @@ namespace VoidWars {
         [Client]
         public void EnableEngineFX(bool enable) {
             if (enable) {
-                _audioSource.PlayOneShot(_class.EnginesClip);
+                _audioSource.PlayOneShot(_data.EnginesClip);
             }
             else {
                 _audioSource.Stop();
@@ -825,19 +822,23 @@ namespace VoidWars {
             createPilot();
             controller.RegisterShip(this);
             _controlState = ControlState.IDLE;
-            _class = controller.GetShipClassByName(ClassID);
+            _data = new ShipInstance(controller.GetShipClassByName(ClassID));
 
-            // Set initial values from class.
+            // Build crew, apply buffs and abilities.
+            initCrew();
+
+            // Set initial values from (possibly buffed) data.
             _energyBudget = new EnergyBudget();
-            _maxEnergy = _class.MaxEnergy;
-            _powerDrain = _class.LifeSupportDrainRate;
+            _maxEnergy = _data.MaxEnergy;
+            _powerDrain = _data.LifeSupportDrainRate;
             _shieldPercent = 100.0f;
-            _health = _class.MaxHealth;
-            _coolingRate = _class.CoolingRate;
-            _maneuverability = _class.Maneuverability;
+            _health = _data.MaxHealth;
+            _coolingRate = _data.CoolingRate;
+            _maxShieldEfficiency = _data.MaxShieldEfficiency;
+            _maxMoveSize = _data.MaxMoveSize;
 
             // Figure out the total mass from the constituent bits - weapons and equipment.
-            _totalMass = _class.Mass;
+            _totalMass = _data.Mass;
             Debug.Assert(PrimaryWeaponType != WeaponType.None);
             var primaryWeaponClass = controller.GetWeaponClass(PrimaryWeaponType);
             _primaryWeapon = Weapons.CreateWeapon(primaryWeaponClass);
@@ -872,6 +873,10 @@ namespace VoidWars {
 
             updateSystemStatuses();
             updateWeapons();
+        }
+
+        private void initCrew() {
+            // TODO.
         }
 
         private void Update() {
@@ -944,16 +949,25 @@ namespace VoidWars {
 
             // Specific effects here.
             switch(aux.ItemType) {
-                case AuxType.PowerCell:
-                    _maxEnergy += aux.GetFloat("Boost");
+                case AuxType.PowerCell: {
+                        var delta = aux.GetFloat("Boost");
+                        _data.AddBuff(new Buff("MaxEnergy", BuffType.Additive, delta, AuxType.PowerCell));
+                        _maxEnergy = _data.MaxEnergy;
+                    }
                     break;
 
-                case AuxType.DriveBoost:
-                    _maxMoveSize += aux.GetInt("Range");
+                case AuxType.DriveBoost: {
+                        var delta = aux.GetFloat("Boost");
+                        _data.AddBuff(new Buff("MaxMoveSize", BuffType.Additive, delta, AuxType.DriveBoost));
+                        _maxMoveSize = _data.MaxMoveSize;
+                    }
                     break;
 
-                case AuxType.CoolingElement:
-                    _coolingRate += aux.GetFloat("DeltaT");
+                case AuxType.CoolingElement: {
+                        var delta = aux.GetFloat("DeltaT");
+                        _data.AddBuff(new Buff("CoolingRate", BuffType.Additive, delta, AuxType.CoolingElement));
+                        _coolingRate = _data.CoolingRate;
+                    }
                     break;
 
                 case AuxType.Shinobi:
@@ -971,18 +985,21 @@ namespace VoidWars {
             // Specific effects here.
             switch (aux.ItemType) {
                 case AuxType.PowerCell:
-                    _maxEnergy -= aux.GetFloat("Boost");
+                    _data.RemoveBuffsWithOwner(AuxType.PowerCell);
+                    _maxEnergy = _data.MaxEnergy;
                     if (_energy > _maxEnergy) {
                         _energy = _maxEnergy;
                     }
                     break;
 
                 case AuxType.DriveBoost:
-                    _maxMoveSize -= aux.GetInt("Range");
+                    _data.RemoveBuffsWithOwner(AuxType.DriveBoost);
+                    _maxMoveSize = _data.MaxMoveSize;
                     break;
 
                 case AuxType.CoolingElement:
-                    _coolingRate -= aux.GetFloat("DeltaT");
+                    _data.RemoveBuffsWithOwner(AuxType.CoolingElement);
+                    _coolingRate = _data.CoolingRate;
                     break;
 
                 case AuxType.Shinobi:
@@ -1005,6 +1022,7 @@ namespace VoidWars {
         [SyncVar] private ControlState _controlState;
         [SyncVar] private float _energy;
         [SyncVar] private float _maxEnergy;
+        [SyncVar] private int _maxMoveSize;
         [SyncVar(hook="onShieldStatusChanged")] private AuxState _shieldState;
         [SyncVar(hook="onCloakStateChanged")] private bool _cloakActive;
         [SyncVar] private float _lifeSupportLevel;
@@ -1021,7 +1039,7 @@ namespace VoidWars {
         private bool _propulsionOK = true;
         private int _roundsWithoutLifeSupport;
         private Pilot _pilot;
-        private ShipClass _class;
+        private ShipInstance _data;
         private WeaponInstance _primaryWeapon;
         private WeaponInstance _secondaryWeapon;
         private readonly List<AuxItem> _equipment = new List<AuxItem>();
@@ -1029,13 +1047,12 @@ namespace VoidWars {
         private float _powerDrain;
         private float _coolingRate;
         private EnergyBudget _energyBudget;
-        private int _maxMoveSize = 3;
         private bool _canRepairItems;
         private int _actionsThisTurn = 1;
         private GameObject[] _engineFX;
         private AudioSource _audioSource;
         [SerializeField] private MeshRenderer _renderer;
         private List<Task> _tasks;
-        private int _maneuverability;
+        private float _maxShieldEfficiency;
     }
 }

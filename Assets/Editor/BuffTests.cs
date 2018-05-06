@@ -291,5 +291,18 @@ namespace VoidWars {
             Assert.That(() => foo.AddBuff(add), Throws.Exception);
         }
 
+        [Test]
+        public void TestOwner1() {
+            var foo = new Foo();
+            var add1 = new Buff("Bar", BuffType.Additive, 1f, this);
+            foo.AddBuff(add1);
+            var add2 = new Buff("Bar", BuffType.Additive, 1f, null);
+            foo.AddBuff(add2);
+            var add3 = new Buff("Bar", BuffType.Additive, 1f, this);
+            foo.AddBuff(add3);
+            Assert.AreEqual(3, foo.BuffCount);
+            foo.RemoveBuffsWithOwner(this);
+            Assert.AreEqual(1, foo.BuffCount);
+        }
     }
 }

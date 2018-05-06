@@ -16,7 +16,7 @@ namespace VoidWars {
 
         protected override void refresh() {
             if (activeShip != null) {
-                _health = activeShip.Health / activeShip.ShipClass.MaxHealth;
+                _health = activeShip.Health / activeShip.ShipData.MaxHealth;
                 GaugeText.text = string.Format("{0}%", (int)(_health * 100.0f));
             }
         }

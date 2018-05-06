@@ -17,11 +17,11 @@ namespace VoidWars {
         protected override void refresh() {
             var failed = false;
             if (activeShip != null) {
-                if (activeShip.LifeSupportEnergy > 2f*activeShip.ShipClass.LifeSupportDrainRate) {
+                if (activeShip.LifeSupportEnergy > 2f*activeShip.ShipData.LifeSupportDrainRate) {
                     StatusText.color = Color.white;
                     StatusText.text = "NOMINAL";
                 }
-                else if (activeShip.LifeSupportEnergy > activeShip.ShipClass.LifeSupportDrainRate) {
+                else if (activeShip.LifeSupportEnergy > activeShip.ShipData.LifeSupportDrainRate) {
                     StatusText.color = orange;
                     StatusText.text = "CRITICAL";
                 }

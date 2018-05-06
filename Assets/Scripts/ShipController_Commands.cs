@@ -43,7 +43,7 @@ namespace VoidWars {
                         EditorPrefabInfo = "ImageDetailPanel ShieldsImage"
                     });
                 }
-                else if ((_shieldState == AuxState.Idle) && (ShieldEnergy >= _class.ShieldDrainRate)) {
+                else if ((_shieldState == AuxState.Idle) && (ShieldEnergy >= _data.ShieldDrainRate)) {
                     actions.Add(new ActionItem {
                         Action = "shields true",
                         Description = "Raise shields",

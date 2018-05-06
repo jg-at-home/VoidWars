@@ -49,7 +49,7 @@ namespace VoidWars {
 
         private void executeCloak(ShipController shipController, bool status) {
             if (status) {
-                shipController.AudioPlayer.PlayOneShot(shipController.ShipClass.CloakClip);
+                shipController.AudioPlayer.PlayOneShot(shipController.ShipData.CloakClip);
             }
             else {
                 // TODO: uncloak
@@ -59,7 +59,7 @@ namespace VoidWars {
 
         private void executeShields(ShipController shipController, bool status) {
             if (status) {
-                shipController.AudioPlayer.PlayOneShot(shipController.ShipClass.ShieldsClip);
+                shipController.AudioPlayer.PlayOneShot(shipController.ShipData.ShieldsClip);
             }
             else {
                 // TODO: shields down.

@@ -38,7 +38,13 @@ namespace VoidWars {
         [Tooltip("Bitmask indicating the equipment fitted to the ship.")]
         public int EquipmentMask;
 
+        [Tooltip("The additional equipment to install")]
         public AuxType[] Equipment;
+
+        [Header("Crew")]
+        public string Captain;
+        public string FirstOfficer;
+        public string Engineer;
     }
 
     [Serializable]
