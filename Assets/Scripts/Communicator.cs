@@ -352,6 +352,23 @@ namespace VoidWars {
             RpcShowMessageToOtherPlayers(shipController.OwnerID, msg);
         }
 
+        /// <summary>
+        /// Enables an auxiliary item on a ship.
+        /// </summary>
+        /// <param name="shipID">The ship to affect.</param>
+        /// <param name="auxType">The type of item.</param>
+        /// <param name="enable">Enable / disable flag.</param>
+        [Command]
+        public void CmdEnableAuxiliary(int shipID, AuxType auxType, bool enable) {
+            RpcEnableAuxiliary(shipID, auxType, enable);
+        }
+
+        [ClientRpc]
+        void RpcEnableAuxiliary(int shipID, AuxType auxType, bool enable) {
+            var ship = controller.GetShip(shipID);
+            ship.EnableAuxiliary(auxType, enable);
+        }
+
         #region UI
         [Command]
         public void CmdDisableActionPanel() {

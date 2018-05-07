@@ -12,14 +12,15 @@ MonoBehaviour:
   m_Name: Scanners
   m_EditorClassIdentifier: 
   Name: Scanners
-  Icon: {fileID: 0}
-  Description: Inspect enemy ships
+  Icon: {fileID: 21300000, guid: 420e037d6b6483242aab5e3901f88326, type: 3}
+  Description: scanners
   Detail: Shows enemy ship stats so you can hatch evil plans
   Cost: 8
   Mass: 4
-  PowerUsage: 7
+  PowerUsage: 10
   MaxTemperature: 60
-  Metadata: 
   RepairCost: 7
+  RepairTurns: 0
+  MetaItems: []
   ItemType: 16
   Mode: 1

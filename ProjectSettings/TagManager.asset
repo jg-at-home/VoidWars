@@ -8,6 +8,7 @@ TagManager:
   - Engine
   - Targetable
   - Sun
+  - scanner
   layers:
   - Default
   - TransparentFX

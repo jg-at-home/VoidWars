@@ -43,6 +43,12 @@ namespace VoidWars {
                     }
                     break;
 
+                case "scanners": {
+                        var status = bool.Parse(parts[2]);
+                        executeScanners(_activeShip, status);
+                    }
+                    break;
+
                 // TODO: everything else
             }
         }
@@ -65,6 +71,30 @@ namespace VoidWars {
                 // TODO: shields down.
             }
             _communicator.CmdSetShieldStatus(shipController.ID, status);
+        }
+
+        private void executeScanners(ShipController shipController, bool status) {
+            if (status) {
+                shipController.AudioPlayer.PlayOneShot(shipController.ShipData.ScannersClip);
+            }
+            _communicator.CmdEnableAuxiliary(shipController.ID, AuxType.Scanners, status);
+
+            // On this client only, show / hide the scanner data.
+            foreach (var ship in _ships) {
+                // TODO: only ships in range?
+                // Target all ships owned by everyone else.
+                if (ship.OwnerID != shipController.OwnerID) {
+                    if (status) {
+                        Instantiate(ScannerInfoPrefab, ship.transform);
+                    }
+                    else {
+                        var scannerInfo = ship.gameObject.FindChildrenWithTag("scanner");
+                        Debug.Assert(scannerInfo.Length == 1);
+                        scannerInfo[0].transform.SetParent(null, false);
+                        Destroy(scannerInfo[0]);
+                    }
+                }
+            }
         }
 
         /// <summary>

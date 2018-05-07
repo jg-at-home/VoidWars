@@ -77,6 +77,7 @@ namespace VoidWars {
         public AudioClip EnginesClip;
         public AudioClip ShieldsClip;
         public AudioClip CloakClip;
+        public AudioClip ScannersClip;
 
         [Header("Visual Effects")]
         public Material CloakEffect;
@@ -170,6 +171,7 @@ namespace VoidWars {
         public AudioClip EnginesClip { get { return _class.EnginesClip; } }
         public AudioClip ShieldsClip { get { return _class.ShieldsClip; } }
         public AudioClip CloakClip {  get { return _class.CloakClip; } }
+        public AudioClip ScannersClip {  get { return _class.ScannersClip; } }
         public Material CloakEffect {  get { return _class.CloakEffect; } }
         public Material ShieldEffect {  get { return _class.ShieldEffect; } }
         public GameObject EmpPrefab {  get { return _class.EmpPrefab; } }

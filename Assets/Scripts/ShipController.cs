@@ -105,6 +105,13 @@ namespace VoidWars {
         }
 
         /// <summary>
+        /// Gets the max health of the ship.
+        /// </summary>
+        public float MaxHealth {
+            get { return _data.MaxHealth; }
+        }
+
+        /// <summary>
         /// Gets the ship's hull temperature in arbitrary [0,100] range.
         /// </summary>
         public float HullTemperature {
@@ -879,7 +886,7 @@ namespace VoidWars {
 
         private void Awake() {
             _controlState = ControlState.UNINITIALIZED;
-            _engineFX = Util.FindChildrenWithTag(gameObject, "Engine");
+            _engineFX = gameObject.FindChildrenWithTag("Engine");
             _audioSource = GetComponent<AudioSource>();
         }
 
@@ -1059,6 +1066,31 @@ namespace VoidWars {
             }
         }
 
+        /// <summary>
+        /// Turns an auxiliary on or off.
+        /// </summary>
+        /// <param name="type">The type of item.</param>
+        /// <param name="enable">Enable / disable flag.</param>
+        public void EnableAuxiliary(AuxType type, bool enable) {
+            Debug.LogFormat("ShipController: aux {0} enabled = {1}", type, enable);
+
+            var auxItem = _equipment.Find(item => item.ItemType == type);
+            Debug.Assert(auxItem.Mode == AuxMode.Switchable || auxItem.Mode == AuxMode.OneShot);
+            if (enable) {
+                Debug.Assert(auxItem.State == AuxState.Idle);
+                if (auxItem.Mode == AuxMode.Switchable) {
+                    auxItem.State = AuxState.Operational;
+                    applyAuxiliary(auxItem);
+                }
+            }
+            else {
+                Debug.Assert(auxItem.State == AuxState.Operational);
+                Debug.Assert(auxItem.Mode == AuxMode.Switchable);
+                auxItem.State = AuxState.Idle;
+                unapplyAuxiliary(auxItem);
+            }
+        }
+
         private void applyAuxiliary(AuxItem aux) {
             Debug.LogFormat("Applying auxiliary '{0}'", aux.Name);
 
@@ -1088,6 +1120,12 @@ namespace VoidWars {
                     }
                     break;
 
+                case AuxType.Scanners: {
+                        // Side effect: 5% drop in shield efficency.
+                        _data.AddBuff(new Buff("MaxShieldEfficiency", BuffType.Percentage, -5f, AuxType.Scanners));
+                    }
+                    break;
+
                 case AuxType.Shinobi:
                     _cloakActive = true;
                     break;
@@ -1101,9 +1139,9 @@ namespace VoidWars {
             _powerDrain -= aux.PowerUsage;
 
             // Specific effects here.
+            _data.RemoveBuffsWithOwner(aux.ItemType);
             switch (aux.ItemType) {
                 case AuxType.PowerCell:
-                    _data.RemoveBuffsWithOwner(AuxType.PowerCell);
                     _maxEnergy = _data.MaxEnergy;
                     if (_energy > _maxEnergy) {
                         _energy = _maxEnergy;
@@ -1111,13 +1149,14 @@ namespace VoidWars {
                     break;
 
                 case AuxType.DriveBoost:
-                    _data.RemoveBuffsWithOwner(AuxType.DriveBoost);
                     _maxMoveSize = _data.MaxMoveSize;
                     break;
 
                 case AuxType.CoolingElement:
-                    _data.RemoveBuffsWithOwner(AuxType.CoolingElement);
                     _coolingRate = _data.CoolingRate;
+                    break;
+
+                case AuxType.Scanners:
                     break;
 
                 case AuxType.Shinobi:
