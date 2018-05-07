@@ -70,6 +70,9 @@ namespace VoidWars {
         [Tooltip("Maximum efficiency of shields")]
         public float MaxShieldEfficiency;
 
+        [Tooltip("Luck factor")]
+        public float Luckiness;
+
         [Header("Sound effects")]
         public AudioClip EnginesClip;
         public AudioClip ShieldsClip;
@@ -94,6 +97,8 @@ namespace VoidWars {
             RechargeRate = _class.RechargeRate;
             CoolingRate = _class.CoolingRate;
             MaxMoveSize = _class.MaxMoveSize;
+            Luckiness = _class.Luckiness;
+            Maneuverability = _class.Maneuverability;
         }
 
         public Species Species {  get { return _class.Species; } }
@@ -143,11 +148,22 @@ namespace VoidWars {
             set { setValue("MaxMoveSize", (float)value); }
         }
 
+        [Stat(0f, 1f)]
+        public float Luckiness {
+            get { return getValue("Luckiness"); }
+            set { setValue("Luckiness", value); }
+        }
+
+        [Stat(1f, 3f)]
+        public int Maneuverability {
+            get { return (int)getValue("Maneuverability"); }
+            set { setValue("Maneuverability", value); }
+        }
+
         public float MaxFuelLevel {  get { return _class.MaxFuelLevel; } }
         public int NumAuxiliarySlots {  get { return _class.NumAuxiliarySlots; } }
         public bool Stealth { get { return _class.Stealth; } }
         public int ActionsPerTurn { get { return _class.ActionsPerTurn; } }
-        public int Maneuverability { get { return _class.Maneuverability; } }
         public float MoveDrainRate { get { return _class.MoveDrainRate; } }
         public float LifeSupportDrainRate {  get { return _class.LifeSupportDrainRate; } }
         public float ShieldDrainRate { get { return _class.ShieldDrainRate; } }

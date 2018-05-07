@@ -44,9 +44,22 @@ namespace VoidWars {
     /// </summary>
     [Serializable]
     public struct BuffInfo {
+        [Tooltip("Name of the Buff")]
+        public string Name;
+
+        [Tooltip("What type of thing the buff affects")]
         public BuffTarget Target;
+
+        [Tooltip("The specific item to affect, or * to affect all")]
+        public string TargetName;
+
+        [Tooltip("The name of the stat the buff modifies")]
         public string Property;
+
+        [Tooltip("The type of modification")]
         public BuffType BuffType;
+
+        [Tooltip("The amount of modification")]
         public float Value;
     }
 

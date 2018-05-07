@@ -238,6 +238,16 @@ namespace VoidWars {
         public delegate void OnMoveFinished(int shipID);
 
         /// <summary>
+        /// Gets a luck value.
+        /// </summary>
+        public float LuckRoll {
+            get {
+                var luckiness = ShipData.Luckiness;
+                return Random.Range(luckiness, luckiness+1f);
+            }
+        }
+
+        /// <summary>
         /// Gets the number of auxiliary items equipped.
         /// </summary>
         /// <returns>The aux count.</returns>
@@ -264,6 +274,25 @@ namespace VoidWars {
         }
 
         /// <summary>
+        /// Gets items by name.
+        /// </summary>
+        /// <param name="name">The name of the item ,or '*' to select all.</param>
+        /// <returns>The selected items.</returns>
+        public List<AuxItem> GetAuxiliaryItemsByName(string name) {
+            var items = new List<AuxItem>();
+            if (name == "*") {
+                items.AddRange(_equipment);
+            }
+            else {
+                var item = _equipment.Find(ai => ai.Name == name);
+                if (item != null) {
+                    items.Add(item);
+                }
+            }
+            return items;
+        }
+
+        /// <summary>
         /// Gets the weapon type for the slot (0=primary, 1 = secondary)
         /// </summary>
         /// <param name="slot">Slot index.</param>
@@ -281,6 +310,32 @@ namespace VoidWars {
         /// <returns>Weapon node.</returns>
         public Transform GetWeaponNode(int slot) {
             return (slot == 0) ? FrontNode : RearNode;
+        }
+
+
+        /// <summary>
+        /// Gets weapons by name.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public List<WeaponInstance> GetWeaponsByName(string name) {
+            var result = new List<WeaponInstance>();
+            if (name == "*") {
+                result.Add(_primaryWeapon);
+                if (_secondaryWeapon != null) {
+                    result.Add(_secondaryWeapon);
+                }
+            }
+            else {
+                if (_primaryWeapon.Name == name) {
+                    result.Add(_primaryWeapon);
+                }
+                if ((_secondaryWeapon != null) && (_secondaryWeapon.Name == name)) {
+                    result.Add(_secondaryWeapon);
+                }
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -306,6 +361,22 @@ namespace VoidWars {
         /// </summary>
         public void ResetActionsThisTurn() {
             _actionsThisTurn = 1;
+        }
+
+        /// <summary>
+        /// Call this to allow repairs to be made on the ship.
+        /// </summary>
+        public void EnableRepairs() {
+            Debug.LogFormat("Ship #{0}: repairs enabled", ID);
+
+            _canRepairItems = true;
+        }
+
+        /// <summary>
+        /// Can we repair items?
+        /// </summary>
+        public bool CanRepair {
+            get { return _canRepairItems; }
         }
 
         /// <summary>
@@ -488,13 +559,14 @@ namespace VoidWars {
         /// <param name="damage">The amount of damage to apply.</param>
         /// <param name="dT">The temperature effect/</param>
         /// <returns>The amount of damage done</returns>
+        [Server]
         public float ComputeDamage(float damage, float dT) {
             Debug.LogFormat("Ship ID {0} took {1} damage", ID, damage);
 
             // How much the shields reduce damage by at 100% when energy is nominally distributed (25%)
             if (ShieldsActive) {
                 var shieldFrac = _shieldPercent / 100f;
-                var shieldEfficiency = Mathf.Min(_maxShieldEfficiency, 1f) * (_energyBudget.Available(EnergyConsumer.Shields)/0.25f);
+                var shieldEfficiency = Mathf.Min(_data.MaxShieldEfficiency, 1f) * (_energyBudget.Available(EnergyConsumer.Shields)/0.25f);
                 var shieldReduction = Mathf.Clamp01(shieldFrac * shieldEfficiency);
                 damage *= (1f - shieldReduction);
                 dT *= (1f - shieldReduction);
@@ -531,6 +603,8 @@ namespace VoidWars {
 
             // Run tasks.
             serviceTasks();
+
+            // Update skills.
 
             // Drain some power, recharge some power.
             if (round > 0) {
@@ -824,20 +898,7 @@ namespace VoidWars {
             _controlState = ControlState.IDLE;
             _data = new ShipInstance(controller.GetShipClassByName(ClassID));
 
-            // Build crew, apply buffs and abilities.
-            initCrew();
-
-            // Set initial values from (possibly buffed) data.
-            _energyBudget = new EnergyBudget();
-            _maxEnergy = _data.MaxEnergy;
-            _powerDrain = _data.LifeSupportDrainRate;
-            _shieldPercent = 100.0f;
-            _health = _data.MaxHealth;
-            _coolingRate = _data.CoolingRate;
-            _maxShieldEfficiency = _data.MaxShieldEfficiency;
-            _maxMoveSize = _data.MaxMoveSize;
-
-            // Figure out the total mass from the constituent bits - weapons and equipment.
+            // Init weapons
             _totalMass = _data.Mass;
             Debug.Assert(PrimaryWeaponType != WeaponType.None);
             var primaryWeaponClass = controller.GetWeaponClass(PrimaryWeaponType);
@@ -868,7 +929,17 @@ namespace VoidWars {
                 mask <<= 1;
             }
 
-            // Can set parameters affected by aux items now.
+            // Build crew, apply buffs and abilities.
+            initCrew();
+
+            // Set initial values from (possibly buffed) data.
+            _energyBudget = new EnergyBudget();
+            _maxEnergy = _data.MaxEnergy;
+            _powerDrain = _data.LifeSupportDrainRate;
+            _shieldPercent = 100.0f;
+            _health = _data.MaxHealth;
+            _coolingRate = _data.CoolingRate;
+            _maxMoveSize = _data.MaxMoveSize;
             _energy = _maxEnergy;
 
             updateSystemStatuses();
@@ -876,7 +947,54 @@ namespace VoidWars {
         }
 
         private void initCrew() {
-            // TODO.
+            foreach(var memberName in CrewNames) {
+                // TODO: remove null check 
+                if (!string.IsNullOrEmpty(memberName)) {
+                    // Load resource data.
+                    var memberInfo = Resources.Load<CrewMember>("Crew/" + memberName);
+                    Debug.LogFormat("Ship #{0}: {1} is {2}", ID, memberInfo.Role, memberInfo.Name);
+                    _crew[(int)memberInfo.Role] = memberInfo;
+
+                    // Init buffs.
+                    foreach(var buffInfo in memberInfo.Buffs) {
+                        Debug.LogFormat("Applying buff '{0}'", buffInfo.Name);
+                        var buff = new Buff(buffInfo.Property, buffInfo.BuffType, buffInfo.Value, memberInfo);
+                        switch(buffInfo.Target) {
+                            case BuffTarget.Ship:
+                                _data.AddBuff(buff);
+                                break;
+
+                            case BuffTarget.Weapon: {
+                                    var weapons = GetWeaponsByName(buffInfo.TargetName);
+                                    foreach (var weapon in weapons) {
+                                        weapon.AddBuff(buff);
+                                    }
+                                }
+                                break;
+
+
+                            case BuffTarget.Auxiliary: {
+                                    var items = GetAuxiliaryItemsByName(buffInfo.TargetName);
+                                    foreach (var aux in items) {
+                                        aux.AddBuff(buff);
+                                    }
+                                }
+                                break;
+
+                            default:
+                                Debug.Assert(false);
+                                break;
+
+                        }
+                    }
+
+                    // Abilities.
+                    foreach(var ability in memberInfo.Abilities) {
+                        Debug.LogFormat("Applying ability '{0}'", ability.Type);
+                        Abilities.Apply(this, ability);
+                    }
+                }
+            }
         }
 
         private void Update() {
@@ -1053,6 +1171,6 @@ namespace VoidWars {
         private AudioSource _audioSource;
         [SerializeField] private MeshRenderer _renderer;
         private List<Task> _tasks;
-        private float _maxShieldEfficiency;
+        private readonly CrewMember[] _crew = new CrewMember[3];
     }
 }

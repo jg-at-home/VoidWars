@@ -22,8 +22,8 @@ namespace VoidWars {
             if (applyDamage) {
                 var gameController = Util.GetGameController();
                 var layerMask = 1 << LayerMask.NameToLayer("ActiveObjects");
-                var overlaps = Physics.OverlapSphere(ship.transform.position, Range, layerMask);
-                // TODO: randomise a bit.
+                var radius = Range * ship.LuckRoll;
+                var overlaps = Physics.OverlapSphere(ship.transform.position, radius, layerMask);
                 var numTurns = GetInt("LastsForTurns");
                 for (int i = 0; i < overlaps.Length; ++i) {
                     var gob = overlaps[i].gameObject;

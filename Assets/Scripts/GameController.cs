@@ -460,9 +460,8 @@ namespace VoidWars {
 
             // Can't fire if you're cloaked!
             if (!shipController.IsCloaked) {
-                var weapon = _activeWeapon == 0 ? shipController.PrimaryWeaponType : shipController.SecondaryWeaponType;
-                var weaponClass = GetWeaponClass(weapon);
-                var range = weaponClass.Range;
+                var weapon = shipController.GetWeapon(_activeWeapon);
+                var range = weapon.Range;
                 var position = shipController.gameObject.transform.position;
                 var objectsInRange = Physics.OverlapSphere(position, range);
                 foreach (var target in objectsInRange) {
@@ -475,7 +474,7 @@ namespace VoidWars {
                         }
 
                         // Target in range, but we need to check the angles.
-                        if (checkTargetGeometry(shipController, target.gameObject, weaponClass)) {
+                        if (checkTargetGeometry(shipController, target.gameObject, weapon)) {
                             var indicatorGO = Instantiate(TargetIndicatorPrefab);
                             var indicator = indicatorGO.GetComponent<TargetIndicator>();
                             indicator.Initialize(shipController.gameObject, target.gameObject);
@@ -516,7 +515,7 @@ namespace VoidWars {
         /// <param name="target">The targeted object.</param>
         /// <param name="weapon">The weapon being used.</param>
         /// <returns>True if the target can be hit.</returns>
-        private bool checkTargetGeometry(ShipController shipController, GameObject target, WeaponClass weapon) {
+        private bool checkTargetGeometry(ShipController shipController, GameObject target, WeaponInstance weapon) {
             // Front or back?
             Transform node;
             float angle;

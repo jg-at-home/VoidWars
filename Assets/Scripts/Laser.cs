@@ -49,14 +49,11 @@ namespace VoidWars {
                     distanceScalar = 0.8f * Range / distance;
                 }
 
-                // Small amount of luck
-                var luckFactor = Random.Range(0.95f, 1.05f);
-
                 // Compute thermal damage.
-                var dT = luckFactor * GetFloat("ThermalDamage");
+                var dT = ship.LuckRoll * GetFloat("ThermalDamage");
 
                 // Total.
-                var damage = MaxDamage * luckFactor * distanceScalar * temperatureScalar;
+                var damage = MaxDamage * ship.LuckRoll * distanceScalar * temperatureScalar;
 
                 // Push to server.
                 var gameController = Util.GetGameController();

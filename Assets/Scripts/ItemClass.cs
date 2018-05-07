@@ -39,7 +39,7 @@ namespace VoidWars {
         public int Mass;
 
         [Tooltip("How much power it takes to use the item.")]
-        public int PowerUsage;
+        public float PowerUsage;
 
         [Tooltip("Maximum temperature above which the device will not function")]
         public float MaxTemperature;
@@ -71,13 +71,13 @@ namespace VoidWars {
         public float MaxTemperature { get { return _class.MaxTemperature; } }
         public float RepairCost { get { return _class.RepairCost; } }
 
-        [Stat]
-        public int PowerUsage {
-            get { return (int)getValue("PowerUsage"); }
+        [Stat(0f, float.PositiveInfinity)]
+        public float PowerUsage {
+            get { return getValue("PowerUsage"); }
             set { setValue("PowerUsage", value); }
         }
 
-        [Stat]
+        [Stat(1f, 10f)]
         public int RepairTurns {
             get { return (int)getValue("RepairTurns"); }
             set { setValue("RepairTurns", value); }
