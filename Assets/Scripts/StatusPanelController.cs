@@ -42,7 +42,7 @@ namespace VoidWars {
         private void onButtonClicked() {
             SendMessageUpwards("PlayButtonClick");
             _timer = 0;
-            _currentPanel.SetAlpha(1f);
+            _canvasGroup.alpha = 1f;
             if (_scrolling) {
                 StopCoroutine("scrollPanels");                
                 _scrolling = false;
@@ -58,6 +58,7 @@ namespace VoidWars {
         }
 
         private void Start() {
+            _canvasGroup = PanelRoot.GetComponent<CanvasGroup>();
             _panels = new SubpanelController[PanelPrefabs.Length];
             setCurrentPanel(0, true);
             if (PanelPrefabs.Length < 2) {
@@ -88,7 +89,7 @@ namespace VoidWars {
                 // Fade current panel out.
                 for (var t = 0f; t < FadeTime; t += Time.deltaTime) {
                     var alpha = 1f - Mathf.Clamp01(t / FadeTime);
-                    _currentPanel.SetAlpha(alpha);
+                    _canvasGroup.alpha = alpha;
                     yield return null;
                 }
 
@@ -98,7 +99,7 @@ namespace VoidWars {
                 // Fade up.
                 for (var t = 0f; t < FadeTime; t += Time.deltaTime) {
                     var alpha = Mathf.Clamp01(t / FadeTime);
-                    _currentPanel.SetAlpha(alpha);
+                    _canvasGroup.alpha = alpha;
                     yield return null;
                 }
 
@@ -135,5 +136,6 @@ namespace VoidWars {
         private bool _scrolling;
         private SubpanelController _currentPanel;
         public ShipController _activeShip;
+        private CanvasGroup _canvasGroup;
     }
 }

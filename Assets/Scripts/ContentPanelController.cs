@@ -38,6 +38,14 @@ namespace VoidWars {
         }
 
         /// <summary>
+        /// Sets the text on the Done button.
+        /// </summary>
+        /// <param name="caption">The button text.</param>
+        public void SetDoneButtonCaption(string caption) {
+            _doneButton.GetComponentInChildren<Text>().text = caption;
+        }
+
+        /// <summary>
         /// Enable or disable the 'done' button.
         /// </summary>
         /// <param name="enable">If true, enable the button.</param>

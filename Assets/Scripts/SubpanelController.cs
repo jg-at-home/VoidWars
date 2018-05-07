@@ -10,19 +10,6 @@ namespace VoidWars {
 
         private void Awake() {
             _controller = Util.GetGameController();
-            _images = GetComponentsInChildren<MaskableGraphic>();
-        }
-
-        /// <summary>
-        /// Sets the transparency level for the panel/
-        /// </summary>
-        /// <param name="alpha">Transparency in [0,1]</param>
-        public void SetAlpha(float alpha) {
-            foreach(var image in _images) {
-                var color = image.color;
-                color.a = alpha;
-                image.color = color;
-            }
         }
 
         private void Update() {
@@ -86,6 +73,5 @@ namespace VoidWars {
         private GameController _controller;
         private StatusPanelController _root;
         private float _timer;
-        private MaskableGraphic[] _images;
     }
 }

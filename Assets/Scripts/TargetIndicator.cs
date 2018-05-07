@@ -2,6 +2,7 @@
 
 namespace VoidWars {
     public class TargetIndicator : MonoBehaviour {
+        public float ScrollSpeed = 2.5f;
         public float Radius;
         public Material Material;
         public float LineWidth = 0.1f;
@@ -55,7 +56,12 @@ namespace VoidWars {
         }
 
         private void Update() {
+            _offset.x -= ScrollSpeed * Time.deltaTime;
+            if (_offset.x < 0f) {
+                _offset.x += 1f;
+            }
 
+            Material.SetTextureOffset("_MainTex", _offset);
         }
 
         private void setShared(LineRenderer renderer) {
@@ -66,5 +72,6 @@ namespace VoidWars {
         }
 
         [SerializeField] private GameObject _target;
+        private Vector2 _offset = new Vector2(0f, 0f);
     }
 }

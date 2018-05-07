@@ -8,6 +8,7 @@ namespace VoidWars {
         private void OnEnable() {
             // Done = Skip the attack, so always available.
             EnableDoneButton(true);
+            SetDoneButtonCaption("Skip");
         }
 
         public void OnTargetsRecomputed() {
