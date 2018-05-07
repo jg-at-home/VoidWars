@@ -124,7 +124,6 @@ namespace VoidWars {
                 panelInstance = _panels[panel];
                 panelInstance.GetComponent<RectTransform>().SetParent(PanelRoot,false);
                 panelInstance.OnActivation(this);
-                _currentPanel = panelInstance;
 
                 TitleText.text = panelInstance.Name;
             }
@@ -134,7 +133,6 @@ namespace VoidWars {
         private int _currentPanelIndex;
         private float _timer;
         private bool _scrolling;
-        private SubpanelController _currentPanel;
         public ShipController _activeShip;
         private CanvasGroup _canvasGroup;
     }

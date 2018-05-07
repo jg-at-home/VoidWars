@@ -665,6 +665,7 @@ namespace VoidWars {
                         InfoPanel.NotifyActiveShipChange(true);
                         EnableActionPanel(true);
                         setActionPanelTitle();
+                        InfoPanel.NotifyContent("SetDoneButtonCaption", "Select");
                     }
                     else {
                         InfoPanel.NotifyActiveShipChange(false);

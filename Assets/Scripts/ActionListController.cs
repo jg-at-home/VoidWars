@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace VoidWars {
@@ -9,6 +10,14 @@ namespace VoidWars {
         [SerializeField] private RectTransform _contentPanel;
         [SerializeField] private ObjectPool _buttonPool;
         [SerializeField] private RectTransform _detailPanel;
+        [SerializeField] private RectTransform _viewport;
+        [SerializeField] private float _spinRate;
+
+        private void Awake() {
+            var control = _buttonPool.GetObject();
+            _itemHeight = control.GetComponent<RectTransform>().rect.height;
+            _buttonPool.ReturnObject(control);
+        }
 
         /// <summary>
         /// Rebuilds the list of actions.
@@ -76,7 +85,26 @@ namespace VoidWars {
         }
 
         private void addButtons() {
-            for(var i = 0; i < _items.Count; ++i) {
+            if (_items.Count > 0) {
+                StartCoroutine(addButtonsCoro());
+            }
+        }
+
+        private IEnumerator addButtonsCoro() {
+            var i = 0;
+            int numVisibleItems = (int)((_viewport.rect.height + _itemHeight - 1) / _itemHeight);
+            for (; i < Mathf.Min(_items.Count, numVisibleItems); ++i) {
+                var action = _items[i];
+                var control = _buttonPool.GetObject();
+                control.transform.SetParent(_contentPanel, false);
+                var actionControl = control.GetComponent<ActionItemView>();
+                actionControl.Setup(action, this);
+                _views.Add(actionControl);
+                StartCoroutine(spinItemIntoView(actionControl));
+                yield return new WaitForSeconds(0.1f);
+            }
+
+            for(; i < _items.Count; ++i ) {
                 var action = _items[i];
                 var control = _buttonPool.GetObject();
                 control.transform.SetParent(_contentPanel, false);
@@ -84,6 +112,17 @@ namespace VoidWars {
                 actionControl.Setup(action, this);
                 _views.Add(actionControl);
             }
+        }
+
+        private IEnumerator spinItemIntoView(ActionItemView item) {
+            var rt = item.GetComponent<RectTransform>();
+            var angle = -90f;
+            while(angle < 0f) {
+                rt.rotation = Quaternion.Euler(angle, 0f, 0f);
+                angle += _spinRate * Time.deltaTime;
+                yield return null;
+            }
+            rt.rotation = Quaternion.identity;
         }
 
         private void removeButtons() {
@@ -99,5 +138,6 @@ namespace VoidWars {
         private readonly List<ActionItemView> _views = new List<ActionItemView>();
         private ActionDetailPanelController _current;
         private ActionItem _currentItem;
+        private float _itemHeight;
     }
 }

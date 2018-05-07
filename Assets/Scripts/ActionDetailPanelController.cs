@@ -27,6 +27,9 @@ namespace VoidWars {
         /// </summary>
         /// <param name="item">The item the planel is controlling</param>
         /// <param name="args">Arguments to send to the panel.</param>
-        protected abstract void initializeInner(ActionItem item, string[] args);
+        protected virtual void initializeInner(ActionItem item, string[] args) {
+            var controller = Util.GetGameController();
+            controller.InfoPanel.NotifyContent("SetDoneButtonCaption", "Select");
+        }
     }
 }
