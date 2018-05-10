@@ -39,6 +39,7 @@ GameObject:
   - component: {fileID: 114823556427857058}
   - component: {fileID: 114931306788584148}
   - component: {fileID: 114269601209077972}
+  - component: {fileID: 54803193837292914}
   m_Layer: 0
   m_Name: HomingMissile
   m_TagString: Untagged
@@ -73,6 +74,21 @@ Transform:
   m_Father: {fileID: 4379588196524104}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!54 &54803193837292914
+Rigidbody:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1996478456810176}
+  serializedVersion: 2
+  m_Mass: 0.0000001
+  m_Drag: 0
+  m_AngularDrag: 0
+  m_UseGravity: 0
+  m_IsKinematic: 0
+  m_Interpolate: 1
+  m_Constraints: 4
+  m_CollisionDetection: 0
 --- !u!114 &114269601209077972
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -84,9 +100,9 @@ MonoBehaviour:
   m_Script: {fileID: -1768714887, guid: dc443db3e92b4983b9738c1131f555cb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_TransformSyncMode: 1
+  m_TransformSyncMode: 3
   m_SendInterval: 0.1
-  m_SyncRotationAxis: 7
+  m_SyncRotationAxis: 2
   m_RotationSyncCompression: 0
   m_SyncSpin: 0
   m_MovementTheshold: 0.001
