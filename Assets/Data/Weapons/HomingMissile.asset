@@ -17,19 +17,24 @@ MonoBehaviour:
   Detail: 
   Cost: 3
   Mass: 7
-  PowerUsage: 7
+  PowerUsage: 5
   MaxTemperature: 80
-  Metadata: 
   RepairCost: 3
-  RepairTurns: 0
-  WeaponType: 4
+  RepairTurns: 1
+  MetaItems:
+  - Name: DurationTurns
+    Type: 1
+    Value: 3
+  - Name: DistancePerTurn
+    Type: 2
+    Value: 8
+  WeaponType: 3
   Cardinality: 2
   MaxDamage: 60
-  Range: 0
-  PrimaryAngle: 0
-  SecondaryAngle: 0
-  RequiresLineOfSight: 0
+  Range: 60
+  PrimaryAngle: 40
+  SecondaryAngle: 40
+  RequiresLineOfSight: 1
   Accuracy: 1
-  SoundEffect: {fileID: 0}
-  MetaData: 
-  Prefab: {fileID: 0}
+  SoundEffect: {fileID: 8300000, guid: 85ba6b0f0aacba643bac4b551bbac29c, type: 3}
+  Prefab: {fileID: 1996478456810176, guid: 89a72fba23e2cfd4b969e6a835147349, type: 2}

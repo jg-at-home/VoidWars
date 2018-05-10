@@ -108,6 +108,7 @@ namespace VoidWars {
         public AudioClip SoundEffect {  get { return _class.SoundEffect; } }
         public GameObject Prefab {  get { return _class.Prefab; } }
         public WeaponType WeaponType { get { return _class.WeaponType; } }
+        public virtual bool CanFire {  get { return true; } }
 
         public abstract IEnumerator Attack(ShipController ship, int slot, ShipController target, bool applyDamage);
 

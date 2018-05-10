@@ -28,6 +28,7 @@ namespace VoidWars {
         MOVING_SHIPS,
         TAKING_ACTION,
         SELECTING_ATTACK,
+        UPDATE_NPCS,
         // TODO: other stuff.
     }
 
@@ -405,7 +406,6 @@ namespace VoidWars {
                 yield return null;
             }
 
-            var weaponType = sourceShip.GetWeaponType(weaponSlot);
             var weapon = sourceShip.GetWeapon(weaponSlot);
             yield return sourceShip.Attack(targetShip, weaponSlot, weapon);
 
@@ -580,6 +580,18 @@ namespace VoidWars {
         }
 
         /// <summary>
+        /// Gets the marker colour for a ship.
+        /// </summary>
+        /// <param name="shipID">The ID of the ship.</param>
+        /// <returns>The marker color.</returns>
+        public Color GetShipMarkerColor(int shipID) {
+            var shipController = _ships.Find(s => s.ID == shipID);
+            var shipClass = GetShipClassByName(shipController.ClassID);
+            var species = SpeciesInfo[(int)shipClass.Species];
+            return species.MarkerColor;
+        }
+
+        /// <summary>
         /// Called client-side to notify a new ship has become active.
         /// </summary>
         /// <param name="ownerID">The ID of the ship's owner.</param>
@@ -594,10 +606,8 @@ namespace VoidWars {
 
             if (shipID >= 0) {
                 // Change the border colour to reflect the new ship's faction.
-                var shipController = _ships.Find(s => s.ID == shipID);
-                var shipClass = GetShipClassByName(shipController.ClassID);
-                var species = SpeciesInfo[(int)shipClass.Species];
-                BorderController.SetColor(species.MarkerColor);
+                var markerColor = GetShipMarkerColor(shipID);
+                BorderController.SetColor(markerColor);
             }
         }
 
@@ -775,6 +785,52 @@ namespace VoidWars {
 
         #region Server code
         /// <summary>
+        /// Adds an NPC to the controlled set.
+        /// </summary>
+        /// <param name="npc">The NPC to add.</param>
+        public void AddNPC(NPCObject npc) {
+            _npcs.Add(npc);
+        }
+
+        /// <summary>
+        /// Updates the NPCs.
+        /// </summary>
+        public void UpdateNPCs() {
+            Debug.Log("GameController.UpdateNPCs()");
+            var numNPCs = _npcs.Count;
+            if (numNPCs > 0) {
+                var syncToken = new NPCSyncToken(numNPCs);
+                StartCoroutine(npcUpdateCoro(syncToken));
+            }
+            else {
+                AdvanceGame();
+            }
+        }
+
+        private IEnumerator npcUpdateCoro(NPCSyncToken syncToken) {
+            // Start NPC updates.
+            foreach(var npc in _npcs) {
+                StartCoroutine(npc.PerTurnUpdate(syncToken));
+            }
+
+            // Wait for them all to complete.
+            while(!syncToken.IsSynced) {
+                yield return null;
+            }
+
+            // Clean up any expired ones.
+            for(int i = _npcs.Count-1; i >= 0; --i) {
+                if (_npcs[i].HasExpired) {
+                    Destroy(_npcs[i].gameObject);
+                    _npcs.RemoveAt(i);
+                }
+            }
+
+            // Move on.
+            AdvanceGame();
+        }
+
+        /// <summary>
         /// Adds a player move to the set. There should be one for each player.
         /// </summary>
         /// <param name="move"></param>
@@ -861,13 +917,20 @@ namespace VoidWars {
                     break;
 
                 case PlayPhase.SELECTING_ATTACK:
+                    _communicator.CmdDisableInfoPanel();
+                    SetPlayPhase(PlayPhase.UPDATE_NPCS, true);
+                    _communicator.CmdUpdateNPCs();
+                    break;
+
+                case PlayPhase.UPDATE_NPCS:
+                    _communicator.CmdEnableInfoPanel("Move", "MoveInfoPanel");
                     SetPlayPhase(PlayPhase.SELECTING_MOVES, true);
                     _communicator.EndThisRound();
                     _communicator.BeginNextRound();
                     break;
             }
         }
-
+        
         /// <summary>
         /// Adds a player to the active list.
         /// </summary>
@@ -1158,6 +1221,7 @@ namespace VoidWars {
         private readonly List<GameObject> _mapPins = new List<GameObject>();
         private int _round;
         private int _movesToMake;
+        private readonly List<NPCObject> _npcs = new List<NPCObject>();
         #endregion Server Data
 
         private Communicator _communicator;

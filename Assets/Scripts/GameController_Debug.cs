@@ -15,7 +15,6 @@ namespace VoidWars {
         }
 
         private void print(string msg) {
-            var text = string.Format("Controller ID: {0}", _communicator.ID);
             GUI.Label(_printRect, msg);
             _printRect.y += 20;
         }

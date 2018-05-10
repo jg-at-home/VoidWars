@@ -20,7 +20,6 @@ namespace VoidWars {
             yield return new WaitForSeconds(_duration);
             Object.Destroy(effect);
             if (applyDamage) {
-                var gameController = Util.GetGameController();
                 var layerMask = 1 << LayerMask.NameToLayer("ActiveObjects");
                 var radius = Range * ship.LuckRoll;
                 var overlaps = Physics.OverlapSphere(ship.transform.position, radius, layerMask);

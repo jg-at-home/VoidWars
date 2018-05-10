@@ -20,6 +20,9 @@
                 case WeaponType.RailGun:
                     return new RailGun(weaponClass);
 
+                case WeaponType.HomingMissile:
+                    return new HomingMissileLauncher(weaponClass);
+
                 default:
                     return null;
             }

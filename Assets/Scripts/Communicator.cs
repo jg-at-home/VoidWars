@@ -125,6 +125,12 @@ namespace VoidWars {
             controller.ShowDamage(shipID, damage);
         }
 
+        [Command]
+        public void CmdUpdateNPCs() {
+            Debug.Log("CmdUpdateNPCs()");
+            controller.UpdateNPCs();
+        }
+
         /// <summary>
         /// Spawns all the ships in the game. Must be called from server context.
         /// </summary>
