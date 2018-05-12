@@ -66,6 +66,8 @@ namespace VoidWars {
             var direction = (target - start).normalized;
             Vector3 lineEnd = target - Radius * direction;
             _lineRenderer.SetPosition(1, lineEnd);
+            var xScale = Mathf.Max((target - start).magnitude / 2, 1f);
+            _lineRenderer.sharedMaterial.mainTextureScale = new Vector2(xScale, 1f);
             checkLineValid();
             for (int i = 0; i < NumCirclePoints; ++i) {
                 var point = target + _circlePoints[i];
@@ -108,7 +110,7 @@ namespace VoidWars {
         }
 
         private void setShared(LineRenderer renderer) {
-            renderer.material = Material;
+            renderer.sharedMaterial = Material;
             renderer.startWidth = LineWidth;
             renderer.endWidth = LineWidth;
             renderer.useWorldSpace = true;

@@ -242,7 +242,7 @@ namespace VoidWars {
             Expired
         }
 
-        private State _state;
+        [SyncVar] private State _state;
         private int _turnCounter;
         private Vector3 _velocity;
         [SyncVar] private int _ownerID;
