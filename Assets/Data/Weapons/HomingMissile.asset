@@ -36,5 +36,6 @@ MonoBehaviour:
   SecondaryAngle: 40
   RequiresLineOfSight: 1
   Accuracy: 1
+  TurnsBetweenUses: 3
   SoundEffect: {fileID: 8300000, guid: 85ba6b0f0aacba643bac4b551bbac29c, type: 3}
   Prefab: {fileID: 1996478456810176, guid: 89a72fba23e2cfd4b969e6a835147349, type: 2}

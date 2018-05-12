@@ -400,6 +400,7 @@ namespace VoidWars {
         /// </summary>
         [Client]
         public void BeginRound() {
+            // Refresh weapons.
             if (_primaryWeapon != null) {
                 _primaryWeapon.BeginRound();
             }

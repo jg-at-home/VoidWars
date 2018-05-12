@@ -19,8 +19,9 @@ MonoBehaviour:
   Mass: 5
   PowerUsage: 5
   MaxTemperature: 95
-  Metadata: 
   RepairCost: 1
+  RepairTurns: 0
+  MetaItems: []
   WeaponType: 32
   Cardinality: 1
   MaxDamage: 60
@@ -28,3 +29,7 @@ MonoBehaviour:
   PrimaryAngle: 0
   SecondaryAngle: 0
   RequiresLineOfSight: 0
+  Accuracy: 0
+  TurnsBetweenUses: 1
+  SoundEffect: {fileID: 0}
+  Prefab: {fileID: 0}

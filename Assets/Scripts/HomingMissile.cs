@@ -157,12 +157,14 @@ namespace VoidWars {
         void RpcCreateExplosion(Vector3 position) {
             var explosion = Instantiate(_explosionPrefab, position, Quaternion.identity);
             Destroy(explosion, 3f);
+            Destroy(_targetIndicator.gameObject);
         }
 
         [ClientRpc]
         void RpcCreateExpiryEffect(Vector3 position) {
             var effect = Instantiate(_expiryPrefab, position, Quaternion.identity);
             Destroy(effect, 3f);
+            Destroy(_targetIndicator.gameObject);
         }
 
         [Server]

@@ -32,18 +32,17 @@ namespace VoidWars {
                 }
                 else {
                     var index = gameController.GetActiveWeaponIndex();
-                    var weaponType = shipController.GetWeaponType(index);
                     var targets = gameController.AttackTargetCount;
                     var weapon = shipController.GetWeapon(index);
-                    if (targets == 0) {
-                        text = "There are no targets within range. Change weapons, or press 'Done' to finish";
-                    }
-                    else if (!weapon.IsAvailable) {
+
+                    if (!weapon.IsAvailable) {
                         text = "Weapon not available this turn";
                     }
+                    else if (targets == 0) {
+                        text = "There are no targets within range. Change weapons, or press 'Skip' to finish";
+                    }
                     else {
-                        var weaponClass = gameController.GetWeaponClass(weaponType);
-                        if (shipController.GetEnergyBudgetFor(EnergyConsumer.Weapons) >= weaponClass.PowerUsage) {
+                        if (shipController.GetEnergyBudgetFor(EnergyConsumer.Weapons) >= weapon.PowerUsage) {
                             text = "Click on a target to attack, or press 'Skip' to finish";
                         }
                         else {
@@ -51,7 +50,7 @@ namespace VoidWars {
                         }
                     }
 
-                    WeaponText.text = Util.PascalToSpaced(weaponType.ToString());
+                    WeaponText.text = Util.PascalToSpaced(weapon.WeaponType.ToString());
                 }
             }
             else {
