@@ -57,6 +57,9 @@ namespace VoidWars {
         [Range(0f, 1f)]
         public float Accuracy;
 
+        [Tooltip("How many turns before you can use the weapon again")]
+        public int TurnsBetweenUses;
+
         [Tooltip("The noise to make when invoked")]
         public AudioClip SoundEffect;
 
@@ -108,10 +111,33 @@ namespace VoidWars {
         public AudioClip SoundEffect {  get { return _class.SoundEffect; } }
         public GameObject Prefab {  get { return _class.Prefab; } }
         public WeaponType WeaponType { get { return _class.WeaponType; } }
-        public virtual bool CanFire {  get { return true; } }
+        public bool IsAvailable {  get { return _turnCounter == 0; } }
 
-        public abstract IEnumerator Attack(ShipController ship, int slot, ShipController target, bool applyDamage);
+        /// <summary>
+        /// Called at start of round.
+        /// </summary>
+        public void BeginRound() {
+            if (_turnCounter > 0) {
+                --_turnCounter;
+            }
+        }
+
+        /// <summary>
+        /// Fires the weapon.
+        /// </summary>
+        /// <param name="ship">The firing ship.</param>
+        /// <param name="slot">The weapon slot.</param>
+        /// <param name="target">The target ship.</param>
+        /// <param name="applyDamage">If true, compute damage.</param>
+        /// <returns>Enumerator.</returns>
+        public IEnumerator Fire(ShipController ship, int slot, ShipController target, bool applyDamage) {
+            _turnCounter = _class.TurnsBetweenUses;
+            yield return attack(ship, slot, target, applyDamage);
+        }
+
+        protected abstract IEnumerator attack(ShipController ship, int slot, ShipController target, bool applyDamage);
 
         private readonly WeaponClass _class;
+        private int _turnCounter;
     }
 }

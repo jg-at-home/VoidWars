@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 
 namespace VoidWars {
-    public class TargetIndicator : VoidNetworkBehaviour {
+    public class TargetIndicator : MonoBehaviour {
         public float ScrollSpeed = 2.5f;
         public float Radius;
         public Material Material;
@@ -23,6 +23,10 @@ namespace VoidWars {
         /// <param name="source">Source object.</param>
         /// <param name="target">Target object.</param>
         public void Initialize(GameObject source, GameObject target, Color color) {
+            _matProps = new MaterialPropertyBlock();
+            setShared(_lineRenderer);
+            setShared(_circleRenderer);
+
             var delta = target.transform.position - source.transform.position;
             var direction = delta.normalized;
 
@@ -67,7 +71,7 @@ namespace VoidWars {
             Vector3 lineEnd = target - Radius * direction;
             _lineRenderer.SetPosition(1, lineEnd);
             var xScale = Mathf.Max((target - start).magnitude / 2, 1f);
-            _lineRenderer.sharedMaterial.mainTextureScale = new Vector2(xScale, 1f);
+            _lineRenderer.material.mainTextureScale = new Vector2(xScale, 1f);
             checkLineValid();
             for (int i = 0; i < NumCirclePoints; ++i) {
                 var point = target + _circlePoints[i];
@@ -106,11 +110,12 @@ namespace VoidWars {
                 _offset.x += 1f;
             }
 
-            Material.SetTextureOffset("_MainTex", _offset);
+            _lineRenderer.material.SetTextureOffset("_MainTex", _offset);
+            _circleRenderer.material.SetTextureOffset("_MainTex", _offset);
         }
 
         private void setShared(LineRenderer renderer) {
-            renderer.sharedMaterial = Material;
+            renderer.material = Material;
             renderer.startWidth = LineWidth;
             renderer.endWidth = LineWidth;
             renderer.useWorldSpace = true;
@@ -131,5 +136,6 @@ namespace VoidWars {
         private GameObject _target;
         private Color _color;
         private Vector3[] _circlePoints;
+        private MaterialPropertyBlock _matProps;
     }
 }

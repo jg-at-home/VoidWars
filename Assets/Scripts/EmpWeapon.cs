@@ -14,7 +14,7 @@ namespace VoidWars {
             _duration = GetFloat("Duration");
         }
 
-        public override IEnumerator Attack(ShipController ship, int slot, ShipController target, bool applyDamage) {
+        protected override IEnumerator attack(ShipController ship, int slot, ShipController target, bool applyDamage) {
             ship.AudioPlayer.PlayOneShot(SoundEffect);
             var effect = Object.Instantiate(Prefab, ship.transform.position, Quaternion.identity);
             yield return new WaitForSeconds(_duration);

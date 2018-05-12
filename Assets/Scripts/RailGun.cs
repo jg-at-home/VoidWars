@@ -16,7 +16,7 @@ namespace VoidWars {
             }
         }
 
-        public override IEnumerator Attack(ShipController ship, int slot, ShipController target, bool applyDamage) {
+        protected override IEnumerator attack(ShipController ship, int slot, ShipController target, bool applyDamage) {
             ship.AudioPlayer.PlayOneShot(SoundEffect);
             var node = ship.GetWeaponNode(slot);
             var start = node.position;

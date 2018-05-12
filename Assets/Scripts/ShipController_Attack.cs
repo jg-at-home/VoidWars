@@ -20,7 +20,7 @@ namespace VoidWars {
             Debug.Assert(_energy >= 0f);
 
             // Do the attack.
-            yield return weapon.Attack(this, weaponSlot, target, isServer);
+            yield return weapon.Fire(this, weaponSlot, target, isServer);
         }
     }
 }

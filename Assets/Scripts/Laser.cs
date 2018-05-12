@@ -13,7 +13,7 @@ namespace VoidWars {
         public Laser(WeaponClass weaponClass) : base(weaponClass) {
         }
 
-        public override IEnumerator Attack(ShipController ship, int slot, ShipController target, bool applyDamage) {
+        protected override IEnumerator attack(ShipController ship, int slot, ShipController target, bool applyDamage) {
             var sourceNode = ship.GetWeaponNode(slot);
             var sourcePoint = sourceNode.position;
             var laserGob = Object.Instantiate(Prefab);

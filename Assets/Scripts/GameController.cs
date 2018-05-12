@@ -480,24 +480,26 @@ namespace VoidWars {
             // Can't fire if you're cloaked!
             if (!shipController.IsCloaked) {
                 var weapon = shipController.GetWeapon(_activeWeapon);
+                if (weapon.IsAvailable) { 
                 var range = weapon.Range;
                 var position = shipController.gameObject.transform.position;
                 var objectsInRange = Physics.OverlapSphere(position, range);
-                foreach (var target in objectsInRange) {
-                    if ((target.gameObject != shipController.gameObject) &&
-                        (target.gameObject.CompareTag("Targetable"))) {
-                        // Can't target cloaked vessels.
-                        var targetShip = target.GetComponent<ShipController>();
-                        if ((targetShip != null) && targetShip.IsCloaked) {
-                            continue;
-                        }
+                    foreach (var target in objectsInRange) {
+                        if ((target.gameObject != shipController.gameObject) &&
+                            (target.gameObject.CompareTag("Targetable"))) {
+                            // Can't target cloaked vessels.
+                            var targetShip = target.GetComponent<ShipController>();
+                            if ((targetShip != null) && targetShip.IsCloaked) {
+                                continue;
+                            }
 
-                        // Target in range, but we need to check the angles.
-                        if (checkTargetGeometry(shipController, target.gameObject, weapon)) {
-                            var indicatorGO = Instantiate(TargetIndicatorPrefab);
-                            var indicator = indicatorGO.GetComponent<TargetIndicator>();
-                            indicator.Initialize(shipController.gameObject, target.gameObject, Color.red);
-                            _attackTargets.Add(indicator);
+                            // Target in range, but we need to check the angles.
+                            if (checkTargetGeometry(shipController, target.gameObject, weapon)) {
+                                var indicatorGO = Instantiate(TargetIndicatorPrefab);
+                                var indicator = indicatorGO.GetComponent<TargetIndicator>();
+                                indicator.Initialize(shipController.gameObject, target.gameObject, Color.red);
+                                _attackTargets.Add(indicator);
+                            }
                         }
                     }
                 }
@@ -772,6 +774,11 @@ namespace VoidWars {
         /// </summary>
         public void BeginRoundClient() {
             Debug.Log("GameController.BeginRoundClient()");
+
+            // Update ships.
+            foreach(var ship in _ships) {
+                ship.BeginRound();
+            }
 
             EnableInfoPanel("Move", "MoveInfoPanel");
         }

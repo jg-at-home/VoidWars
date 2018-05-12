@@ -12,7 +12,7 @@ namespace VoidWars {
             DurationTurns = GetInt("DurationTurns");
         }
 
-        public override IEnumerator Attack(ShipController ship, int slot, ShipController target, bool server) {
+        protected override IEnumerator attack(ShipController ship, int slot, ShipController target, bool server) {
             ship.AudioPlayer.PlayOneShot(SoundEffect);
             if (server) {
                 var node = ship.GetWeaponNode(slot);
@@ -46,6 +46,7 @@ namespace VoidWars {
 
         [SerializeField] private GameObject _explosionPrefab;
         [SerializeField] private GameObject _expiryPrefab;
+        [SerializeField] private TargetIndicator _targetIndicatorPrefab;
 
         private void Awake() {
             _rb = GetComponent<Rigidbody>();
@@ -76,7 +77,7 @@ namespace VoidWars {
             tint.a = 0.5f;
             particleSystem.startColor = tint;
 
-            _targetIndicator = GetComponentInChildren<TargetIndicator>();
+            _targetIndicator = Instantiate(_targetIndicatorPrefab);
             var source = gameObject;
             var target = controller.GetShip(_targetID);
             _targetIndicator.Initialize(source.gameObject, target.gameObject, markerColor);

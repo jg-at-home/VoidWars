@@ -31,16 +31,20 @@ namespace VoidWars {
                     WeaponText.text = "---";
                 }
                 else {
-                    var weapon = gameController.GetActiveWeaponIndex();
-                    var weaponType = (weapon == 0) ? shipController.PrimaryWeaponType : shipController.SecondaryWeaponType;
+                    var index = gameController.GetActiveWeaponIndex();
+                    var weaponType = shipController.GetWeaponType(index);
                     var targets = gameController.AttackTargetCount;
+                    var weapon = shipController.GetWeapon(index);
                     if (targets == 0) {
                         text = "There are no targets within range. Change weapons, or press 'Done' to finish";
+                    }
+                    else if (!weapon.IsAvailable) {
+                        text = "Weapon not available this turn";
                     }
                     else {
                         var weaponClass = gameController.GetWeaponClass(weaponType);
                         if (shipController.GetEnergyBudgetFor(EnergyConsumer.Weapons) >= weaponClass.PowerUsage) {
-                            text = "Click on a target to attack, or and press 'Done' to finish";
+                            text = "Click on a target to attack, or press 'Skip' to finish";
                         }
                         else {
                             text = "Insufficient energy to use this weapon";

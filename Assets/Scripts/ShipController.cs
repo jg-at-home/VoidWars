@@ -396,6 +396,20 @@ namespace VoidWars {
         }
 
         /// <summary>
+        /// Called at the begiining of a round.
+        /// </summary>
+        [Client]
+        public void BeginRound() {
+            if (_primaryWeapon != null) {
+                _primaryWeapon.BeginRound();
+            }
+
+            if (_secondaryWeapon != null) {
+                _secondaryWeapon.BeginRound();
+            }
+        }
+
+        /// <summary>
         /// Enables cloaking - yes, I'll use the ST reference as I keep forgetting wtf 'Shinobi'
         /// means :-) Call server-side.
         /// </summary>
