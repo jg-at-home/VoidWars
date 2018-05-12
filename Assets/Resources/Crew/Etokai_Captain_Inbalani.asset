@@ -22,4 +22,10 @@ MonoBehaviour:
     Property: Range
     BuffType: 2
     Value: 10
+  - Name: Duration+1
+    Target: 2
+    TargetName: '*'
+    Property: DurationTurns
+    BuffType: 1
+    Value: 1
   Abilities: []

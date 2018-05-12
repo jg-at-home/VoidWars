@@ -28,6 +28,11 @@ namespace VoidWars {
         /// increase, not 4 as with the percentage.
         /// </summary>
         CumulativePercentage,
+
+        /// <summary>
+        /// Fixes the stat at a single value.
+        /// </summary>
+        Fix,
     }
 
     /// <summary>
@@ -186,6 +191,10 @@ namespace VoidWars {
                         case BuffType.Percentage:
                             _valueCache *= (1f + (buff.Value / 100f));
                             break;
+
+                        case BuffType.Fix:
+                            _valueCache = buff.Value;
+                            return;
 
                         default:
                             break;

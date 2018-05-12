@@ -387,6 +387,15 @@ namespace VoidWars {
         }
 
         /// <summary>
+        /// Gets the crew member for a given role.
+        /// </summary>
+        /// <param name="role">The role.</param>
+        /// <returns>Data for the requested crew member.</returns>
+        public CrewMember GetCrewMember(Role role) {
+            return _crew[(int)role];
+        }
+
+        /// <summary>
         /// Enables cloaking - yes, I'll use the ST reference as I keep forgetting wtf 'Shinobi'
         /// means :-) Call server-side.
         /// </summary>
@@ -470,7 +479,7 @@ namespace VoidWars {
                 _tasks.Add(restoreTask);
                 var controller = Util.GetGameController();
                 var msg = string.Format("Ship <color=orange>{0}</color>'s shields have been disabled", _data.Name);
-                controller.BroadcastMsg(msg);
+                controller.BroadcastMsg(msg, Role.FirstOfficer);
             }
         }
 
@@ -478,7 +487,7 @@ namespace VoidWars {
             _shieldState = AuxState.Idle;
             var controller = Util.GetGameController();
             var msg = string.Format("Ship <color=orange>{0}</color>'s shields have been restored", _data.Name);
-            controller.BroadcastMsg(msg);
+            controller.BroadcastMsg(msg, Role.FirstOfficer);
         }
 
         /// <summary>

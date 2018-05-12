@@ -9,6 +9,7 @@ namespace VoidWars {
     /// </summary>
     public class HomingMissileLauncher : WeaponInstance {
         public HomingMissileLauncher(WeaponClass weaponClass) : base(weaponClass) {
+            DurationTurns = GetInt("DurationTurns");
         }
 
         public override IEnumerator Attack(ShipController ship, int slot, ShipController target, bool server) {
@@ -21,6 +22,12 @@ namespace VoidWars {
                 NetworkServer.Spawn(missileGO);
                 yield return missile.Launch();
             }                
+        }
+
+        [Stat]
+        public int DurationTurns {
+            get { return (int)getValue("DurationTurns"); }
+            set { setValue("DurationTurns", value); }
         }
     }
 
@@ -53,7 +60,7 @@ namespace VoidWars {
             _targetID = targetID;
             HasExpired = false;
             _velocity = node.forward * Speed; ;
-            _turnCounter = launcher.GetInt("DurationTurns");
+            _turnCounter = launcher.DurationTurns;
             _distancePerTurn = launcher.GetFloat("DistancePerTurn");
             _state = State.Idle;
 

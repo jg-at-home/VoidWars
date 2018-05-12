@@ -47,7 +47,7 @@ namespace VoidWars {
                         }
                     }
 
-                    WeaponText.text = weaponType.ToString();
+                    WeaponText.text = Util.PascalToSpaced(weaponType.ToString());
                 }
             }
             else {

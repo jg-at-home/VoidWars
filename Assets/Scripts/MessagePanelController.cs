@@ -2,8 +2,19 @@
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using UnityEngine.UI;
 
 namespace VoidWars {
+    public class Message {
+        public readonly string Text;
+        public readonly Sprite Icon;
+
+        public Message(string text, Sprite icon) {
+            Text = text;
+            Icon = icon;
+        }
+    }
+
     public class MessagePanelController : MonoBehaviour {
         public float DisplayDuration = 2.0f;
         public float InterMessageDuration = 1.0f;
@@ -11,7 +22,9 @@ namespace VoidWars {
         [SerializeField] private AnimationClip _inClip;
         [SerializeField] private AnimationClip _outClip;
         [SerializeField] private TextMeshProUGUI _text;
-        private readonly Queue<string> _messages = new Queue<string>();
+        [SerializeField] private Image _image;
+
+        private readonly Queue<Message> _messages = new Queue<Message>();
         private Animator _animator;
 
         private void Start() {
@@ -19,7 +32,8 @@ namespace VoidWars {
             StartCoroutine(handleMessages());
         }
 
-        public void ShowMessage(string message) {
+        public void ShowMessage(string text, Sprite icon) {
+            var message = new Message(text, icon);
             _messages.Enqueue(message);
         }
 
@@ -34,7 +48,8 @@ namespace VoidWars {
                 }
 
                 var msg = _messages.Dequeue();
-                _text.text = msg;
+                _text.text = msg.Text;
+                _image.sprite = msg.Icon;
                 _animator.SetTrigger("Summon");
                 yield return new WaitForSeconds(_inClip.length + DisplayDuration);
                 _animator.SetTrigger("Dismiss");

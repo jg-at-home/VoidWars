@@ -185,6 +185,15 @@ namespace VoidWars {
         }
 
         /// <summary>
+        /// Gets the ships owned by a player.
+        /// </summary>
+        /// <param name="ownerID">The owner to query.</param>
+        /// <returns>The requesed ships.</returns>
+        public List<ShipController> GetShipsOwnedBy(int ownerID) {
+            return _ships.FindAll(s => s.OwnerID == ownerID);
+        }
+
+        /// <summary>
         /// Gets the currently active ship controller.
         /// </summary>
         /// <returns>The active ship controller, or null.</returns>
@@ -322,21 +331,30 @@ namespace VoidWars {
             return (ownerID == _communicator.ID);
         }
 
+        /// <summary>
+        /// Gets the ID of the local player.
+        /// </summary>
+        public int LocalOwnerID {
+            get { return _communicator.ID; }
+        }
+
         #region Client Code
         /// <summary>
         /// Shows a message popup.
         /// </summary>
         /// <param name="message">The message to show.</param>
-        public void ShowMsg(string message) {
-            MessagePanelController.ShowMessage(message);
+        /// <param name="icon">The icon to show.</param>
+        public void ShowMsg(string message, Sprite icon) {
+            MessagePanelController.ShowMessage(message, icon);
         }
 
         /// <summary>
         /// Shows everyone a popup message.
         /// </summary>
         /// <param name="message">The message to show.</param>
-        public void BroadcastMsg(string message) {
-            _communicator.CmdBroadcastMessage(message);
+        /// <param name="role">Who issued the message.</param>
+        public void BroadcastMsg(string message, Role role) {
+            _communicator.CmdBroadcastMessage(message, role);
         }
 
         /// <summary>

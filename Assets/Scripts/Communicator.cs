@@ -292,14 +292,23 @@ namespace VoidWars {
         /// Shows message on all clients.
         /// </summary>
         /// <param name="msg">The message to show.</param>
+        /// <param name="role">Who issued the message.</param>
         [Command]
-        public void CmdBroadcastMessage(string msg) {
-            RpcBroadcastMessage(msg);
+        public void CmdBroadcastMessage(string msg, Role role) {
+            RpcBroadcastMessage(msg, role);
         }
 
         [ClientRpc]
-        void RpcBroadcastMessage(string message) {
-            controller.ShowMsg(message);
+        void RpcBroadcastMessage(string message, Role role) {
+            var myShips = getLocalShips();
+            var myShip = myShips[0];
+            var crewMember = myShip.GetCrewMember(role);
+            controller.ShowMsg(message, crewMember.Photo);
+        }
+
+        private List<ShipController> getLocalShips() {
+            var localOwnerID = controller.LocalOwnerID;
+            return controller.GetShipsOwnedBy(localOwnerID);
         }
 
         /// <summary>
@@ -329,13 +338,17 @@ namespace VoidWars {
             shipController.EnableShields(enable);
             var msg = string.Format("Ship <color=orange>'{0}'</color> has {1}ed shields",
                 shipController.ShipData.Name, enable ? "rais" : "lower");
-            RpcShowMessageToOtherPlayers(shipController.OwnerID, msg);
+            RpcShowMessageToOtherPlayers(shipController.OwnerID, msg, Role.FirstOfficer);
         }
 
         [ClientRpc]
-        void RpcShowMessageToOtherPlayers(int ownerID, string msg) {
+        void RpcShowMessageToOtherPlayers(int ownerID, string msg, Role role) {
             if (!controller.IsOwner(ownerID)) {
-                controller.ShowMsg(msg);
+                // TODO: select a ship (ergo crew member) in a better way.
+                var myShips = getLocalShips();
+                var myShip = myShips[0];
+                var crewMember = myShip.GetCrewMember(role);
+                controller.ShowMsg(msg, crewMember.Photo);
             }
         }
 
@@ -355,7 +368,7 @@ namespace VoidWars {
             shipController.EnableCloaking(enable);
             var msg = string.Format("Ship <color=orange>'{0}'</color> has {1}stealthed",
                 shipController.ShipData.Name, enable ? "" : "de-");
-            RpcShowMessageToOtherPlayers(shipController.OwnerID, msg);
+            RpcShowMessageToOtherPlayers(shipController.OwnerID, msg, Role.FirstOfficer);
         }
 
         /// <summary>
