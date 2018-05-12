@@ -637,7 +637,6 @@ namespace VoidWars {
             }
         }
 
-        [Server]
         private void updateWeapons() {
             _weaponsLevel = GetEnergyBudgetFor(EnergyConsumer.Weapons);
             updateWeaponState(_primaryWeapon, ref _primaryWeaponState);
@@ -646,7 +645,6 @@ namespace VoidWars {
             }
         }
 
-        [Server]
         private void updateSystemStatuses() {
             // Check systems.
             if (_shieldPercent > 0f) {
@@ -655,6 +653,8 @@ namespace VoidWars {
                     if (_shieldEnergy < _data.ShieldDrainRate) {
                         // Shields have failed.
                         _shieldState = AuxState.Idle;
+
+                        // TODO: review client / server status
                         var gameController = Util.GetGameController();
                         gameController.OnShieldsFailed(this);
                     }
@@ -696,7 +696,6 @@ namespace VoidWars {
             }
         }
 
-        [Server]
         private void updateWeaponState(WeaponInstance weaponClass, ref AuxState state) {
             switch (state) {
                 case AuxState.Idle:
@@ -736,13 +735,16 @@ namespace VoidWars {
             temperature -= _coolingRate;
             temperature = Mathf.Clamp(temperature, 0f, 100f);
             if (Mathf.Abs(_hullTemperature-temperature) > 0.1f) {
-                onHullTemperatureChanged(temperature);
+                _hullTemperature = temperature;
             }
         }
 
         [Client]
         private void onHullTemperatureChanged(float temperature) {
             Debug.LogFormat("Ship #{0}: T_hull = {1}", ID, temperature);
+
+            _hullTemperature = temperature;
+
             // Disable items above their max T (and re-enable those under it).
             for(var i = 0; i < _equipment.Count; ++i) {
                 var auxItem = _equipment[i];
@@ -1187,8 +1189,7 @@ namespace VoidWars {
         [SyncVar] private float _shieldEnergy;
         [SyncVar] private float _weaponsLevel;
         [SyncVar] private float _shieldPercent;
-        //[SyncVar(hook="onHullTemperatureChanged")]
-        [SyncVar] private float _hullTemperature;
+        [SyncVar(hook="onHullTemperatureChanged")] private float _hullTemperature;
         [SyncVar] private float _health;
         private bool _lifeSupportOK = true;
         private AuxState _primaryWeaponState;

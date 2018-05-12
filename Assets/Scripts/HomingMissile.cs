@@ -12,6 +12,7 @@ namespace VoidWars {
         }
 
         public override IEnumerator Attack(ShipController ship, int slot, ShipController target, bool server) {
+            ship.AudioPlayer.PlayOneShot(SoundEffect);
             if (server) {
                 var node = ship.GetWeaponNode(slot);
                 var missileGO = Object.Instantiate(Prefab, node.transform.position, Quaternion.identity);
@@ -36,18 +37,16 @@ namespace VoidWars {
         [Tooltip("Travel speed")]
         public float Speed;
 
+        [SerializeField] private GameObject _explosionPrefab;
+        [SerializeField] private GameObject _expiryPrefab;
+
         private void Awake() {
             _rb = GetComponent<Rigidbody>();
+            _targetIndicator = GetComponentInChildren<TargetIndicator>();
         }
 
         [Server]
         public void Initialize(HomingMissileLauncher launcher, Transform node, int ownerID, int targetID) {
-            // Set particle color. Don't use full-range RGB as it will lose the white core effect.
-            var particleSystem = GetComponentInChildren<ParticleSystem>().main;
-            var tint = controller.GetShipMarkerColor(ownerID);
-            tint.a = 0.5f;
-            particleSystem.startColor = tint;
-
             // Set up other parameters.
             _launcher = launcher;
             _ownerID = ownerID;
@@ -62,13 +61,33 @@ namespace VoidWars {
             controller.AddNPC(this);
         }
 
+        public override void OnStartClient() {
+            // Set particle color. Don't use full-range RGB as it will lose the white core effect.
+            var markerColor = controller.GetShipMarkerColor(_ownerID);
+            var particleSystem = GetComponentInChildren<ParticleSystem>().main;
+            var tint = markerColor;
+            tint.a = 0.5f;
+            particleSystem.startColor = tint;
+
+            _targetIndicator = GetComponentInChildren<TargetIndicator>();
+            var source = gameObject;
+            var target = controller.GetShip(_targetID);
+            _targetIndicator.Initialize(source.gameObject, target.gameObject, markerColor);
+        }
+
         [Server]
         public IEnumerator Launch() {
+            // TODO: launch sounds.
             _state = State.Launch;
-            _rb.velocity = _velocity;
             var distance = 0f;
             var start = _rb.position;
-            while(distance < _distancePerTurn) {
+            _rb.velocity = _velocity;
+            while (distance < _distancePerTurn) {
+                //var target = controller.GetShip(_targetID);
+                //if (target != null) {
+                //    _targetIndicator.Rebuild(_rb.position, target.transform.position);
+                //}
+
                 if (checkCollision()) {
                     yield break;
                 }
@@ -79,6 +98,12 @@ namespace VoidWars {
             }
             _rb.velocity = Vector3.zero;
             _state = State.Flight;
+            RpcSetLineBrightness(0.25f);
+        }
+
+        [ClientRpc]
+        void RpcSetLineBrightness(float value) {
+            _targetIndicator.SetBrightness(value);
         }
 
         private bool checkCollision() {
@@ -107,13 +132,14 @@ namespace VoidWars {
             if (collided) {
                 if (toDamage.Count > 0) {
                     // I hit one or more ships.
-                    // TODO: compute damage.
-                    var damage = 10f;
-                    foreach(var ship in toDamage) {
+                    var launchShip = controller.GetShip(_ownerID);
+                    var damage = launchShip.LuckRoll * _launcher.MaxDamage;
+                    foreach (var ship in toDamage) {
                         controller.ApplyDamageToShip(ship.ID, damage, 0f);
                     }
 
-                    // TODO: explosion.
+                    // Create an explosion.
+                    RpcCreateExplosion(_rb.position);
                     expire(false);
                 }
                 else {
@@ -122,6 +148,18 @@ namespace VoidWars {
             }
 
             return collided;
+        }
+
+        [ClientRpc]
+        void RpcCreateExplosion(Vector3 position) {
+            var explosion = Instantiate(_explosionPrefab, position, Quaternion.identity);
+            Destroy(explosion, 3f);
+        }
+
+        [ClientRpc]
+        void RpcCreateExpiryEffect(Vector3 position) {
+            var effect = Instantiate(_expiryPrefab, position, Quaternion.identity);
+            Destroy(effect, 3f);
         }
 
         [Server]
@@ -134,6 +172,7 @@ namespace VoidWars {
             }
             --_turnCounter;
 
+            RpcSetLineBrightness(1f);
             var bounds = controller.GetBoardBounds();
             var distance = 0f;
             var lastPos = _rb.position;
@@ -171,19 +210,25 @@ namespace VoidWars {
                 yield return null;
             }
 
+            RpcSetLineBrightness(0.25f);
             _rb.velocity = Vector3.zero;
             syncToken.Sync();
         }
 
-        private void expire(bool showEffect) {
-            Debug.Log("Kaboom!");
+        private void LateUpdate() {
+            var target = controller.GetShip(_targetID);
+            if (target != null) {
+                _targetIndicator.Rebuild(_rb.position, target.transform.position);
+            }
+        }
 
+        private void expire(bool showEffect) {
+            if (showEffect) {
+                RpcCreateExpiryEffect(_rb.position);
+            }
             _state = State.Expired;
             HasExpired = true;
             gameObject.SetActive(false);
-            if (showEffect) {
-                // TODO: expiry effect.
-            }
         }
 
         private enum State {
@@ -196,10 +241,11 @@ namespace VoidWars {
         private State _state;
         private int _turnCounter;
         private Vector3 _velocity;
-        private int _ownerID;
-        private int _targetID;
+        [SyncVar] private int _ownerID;
+        [SyncVar] private int _targetID;
         private float _distancePerTurn;
         private HomingMissileLauncher _launcher;
         private Rigidbody _rb;
+        private TargetIndicator _targetIndicator;
     }
 }

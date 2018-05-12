@@ -51,9 +51,8 @@ namespace VoidWars {
                 var explosion = Object.Instantiate(s_explosionPrefab, _collisionPoint, Quaternion.identity);
                 Object.Destroy(explosion, 3f);
 
-                // Compute damage.
-                var luckFactor = Random.Range(0.85f, 1.05f);
-                var damage = luckFactor * MaxDamage;
+                // Compute damage.                
+                var damage = ship.LuckRoll * MaxDamage;
 
                 // Push to clients.
                 var gameController = Util.GetGameController();

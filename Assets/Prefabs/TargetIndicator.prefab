@@ -20,6 +20,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4259101066073610}
   - component: {fileID: 114518129774782410}
+  - component: {fileID: 114170396309882462}
   m_Layer: 0
   m_Name: TargetIndicator
   m_TagString: Untagged
@@ -100,6 +101,38 @@ Transform:
   m_Father: {fileID: 4259101066073610}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &114170396309882462
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1451599264788136}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 372142912, guid: dc443db3e92b4983b9738c1131f555cb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_SceneId:
+    m_Value: 0
+  m_AssetId:
+    i0: 246
+    i1: 15
+    i2: 216
+    i3: 150
+    i4: 194
+    i5: 94
+    i6: 40
+    i7: 116
+    i8: 106
+    i9: 251
+    i10: 22
+    i11: 32
+    i12: 20
+    i13: 106
+    i14: 157
+    i15: 250
+  m_ServerOnly: 0
+  m_LocalPlayerAuthority: 0
 --- !u!114 &114518129774782410
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -111,13 +144,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4fe70581074690447bcbb0a4b3555c0b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ScrollSpeed: 2.5
   Radius: 3.5
   Material: {fileID: 2100000, guid: c702180a9e8b71e4996cdeb2559dd8de, type: 2}
   LineWidth: 0.1
   NumCirclePoints: 32
   _lineRenderer: {fileID: 120082721225557360}
   _circleRenderer: {fileID: 120251593680646162}
-  _target: {fileID: 0}
 --- !u!120 &120082721225557360
 LineRenderer:
   m_ObjectHideFlags: 1

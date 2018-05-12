@@ -478,7 +478,7 @@ namespace VoidWars {
                         if (checkTargetGeometry(shipController, target.gameObject, weapon)) {
                             var indicatorGO = Instantiate(TargetIndicatorPrefab);
                             var indicator = indicatorGO.GetComponent<TargetIndicator>();
-                            indicator.Initialize(shipController.gameObject, target.gameObject);
+                            indicator.Initialize(shipController.gameObject, target.gameObject, Color.red);
                             _attackTargets.Add(indicator);
                         }
                     }
@@ -917,7 +917,7 @@ namespace VoidWars {
                     break;
 
                 case PlayPhase.SELECTING_ATTACK:
-                    _communicator.CmdDisableInfoPanel();
+                    _communicator.CmdEnableInfoPanel("Please wait", "NpcMoveInfoPanel");
                     SetPlayPhase(PlayPhase.UPDATE_NPCS, true);
                     _communicator.CmdUpdateNPCs();
                     break;
