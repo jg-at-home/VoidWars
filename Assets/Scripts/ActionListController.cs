@@ -23,8 +23,10 @@ namespace VoidWars {
         /// Rebuilds the list of actions.
         /// </summary>
         public void Refresh() {
+            Debug.Log("ActionListController.Refresh()");
             var gameController = Util.GetGameController();
             var activeShip = gameController.GetActiveShip();
+            _views.Clear();
             _items = activeShip.GetAvailableActions();
             refreshButtons();
         }
@@ -127,8 +129,9 @@ namespace VoidWars {
 
         private void removeButtons() {
             while(_contentPanel.childCount > 0) {
-                var item = _contentPanel.transform.GetChild(0).gameObject;
-                _buttonPool.ReturnObject(item);
+                var item = _contentPanel.GetChild(0);
+                item.SetParent(null, false);
+                _buttonPool.ReturnObject(item.gameObject);
             }
 
             _views.Clear();

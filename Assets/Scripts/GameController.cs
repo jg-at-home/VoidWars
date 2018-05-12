@@ -712,7 +712,6 @@ namespace VoidWars {
             else {
                 EnableActionPanel(true);
                 setActionPanelTitle();
-                ActionPanel.Refresh();
             }
         }
 

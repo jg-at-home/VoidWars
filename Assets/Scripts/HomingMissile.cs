@@ -83,11 +83,6 @@ namespace VoidWars {
             var start = _rb.position;
             _rb.velocity = _velocity;
             while (distance < _distancePerTurn) {
-                //var target = controller.GetShip(_targetID);
-                //if (target != null) {
-                //    _targetIndicator.Rebuild(_rb.position, target.transform.position);
-                //}
-
                 if (checkCollision()) {
                     yield break;
                 }
@@ -216,9 +211,11 @@ namespace VoidWars {
         }
 
         private void LateUpdate() {
-            var target = controller.GetShip(_targetID);
-            if (target != null) {
-                _targetIndicator.Rebuild(_rb.position, target.transform.position);
+            if (_state == State.Launch || _state == State.Flight) {
+                var target = controller.GetShip(_targetID);
+                if (target != null) {
+                    _targetIndicator.Rebuild(_rb.position, target.transform.position);
+                }
             }
         }
 
