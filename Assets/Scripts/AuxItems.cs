@@ -8,6 +8,9 @@
                 case AuxType.FlareLauncher:
                     return new FlareLauncher(auxClass);
 
+                case AuxType.ERBInducer:
+                    return new Teleporter(auxClass);
+
                 default:
                     return new AuxItem(auxClass);
             }

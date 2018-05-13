@@ -19,7 +19,12 @@ MonoBehaviour:
   Mass: 10
   PowerUsage: 50
   MaxTemperature: 95
-  Metadata: 
   RepairCost: 5
+  RepairTurns: 0
+  MetaItems: []
   ItemType: 2
   Mode: 2
+  StartSoundClip: {fileID: 8300000, guid: ca198ad75e10a82488b52ce5f1a89fc8, type: 3}
+  StopSoundClip: {fileID: 8300000, guid: d4c9b1e46cbdfb54aa49671db6a60f15, type: 3}
+  EffectPrefab: {fileID: 1773627418574616, guid: f9935a63533407d49b4d34421865ee6d,
+    type: 2}

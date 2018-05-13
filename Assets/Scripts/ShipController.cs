@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -250,7 +251,7 @@ namespace VoidWars {
         public float LuckRoll {
             get {
                 var luckiness = ShipData.Luckiness;
-                return Random.Range(luckiness, luckiness+1f);
+                return UnityEngine.Random.Range(luckiness, luckiness+1f);
             }
         }
 
@@ -318,7 +319,6 @@ namespace VoidWars {
         public Transform GetWeaponNode(int slot) {
             return (slot == 0) ? FrontNode : RearNode;
         }
-
 
         /// <summary>
         /// Gets weapons by name.
@@ -555,6 +555,20 @@ namespace VoidWars {
                     _powerDrain -= _data.ShieldDrainRate;
                 }
             }
+        }
+
+        /// <summary>
+        /// Make the ship invisible.
+        /// </summary>
+        public void Hide() {
+            _renderer.enabled = false;
+        }
+
+        /// <summary>
+        /// Make the ship visible.
+        /// </summary>
+        public void Show() {
+            _renderer.enabled = true;
         }
 
         /// <summary>
@@ -959,11 +973,6 @@ namespace VoidWars {
             _controlState = ControlState.IDLE;
             _data = new ShipInstance(controller.GetShipClassByName(ClassID));
 
-            // Remove sphere colliders.
-            // var sphere = gameObject.GetComponentInChildren<Sphere>();
-            // Cache colliders.
-            _colliders = gameObject.GetComponentsInChildren<Collider>();
-
             // Init weapons
             _totalMass = _data.Mass;
             Debug.Assert(PrimaryWeaponType != WeaponType.None);
@@ -1125,6 +1134,15 @@ namespace VoidWars {
             }
         }
 
+        public void UseOneShotAuxiliary(AuxType type, Action onCompletion) {
+            Debug.LogFormat("ShipController: use {0}", type);
+
+            var auxItem = _equipment.Find(item => item.ItemType == type);
+            Debug.Assert(auxItem.Mode == AuxMode.OneShot);
+            applyAuxiliary(auxItem);
+            StartCoroutine(auxItem.Use(this, onCompletion));
+        }
+
         /// <summary>
         /// Turns an auxiliary on or off.
         /// </summary>
@@ -1134,17 +1152,14 @@ namespace VoidWars {
             Debug.LogFormat("ShipController: aux {0} enabled = {1}", type, enable);
 
             var auxItem = _equipment.Find(item => item.ItemType == type);
-            Debug.Assert(auxItem.Mode == AuxMode.Switchable || auxItem.Mode == AuxMode.OneShot);
+            Debug.Assert(auxItem.Mode == AuxMode.Switchable);
             if (enable) {
                 Debug.Assert(auxItem.State == AuxState.Idle);
-                if (auxItem.Mode == AuxMode.Switchable) {
-                    auxItem.State = AuxState.Operational;
-                }
+                auxItem.State = AuxState.Operational;
                 applyAuxiliary(auxItem);
             }
             else {
                 Debug.Assert(auxItem.State == AuxState.Operational);
-                Debug.Assert(auxItem.Mode == AuxMode.Switchable);
                 auxItem.State = AuxState.Idle;
                 unapplyAuxiliary(auxItem);
             }
@@ -1182,11 +1197,6 @@ namespace VoidWars {
                 case AuxType.Scanners: {
                         // Side effect: 5% drop in shield efficency.
                         _data.AddBuff(new Buff("MaxShieldEfficiency", BuffType.Percentage, -5f, AuxType.Scanners));
-                    }
-                    break;
-
-                case AuxType.FlareLauncher: {
-                        launchFlare();
                     }
                     break;
 
@@ -1232,18 +1242,6 @@ namespace VoidWars {
             }
         }
 
-        [Client]
-        private void launchFlare() {
-            Debug.Log("ShipController.launchFlare()");
-
-            var flare = _equipment.Find(e => e.ItemType == AuxType.FlareLauncher);
-            flare.Use(this);
-        }
-
-        private void OnCollisionEnter(Collision collision) {
-            Debug.Log("Collision with: " + collision.collider.name);
-        }
-
         private enum ControlState {
             UNINITIALIZED,
             READY,
@@ -1286,6 +1284,5 @@ namespace VoidWars {
         [SerializeField] private MeshRenderer _renderer;
         private List<Task> _tasks;
         private readonly CrewMember[] _crew = new CrewMember[3];
-        private Collider[] _colliders;
     }
 }

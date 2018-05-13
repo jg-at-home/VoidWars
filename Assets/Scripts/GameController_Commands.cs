@@ -27,15 +27,17 @@ namespace VoidWars {
                     break;
 
                 case "aux":
-                    handleAuxCommand(parts);
-                    _actionComplete = true;
+                    if (handleAuxCommand(parts)) {
+                        _actionComplete = true;
+                    }
                     break;
 
                 // TODO: everything else
             }
         }
 
-        private void handleAuxCommand(string[] parts) {
+        private bool handleAuxCommand(string[] parts) {
+            var complete = true;
             switch(parts[1]) {
                 case "shinobi": {
                         var status = bool.Parse(parts[2]);
@@ -51,12 +53,19 @@ namespace VoidWars {
 
                 case "flarelauncher": {
                         // It's a one-shot so no need to parse the argument.
-                        _activeShip.EnableAuxiliary(AuxType.FlareLauncher, true);
+                        _activeShip.UseOneShotAuxiliary(AuxType.FlareLauncher, () => _actionComplete = true);
                     }
                     break;
 
+                case "erbinducer": {
+                        _activeShip.UseOneShotAuxiliary(AuxType.ERBInducer, () => _actionComplete = true);
+                        complete = false;
+                    }
+                    break;
                 // TODO: everything else
             }
+
+            return complete;
         }
 
         private void executeCloak(ShipController shipController, bool status) {

@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System;
+using System.Collections;
+using UnityEngine;
 using UnityEngine.Networking;
 
 namespace VoidWars {
@@ -94,7 +96,7 @@ namespace VoidWars {
         public AudioClip StopAudio { get { return _class.StopSoundClip; } }
         public GameObject EffectPrefab {  get { return _class.EffectPrefab; } }
 
-        public virtual void Use(ShipController ship) { }
+        public virtual IEnumerator Use(ShipController ship, Action onCompletion) { yield break; }
 
         private readonly AuxiliaryClass _class;
     }

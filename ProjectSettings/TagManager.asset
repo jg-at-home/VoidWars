@@ -9,6 +9,7 @@ TagManager:
   - Targetable
   - Sun
   - scanner
+  - Teleport
   layers:
   - Default
   - TransparentFX
