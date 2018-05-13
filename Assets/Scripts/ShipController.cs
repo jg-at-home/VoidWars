@@ -346,6 +346,22 @@ namespace VoidWars {
         }
 
         /// <summary>
+        /// Coroutine for performing an attack.
+        /// </summary>
+        /// <param name="target">The target ship</param>
+        /// <param name="weaponSlot">The weapon slot.</param>
+        /// <param name="weapon">The weapon to use.</param>
+        /// <returns>Enumerator</returns>
+        public IEnumerator Attack(ShipController target, int weaponSlot, WeaponInstance weapon) {
+            // Use up some juice.
+            _energy -= weapon.PowerUsage;
+            Debug.Assert(_energy >= 0f);
+
+            // Do the attack.
+            yield return weapon.Fire(this, weaponSlot, target, isServer);
+        }
+
+        /// <summary>
         /// Gets the energy available for the given consumer.
         /// </summary>
         /// <param name="consumer">The consumer.</param>
@@ -444,6 +460,18 @@ namespace VoidWars {
                     unapplyAuxiliary(cloakItem);
                 }
             }
+        }
+
+        /// <summary>
+        /// Flashes the cloak effect for a time.
+        /// </summary>
+        [Client]
+        public void FlashCloak(float time) {
+            Debug.Assert(_cloakActive);
+
+            var shield = gameObject.GetComponent<ForceField3Y3>();
+            shield.SetEffectOn();
+            shield.Invoke("SetEffectOff", time);
         }
 
         private void onCloakStateChanged(bool state) {
@@ -950,7 +978,7 @@ namespace VoidWars {
                 if ((EquipmentMask & mask) != 0) {
                     // Auxiliary device is equipped.
                     var auxClass = controller.ItemClasses[i];
-                    var auxItem = new AuxItem(auxClass);
+                    var auxItem = AuxItems.CreateAux(auxClass);
                     _totalMass += auxClass.Mass;
                     _equipment.Add(auxItem);
                     if (auxClass.Mode == AuxMode.Continuous) {
@@ -1106,8 +1134,8 @@ namespace VoidWars {
                 Debug.Assert(auxItem.State == AuxState.Idle);
                 if (auxItem.Mode == AuxMode.Switchable) {
                     auxItem.State = AuxState.Operational;
-                    applyAuxiliary(auxItem);
                 }
+                applyAuxiliary(auxItem);
             }
             else {
                 Debug.Assert(auxItem.State == AuxState.Operational);
@@ -1152,6 +1180,11 @@ namespace VoidWars {
                     }
                     break;
 
+                case AuxType.FlareLauncher: {
+                        launchFlare();
+                    }
+                    break;
+
                 case AuxType.Shinobi:
                     _cloakActive = true;
                     break;
@@ -1189,9 +1222,17 @@ namespace VoidWars {
                     _cloakActive = false;
                     break;
 
-                    // TODO: other stuff.
+                // TODO: other stuff.
 
             }
+        }
+
+        [Client]
+        private void launchFlare() {
+            Debug.Log("ShipController.launchFlare()");
+
+            var flare = _equipment.Find(e => e.ItemType == AuxType.FlareLauncher);
+            flare.Use(this);
         }
 
         private enum ControlState {

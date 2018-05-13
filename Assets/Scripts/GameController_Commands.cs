@@ -49,6 +49,12 @@ namespace VoidWars {
                     }
                     break;
 
+                case "flarelauncher": {
+                        // It's a one-shot so no need to parse the argument.
+                        _activeShip.EnableAuxiliary(AuxType.FlareLauncher, true);
+                    }
+                    break;
+
                 // TODO: everything else
             }
         }

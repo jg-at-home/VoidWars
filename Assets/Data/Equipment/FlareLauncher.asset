@@ -12,14 +12,21 @@ MonoBehaviour:
   m_Name: FlareLauncher
   m_EditorClassIdentifier: 
   Name: Flare Launcher
-  Icon: {fileID: 0}
-  Description: Allows you to see hidden ships
+  Icon: {fileID: 21300000, guid: 03071d04342c78c4ea8213034a189d93, type: 3}
+  Description: flare launcher
   Detail: Allows you to see hidden ships for a short while
   Cost: 4
   Mass: 3
   PowerUsage: 2
   MaxTemperature: 101
-  Metadata: 
   RepairCost: 3
+  RepairTurns: 2
+  MetaItems:
+  - Name: FlashTime
+    Type: 2
+    Value: 1
   ItemType: 4
   Mode: 2
+  StartSoundClip: {fileID: 8300000, guid: 4b3e4b5379b17a64fab2231a4620c2d1, type: 3}
+  StopSoundClip: {fileID: 0}
+  EffectPrefab: {fileID: 142538, guid: a4bd104969bcc18418d8d1432a624ba0, type: 2}

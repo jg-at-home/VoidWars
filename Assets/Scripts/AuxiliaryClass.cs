@@ -48,6 +48,15 @@ namespace VoidWars {
 
         [Tooltip("The mode of operation")]
         public AuxMode Mode;
+
+        [Tooltip("Sound effect on start")]
+        public AudioClip StartSoundClip;
+
+        [Tooltip("Sound effect on stop")]
+        public AudioClip StopSoundClip;
+
+        [Tooltip("Visual effect on start")]
+        public GameObject EffectPrefab;
     }
 
     /// <summary>
@@ -81,6 +90,11 @@ namespace VoidWars {
 
         public AuxMode Mode {  get { return _class.Mode; } }
         public AuxType ItemType {  get { return _class.ItemType; } }
+        public AudioClip StartAudio { get { return _class.StartSoundClip; } }
+        public AudioClip StopAudio { get { return _class.StopSoundClip; } }
+        public GameObject EffectPrefab {  get { return _class.EffectPrefab; } }
+
+        public virtual void Use(ShipController ship) { }
 
         private readonly AuxiliaryClass _class;
     }

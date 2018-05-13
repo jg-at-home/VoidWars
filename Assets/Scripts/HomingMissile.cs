@@ -193,7 +193,7 @@ namespace VoidWars {
 
                 // Does my target still exist?
                 var target = controller.GetShip(_targetID);
-                if (target != null) {
+                if (target != null && !target.IsCloaked) {
                     // Compute the next move segment and smooth direction changes so we don't veer too sharply.
                     var myPosition = _rb.position;
                     var targetDir = (target.transform.position - myPosition).normalized;

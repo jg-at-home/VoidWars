@@ -194,6 +194,15 @@ namespace VoidWars {
         }
 
         /// <summary>
+        /// Gets the ships NOT owned by a player.
+        /// </summary>
+        /// <param name="ownerID">The owner to exclude</param>
+        /// <returns>A list of ships not owned by the player.</returns>
+        public List<ShipController> GetShipsNotOwnedBy(int ownerID) {
+            return _ships.FindAll(s => s.OwnerID != ownerID);
+        }
+
+        /// <summary>
         /// Gets the currently active ship controller.
         /// </summary>
         /// <returns>The active ship controller, or null.</returns>
