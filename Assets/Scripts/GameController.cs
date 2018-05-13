@@ -314,6 +314,13 @@ namespace VoidWars {
             StartCoroutine(waitForActionCompletion());
         }
 
+        /// <summary>
+        /// Sets the action complete flag.
+        /// </summary>
+        public void OnActionComplete() {
+            _actionComplete = true;
+        }
+
         private IEnumerator waitForActionCompletion() {
             while (!_actionComplete) {
                 yield return null;
@@ -819,6 +826,44 @@ namespace VoidWars {
 
         #region Server code
         /// <summary>
+        /// Computes a destination position for teleporting to.
+        /// </summary>
+        /// <param name="ship">The teleporting ship.</param>
+        /// <returns>The desination position.</returns>
+        public Vector3 GetTeleportDestination(ShipController ship) {
+            var layerMask = 1 << LayerMask.NameToLayer("Ships");
+            layerMask |= 1 << LayerMask.NameToLayer("ActiveObjects");
+
+            var enemyShips = GetShipsNotOwnedBy(ship.OwnerID);
+            var bestPoint = -1;
+            var bestDistance = 0f;
+            for (int i = 0; i < _teleportPoints.Length; ++i) {
+                var point = _teleportPoints[i];
+                var distance = 0f;
+                foreach (var enemy in enemyShips) {
+                    distance += Vector3.Distance(enemy.transform.position, point);
+                }
+
+                if (distance > bestDistance) {
+                    if (!Physics.CheckSphere(point, 1f, layerMask)) {
+                        bestDistance = distance;
+                        bestPoint = i;
+                    }
+                }
+            }
+
+            Vector3 result;
+            if (bestPoint >= 0) {
+                result =_teleportPoints[bestPoint];
+                result.y = ship.transform.position.y;
+            }
+            else {
+                result = ship.transform.position;
+            }
+            return result;
+        }
+
+        /// <summary>
         /// Adds an NPC to the controlled set.
         /// </summary>
         /// <param name="npc">The NPC to add.</param>
@@ -1244,6 +1289,11 @@ namespace VoidWars {
             var boardMesh = Board.GetComponent<MeshRenderer>();
             var bounds = boardMesh.bounds;
             _boardBounds = new Rect(bounds.min.x, bounds.min.z, bounds.size.x, bounds.size.z);
+            var teleportGOs = GameObject.FindGameObjectsWithTag("Teleport");
+            _teleportPoints = new Vector3[teleportGOs.Length];
+            for(int i = 0; i < _teleportPoints.Length; ++i) {
+                _teleportPoints[i] = teleportGOs[i].transform.position;
+            }
         }
 
         #region Server Data
@@ -1256,6 +1306,7 @@ namespace VoidWars {
         private int _round;
         private int _movesToMake;
         private readonly List<NPCObject> _npcs = new List<NPCObject>();
+        private Vector3[] _teleportPoints;
         #endregion Server Data
 
         private Communicator _communicator;

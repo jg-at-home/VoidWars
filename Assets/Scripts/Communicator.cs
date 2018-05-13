@@ -90,6 +90,21 @@ namespace VoidWars {
             controller.SetActiveShipByIndex(index, false);
         }
 
+        [Command]
+        public void CmdTeleportShip(int shipID) {
+            var ship = controller.GetShip(shipID);
+            var destination = controller.GetTeleportDestination(ship);
+            RpcTeleportShip(shipID, destination);
+        }
+
+        [ClientRpc]
+        void RpcTeleportShip(int shipID, Vector3 destination) {
+            var ship = controller.GetShip(shipID);
+            var teleporter = (Teleporter)ship.GetAuxiliaryItem(AuxType.ERBInducer);
+            teleporter.SetDestination(destination);
+            ship.UseOneShotAuxiliary(AuxType.ERBInducer, () => controller.OnActionComplete());
+        }
+
         /// <summary>
         /// Called server-side to set the active ship.
         /// </summary>

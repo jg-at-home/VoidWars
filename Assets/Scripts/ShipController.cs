@@ -268,8 +268,17 @@ namespace VoidWars {
         /// </summary>
         /// <param name="index">The index.</param>
         /// <returns>The requested aux class.</returns>
-        public AuxItem GetAuxiliaryItemC(int index) {
+        public AuxItem GetAuxiliaryItem(int index) {
             return _equipment[index];
+        }
+
+        /// <summary>
+        /// Gets an aux by type.
+        /// </summary>
+        /// <param name="type">The aux type.</param>
+        /// <returns>The aux item.</returns>
+        public AuxItem GetAuxiliaryItem(AuxType type) {
+            return _equipment.Find(a => a.ItemType == type);
         }
 
         /// <summary>

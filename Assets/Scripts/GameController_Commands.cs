@@ -54,11 +54,12 @@ namespace VoidWars {
                 case "flarelauncher": {
                         // It's a one-shot so no need to parse the argument.
                         _activeShip.UseOneShotAuxiliary(AuxType.FlareLauncher, () => _actionComplete = true);
+                        complete = false;
                     }
                     break;
 
                 case "erbinducer": {
-                        _activeShip.UseOneShotAuxiliary(AuxType.ERBInducer, () => _actionComplete = true);
+                        _communicator.CmdTeleportShip(_activeShipID);
                         complete = false;
                     }
                     break;

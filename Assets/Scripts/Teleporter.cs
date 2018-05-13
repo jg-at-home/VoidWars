@@ -7,15 +7,11 @@ namespace VoidWars {
     /// Equipment used to teleport a ship to one of the warp points (usually the safest).
     /// </summary>
     public class Teleporter : AuxItem {
-        [Tooltip("The layer to check to see if points are occupied")]
-        public LayerMask OverlapLayers;
-
         public Teleporter(AuxiliaryClass itemClass) : base(itemClass) {
-            if (s_teleportPoints == null) {
-                s_teleportPoints = GameObject.FindGameObjectsWithTag("Teleport");
-                s_layerMask = 1 << LayerMask.NameToLayer("Ships");
-                s_layerMask |= 1 << LayerMask.NameToLayer("ActiveObjects");
-            }
+        }
+
+        public void SetDestination(Vector3 destination) {
+            _destination = destination;
         }
 
         public override IEnumerator Use(ShipController ship, Action onCompletion) {
@@ -27,15 +23,8 @@ namespace VoidWars {
             // Hide the ship.
             ship.Hide();
 
-            // Select the point that maximises the distance from enemy ships and is not occupied by
-            // another ship.
-            var index = selectPosition(ship);
-            if (index >= 0) {
-                // Jump the ship there
-                var bestPoint = s_teleportPoints[index].transform.position;
-                bestPoint.y = ship.transform.position.y;
-                ship.transform.position = bestPoint;
-            }
+            // Move to the destination.
+            ship.transform.position = _destination;
 
             // Once again play the effect.
             ship.AudioPlayer.PlayOneShot(StopAudio);
@@ -49,30 +38,6 @@ namespace VoidWars {
             onCompletion();
         }
 
-        private int selectPosition(ShipController ship) {
-            var gameController = Util.GetGameController();
-            var enemyShips = gameController.GetShipsNotOwnedBy(ship.OwnerID);
-            var bestPoint = -1;
-            var bestDistance = 0f;
-            for(int i = 0; i < s_teleportPoints.Length; ++i) {
-                var point = s_teleportPoints[i].transform.position;
-                var distance = 0f;
-                foreach(var enemy in enemyShips) {
-                    distance += Vector3.Distance(enemy.transform.position, point);
-                }
-
-                if (distance > bestDistance) {
-                    if (!Physics.CheckSphere(point, 1f, s_layerMask)) {
-                        bestDistance = distance;
-                        bestPoint = i;
-                    }
-                }
-            }
-
-            return bestPoint;
-        }
-
-        private static GameObject[] s_teleportPoints;
-        private static int s_layerMask;
+        private Vector3 _destination;
     }
 }

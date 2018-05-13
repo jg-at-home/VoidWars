@@ -28,7 +28,7 @@ namespace VoidWars {
                 int i = 0;
                 for(; i < numAux; ++i) {
                     _rows[i].gameObject.SetActive(true);
-                    var auxItem = ship.GetAuxiliaryItemC(i);
+                    var auxItem = ship.GetAuxiliaryItem(i);
                     _text[i].text = auxItem.Name;
                     var auxState = ship.GetAuxiliaryItemState(i);
                     if (auxState == AuxState.Broken) {
