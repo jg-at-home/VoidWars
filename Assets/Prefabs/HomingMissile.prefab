@@ -156,6 +156,9 @@ MonoBehaviour:
   DirectionSmoothing: 0.25
   Radius: 0.5
   Speed: 5
+  CollisionLayers:
+    serializedVersion: 2
+    m_Bits: 768
   _explosionPrefab: {fileID: 1267501659689384, guid: 9181a46eb986d6b4b9b20519f1f60100,
     type: 2}
   _expiryPrefab: {fileID: 1353830323806812, guid: ecea3bb3aa1bea74d9634b7f08a77dd7,

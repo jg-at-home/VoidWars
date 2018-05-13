@@ -44,6 +44,9 @@ namespace VoidWars {
         [Tooltip("Travel speed")]
         public float Speed;
 
+        [Tooltip("The layers the missile looks for collisions in.")]
+        public LayerMask CollisionLayers;
+
         [SerializeField] private GameObject _explosionPrefab;
         [SerializeField] private GameObject _expiryPrefab;
         [SerializeField] private TargetIndicator _targetIndicatorPrefab;
@@ -111,8 +114,7 @@ namespace VoidWars {
 
         private bool checkCollision() {
             var toDamage = new List<ShipController>();
-            var layerMask = 1 << LayerMask.NameToLayer("ActiveObjects");
-            var colliders = Physics.OverlapSphere(transform.position, Radius, layerMask);
+            var colliders = Physics.OverlapSphere(transform.position, Radius, CollisionLayers);
             bool collided = false;
             foreach(var collider in colliders) {
                 // I hit something. Was it a ship?

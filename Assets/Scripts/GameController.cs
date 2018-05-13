@@ -653,6 +653,7 @@ namespace VoidWars {
             Debug.LogFormat("GameController.RegisterShip()");
 
             _ships.Add(ship);
+
         }
 
         /// <summary>

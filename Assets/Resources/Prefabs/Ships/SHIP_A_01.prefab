@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 65625501488343418}
   - component: {fileID: 114590573916086328}
   - component: {fileID: 82826750070380948}
-  m_Layer: 8
+  m_Layer: 9
   m_Name: SHIP_A_01
   m_TagString: Targetable
   m_Icon: {fileID: 0}
@@ -334,7 +334,7 @@ Rigidbody:
   m_UseGravity: 0
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 0
+  m_Constraints: 80
   m_CollisionDetection: 0
 --- !u!65 &65625501488343418
 BoxCollider:

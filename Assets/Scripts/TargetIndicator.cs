@@ -119,17 +119,13 @@ namespace VoidWars {
             renderer.startWidth = LineWidth;
             renderer.endWidth = LineWidth;
             renderer.useWorldSpace = true;
-            var matProps = new MaterialPropertyBlock();
-            renderer.GetPropertyBlock(matProps);
-            matProps.SetColor("_Color", _color);
-            renderer.SetPropertyBlock(matProps);
+            setLineColor(renderer);
         }
 
         private void setLineColor(LineRenderer renderer) {
-            var matProps = new MaterialPropertyBlock();
-            renderer.GetPropertyBlock(matProps);
-            matProps.SetColor("_Color", _color);
-            renderer.SetPropertyBlock(matProps);
+            renderer.GetPropertyBlock(_matProps);
+            _matProps.SetColor("_Color", _color);
+            renderer.SetPropertyBlock(_matProps);
         }
 
         private Vector2 _offset = new Vector2(0f, 0f);

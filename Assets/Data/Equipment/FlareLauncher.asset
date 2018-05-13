@@ -25,6 +25,9 @@ MonoBehaviour:
   - Name: FlashTime
     Type: 2
     Value: 1
+  - Name: Range
+    Type: 2
+    Value: 8.5
   ItemType: 4
   Mode: 2
   StartSoundClip: {fileID: 8300000, guid: 4b3e4b5379b17a64fab2231a4620c2d1, type: 3}

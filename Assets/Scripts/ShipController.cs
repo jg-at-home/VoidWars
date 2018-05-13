@@ -907,7 +907,7 @@ namespace VoidWars {
             var moveTemplate = controller.GetMoveTemplate(move.Move);
             var node = (moveTemplate.MoveType == MoveType.Reverse) ? RearNode: FrontNode;
             var renderer = moveTemplate.GetComponent<LineRenderer>();
-            for (int i = 0; i < renderer.positionCount; ++i) {
+            for (int i = 0; i < renderer.positionCount; ++i) {//
                 var positionLocal = renderer.GetPosition(i);
                 var positionWorld = node.transform.TransformPoint(positionLocal);
                 points.Add(positionWorld);
@@ -958,6 +958,11 @@ namespace VoidWars {
             controller.RegisterShip(this);
             _controlState = ControlState.IDLE;
             _data = new ShipInstance(controller.GetShipClassByName(ClassID));
+
+            // Remove sphere colliders.
+            // var sphere = gameObject.GetComponentInChildren<Sphere>();
+            // Cache colliders.
+            _colliders = gameObject.GetComponentsInChildren<Collider>();
 
             // Init weapons
             _totalMass = _data.Mass;
@@ -1235,6 +1240,10 @@ namespace VoidWars {
             flare.Use(this);
         }
 
+        private void OnCollisionEnter(Collision collision) {
+            Debug.Log("Collision with: " + collision.collider.name);
+        }
+
         private enum ControlState {
             UNINITIALIZED,
             READY,
@@ -1277,5 +1286,6 @@ namespace VoidWars {
         [SerializeField] private MeshRenderer _renderer;
         private List<Task> _tasks;
         private readonly CrewMember[] _crew = new CrewMember[3];
+        private Collider[] _colliders;
     }
 }

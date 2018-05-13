@@ -122,6 +122,9 @@ public class ForceField3Y3 : MonoBehaviour
         sphere.GetComponent<Renderer>().receiveShadows = false;
         sphere.GetComponent<Renderer>().material = effect;
         sphere.transform.parent = this.gameObject.transform;
+        // JG 13/5/18 kill the collider.
+        var collider = sphere.GetComponent<SphereCollider>();
+        Destroy(collider);
 
         //Disable effect
         sphere.GetComponent<Renderer>().enabled = false;
