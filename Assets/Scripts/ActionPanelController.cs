@@ -14,6 +14,7 @@ namespace VoidWars {
         [SerializeField] private float _flashPeriod = 1.0f;
         [SerializeField] private Sprite _onSprite;
         [SerializeField] private Sprite _offSprite;
+        [SerializeField] private Button _selectButton;
 
         /// <summary>
         /// Refreshes the list of actions.
@@ -30,11 +31,29 @@ namespace VoidWars {
         }
 
         /// <summary>
+        /// Button handler for select button.
+        /// </summary>
+        public void OnSelectClicked() {
+            EnableSelectButton(false);
+            SendMessageUpwards("PlayButtonClick");
+            var gameController = Util.GetGameController();
+            gameController.ExecuteSelectedAction();
+        }
+
+        /// <summary>
         /// Sets the caption on the panel.
         /// </summary>
         /// <param name="title">Thr caption text.</param>
         public void SetTitle(string title) {
             _titleText.text = title;
+        }
+
+        /// <summary>
+        /// Enables or disables the select button.
+        /// </summary>
+        /// <param name="enable">Control flag.</param>
+        public void EnableSelectButton(bool enable) {
+            _selectButton.interactable = enable;
         }
 
         private void OnEnable() {

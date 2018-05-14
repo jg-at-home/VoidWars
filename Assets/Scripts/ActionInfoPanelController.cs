@@ -20,10 +20,6 @@ namespace VoidWars {
         /// Called when the Done button is clicked.
         /// </summary>
         public override void OnDoneButtonClicked() {
-            EnableDoneButton(false);
-            SendMessageUpwards("PlayButtonClick");
-            var gameController = Util.GetGameController();
-            gameController.ExecuteSelectedAction();
         }
     }
 }

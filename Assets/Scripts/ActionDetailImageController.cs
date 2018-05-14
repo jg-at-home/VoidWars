@@ -11,8 +11,7 @@ namespace VoidWars {
             DetailText.text = item.Detail;
 
             // Allow OK for these panels.
-            var gameController = Util.GetGameController();
-            gameController.InfoPanel.NotifyContent("EnableDoneButton", true);
+            enableSelectButton(true);
         }
 
         public override void SelectAction() {

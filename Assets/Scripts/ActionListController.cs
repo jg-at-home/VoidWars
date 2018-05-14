@@ -7,6 +7,7 @@ namespace VoidWars {
     /// Script controlling the list of actions.
     /// </summary>
     public class ActionListController : MonoBehaviour {
+        [SerializeField] private ActionPanelController _parentController;
         [SerializeField] private RectTransform _contentPanel;
         [SerializeField] private ObjectPool _buttonPool;
         [SerializeField] private RectTransform _detailPanel;
@@ -60,7 +61,7 @@ namespace VoidWars {
 
             panel.transform.SetParent(_detailPanel, false);
             _current = panel.GetComponent<ActionDetailPanelController>();
-            _current.Initialize(item, prefabInfoParts);
+            _current.Initialize(_parentController, item, prefabInfoParts);
             _currentItem = item;
 
             foreach(var view in _views) {
@@ -77,6 +78,7 @@ namespace VoidWars {
         }
 
         private void OnEnable() {
+            _parentController.EnableSelectButton(false);
             clearDetailPanel();
             Refresh();
         }

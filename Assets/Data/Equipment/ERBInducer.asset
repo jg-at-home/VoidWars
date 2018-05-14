@@ -11,7 +11,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1ef9869d461ac3b4eb72df86eac649b0, type: 3}
   m_Name: ERBInducer
   m_EditorClassIdentifier: 
-  Name: Einstein-Rosen Bridge Inducer
+  Name: Teleporter
   Icon: {fileID: 21300000, guid: 625a6489b8fb453429ef6bb28c673c91, type: 3}
   Description: ERB generator
   Detail: Teleport your ship away from danger
@@ -19,8 +19,8 @@ MonoBehaviour:
   Mass: 10
   PowerUsage: 50
   MaxTemperature: 95
-  RepairCost: 5
-  RepairTurns: 0
+  RepairCost: 10
+  RepairTurns: 5
   MetaItems: []
   ItemType: 2
   Mode: 2

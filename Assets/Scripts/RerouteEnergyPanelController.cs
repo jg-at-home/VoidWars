@@ -20,7 +20,7 @@ namespace VoidWars {
             DescriptionText.text = item.Detail;
 
             // Don't allow user to select OK until they change something.
-            gameController.InfoPanel.NotifyContent("EnableDoneButton", false);
+            enableSelectButton(false);
         }
 
         public override void SelectAction() {
@@ -57,8 +57,7 @@ namespace VoidWars {
             if (!_lock) {
                 refresh();
                 // Allow selection of OK.
-                var gameController = Util.GetGameController();
-                gameController.InfoPanel.NotifyContent("EnableDoneButton", true);
+                enableSelectButton(true);
             }
         }
 

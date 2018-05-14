@@ -5,9 +5,11 @@ namespace VoidWars {
         /// <summary>
         /// Initializes the panel.
         /// </summary>
+        /// <param name="actionPanel">The parent action panel.</param>
         /// <param name="item">The item the planel is controlling</param>
         /// <param name="args">Arguments to send to the panel.</param>
-        public void Initialize(ActionItem item, string[] args) {
+        public void Initialize(ActionPanelController actionPanel, ActionItem item, string[] args) {
+            _actionPanel = actionPanel;
             Item = item;
             initializeInner(item, args);
         }
@@ -28,5 +30,15 @@ namespace VoidWars {
         /// <param name="item">The item the planel is controlling</param>
         /// <param name="args">Arguments to send to the panel.</param>
         protected abstract void initializeInner(ActionItem item, string[] args);
+
+        /// <summary>
+        /// Enable the select button on the parent panel.
+        /// </summary>
+        /// <param name="enable">Status flag.</param>
+        protected void enableSelectButton(bool enable) {
+            _actionPanel.EnableSelectButton(enable);
+        }
+
+        private ActionPanelController _actionPanel;
     }
 }
