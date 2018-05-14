@@ -22,7 +22,7 @@ GameObject:
   - component: {fileID: 120583582282963788}
   - component: {fileID: 114160582586420944}
   - component: {fileID: 114434813044548028}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: LeftTurn_1
   m_TagString: Untagged
   m_Icon: {fileID: 0}

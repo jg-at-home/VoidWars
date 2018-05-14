@@ -61,11 +61,13 @@ namespace VoidWars {
         public DamageIndicator DamageIndicator;
         public UIAudioPlayer UIAudioPlayer;
         public MessagePanelController MessagePanelController;
+        public RectTransform CameoPanel;
 
         [Header("Prefabs")]
         public GameObject MapPinPrefab;
         public GameObject TargetIndicatorPrefab;
         public GameObject ScannerInfoPrefab;
+        public ShipCameo ShipCameoPrefab;
 
         public void OnShieldsFailed(ShipController ship) {
             Debug.Log("Shields failed");
@@ -355,6 +357,22 @@ namespace VoidWars {
         }
 
         #region Client Code
+        public ShipCameo CreateShipCameo(ShipController ship) {
+            var shipCameo = Instantiate(ShipCameoPrefab, CameoPanel);
+            var renderTexture = new RenderTexture(256, 256, 16, RenderTextureFormat.ARGB32);
+            shipCameo.Initialize(renderTexture, ship.ShipData.Name);
+            var cameraMount = new GameObject("CameoCam");
+            var cameoCam = cameraMount.AddComponent<Camera>();
+            cameoCam.fieldOfView = 45.0f;
+            cameoCam.targetTexture = renderTexture;
+            cameoCam.cullingMask = ~(1 << LayerMask.NameToLayer("Ships"));
+            cameraMount.transform.position = new Vector3(0, 5f, 0);
+            cameraMount.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
+            cameraMount.transform.SetParent(ship.transform, false);
+
+            return shipCameo;
+        }
+
         /// <summary>
         /// Shows a message popup.
         /// </summary>

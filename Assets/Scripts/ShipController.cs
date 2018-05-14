@@ -1028,6 +1028,11 @@ namespace VoidWars {
 
             updateSystemStatuses();
             updateWeapons();
+
+            // Setup cameo if appropriate.
+            if (OwnerID == controller.LocalOwnerID) {
+                _cameo = controller.CreateShipCameo(this);
+            }
         }
 
         private void initCrew() {
@@ -1293,5 +1298,6 @@ namespace VoidWars {
         [SerializeField] private MeshRenderer _renderer;
         private List<Task> _tasks;
         private readonly CrewMember[] _crew = new CrewMember[3];
+        private ShipCameo _cameo;
     }
 }
