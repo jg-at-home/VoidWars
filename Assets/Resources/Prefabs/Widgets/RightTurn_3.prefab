@@ -37,7 +37,7 @@ GameObject:
   - component: {fileID: 120849712810260552}
   - component: {fileID: 114253977157113104}
   - component: {fileID: 114709500430107564}
-  m_Layer: 9
+  m_Layer: 0
   m_Name: RightTurn_3
   m_TagString: Untagged
   m_Icon: {fileID: 0}

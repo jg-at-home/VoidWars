@@ -10,7 +10,7 @@ GameObject:
   - component: {fileID: 400000}
   - component: {fileID: 3300000}
   - component: {fileID: 2300000}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: zarykorStarship06
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -132,7 +132,7 @@ GameObject:
   - component: {fileID: 4555179279141766}
   - component: {fileID: 33003905868512430}
   - component: {fileID: 23542078845047896}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: EngineEffect1White
   m_TagString: Engine
   m_Icon: {fileID: 0}
@@ -149,7 +149,7 @@ GameObject:
   - component: {fileID: 4755733790111738}
   - component: {fileID: 33734194978150408}
   - component: {fileID: 23961404316646064}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: EngineFrontPlane
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -164,7 +164,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4446951083359918}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: NodeFront
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -179,7 +179,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4237417322870028}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: NodeRear
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -444,6 +444,7 @@ MonoBehaviour:
   effectMode: 0
   effectActivation: 1
   hideObject: 0
+  sphere: {fileID: 0}
 --- !u!114 &114134909943997522
 MonoBehaviour:
   m_ObjectHideFlags: 1

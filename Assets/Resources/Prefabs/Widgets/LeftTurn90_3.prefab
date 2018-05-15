@@ -37,7 +37,7 @@ GameObject:
   - component: {fileID: 120956164554529908}
   - component: {fileID: 114835258682770378}
   - component: {fileID: 114469498962453294}
-  m_Layer: 9
+  m_Layer: 0
   m_Name: LeftTurn90_3
   m_TagString: Untagged
   m_Icon: {fileID: 0}

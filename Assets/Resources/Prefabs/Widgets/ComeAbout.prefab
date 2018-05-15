@@ -40,7 +40,7 @@ GameObject:
   - component: {fileID: 114909552027186100}
   - component: {fileID: 114174657592931172}
   - component: {fileID: 114305734711971298}
-  m_Layer: 9
+  m_Layer: 0
   m_Name: ComeAbout
   m_TagString: Untagged
   m_Icon: {fileID: 0}

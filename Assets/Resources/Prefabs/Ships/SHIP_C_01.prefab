@@ -19,7 +19,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4560153067589740}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: astraTalonFleet_BattleshipA
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -36,7 +36,7 @@ GameObject:
   - component: {fileID: 4593968638039052}
   - component: {fileID: 33224145045388900}
   - component: {fileID: 23129566516960394}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: EngineFrontPlane
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -51,7 +51,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4858559369362230}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: NodeRear
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -69,7 +69,7 @@ GameObject:
   - component: {fileID: 33694224515384662}
   - component: {fileID: 135193257017566644}
   - component: {fileID: 23852323459509624}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Sphere
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -108,7 +108,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4414208543478216}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: NodeFront
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -125,7 +125,7 @@ GameObject:
   - component: {fileID: 4172063252157582}
   - component: {fileID: 33813863941131586}
   - component: {fileID: 23522005829233242}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: EngineEffect1Yellow
   m_TagString: Engine
   m_Icon: {fileID: 0}
@@ -140,7 +140,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4716690389584924}
-  m_Layer: 8
+  m_Layer: 9
   m_Name: NodeEngine
   m_TagString: Engine
   m_Icon: {fileID: 0}
@@ -157,7 +157,7 @@ GameObject:
   - component: {fileID: 4414853817855596}
   - component: {fileID: 33655485550141284}
   - component: {fileID: 23067050174273398}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: BattleshipAModel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -672,6 +672,7 @@ MonoBehaviour:
   effectMode: 0
   effectActivation: 1
   hideObject: 0
+  sphere: {fileID: 0}
 --- !u!114 &114927774034527132
 MonoBehaviour:
   m_ObjectHideFlags: 1

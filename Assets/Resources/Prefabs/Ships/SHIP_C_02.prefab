@@ -19,7 +19,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4786107621652624}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: NodeFront
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -60,7 +60,7 @@ GameObject:
   - component: {fileID: 4682864397873630}
   - component: {fileID: 33595016035719104}
   - component: {fileID: 23658366114196946}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: EngineFrontPlane
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -77,7 +77,7 @@ GameObject:
   - component: {fileID: 4533975124106826}
   - component: {fileID: 33067099013315546}
   - component: {fileID: 23761551955773886}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: CruiserAModel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -92,7 +92,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4241396984718504}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: astraTalonFleet_CruiserA
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -110,7 +110,7 @@ GameObject:
   - component: {fileID: 33020313408798004}
   - component: {fileID: 135783739145512700}
   - component: {fileID: 23876692584602118}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Sphere
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -127,7 +127,7 @@ GameObject:
   - component: {fileID: 4703760339934684}
   - component: {fileID: 33310745526391970}
   - component: {fileID: 23773353027379822}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: EngineEffect1Yellow
   m_TagString: Engine
   m_Icon: {fileID: 0}
@@ -142,7 +142,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4568309328369322}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: NodeRear
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -159,7 +159,7 @@ GameObject:
   - component: {fileID: 4495487464692330}
   - component: {fileID: 33671343513566166}
   - component: {fileID: 23552156460133362}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: EngineFrontPlane
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -176,7 +176,7 @@ GameObject:
   - component: {fileID: 4959483336685598}
   - component: {fileID: 33763569607532348}
   - component: {fileID: 23673873279297874}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: EngineEffect1Yellow
   m_TagString: Engine
   m_Icon: {fileID: 0}
@@ -785,6 +785,7 @@ MonoBehaviour:
   effectMode: 0
   effectActivation: 1
   hideObject: 0
+  sphere: {fileID: 0}
 --- !u!114 &114439125821835006
 MonoBehaviour:
   m_ObjectHideFlags: 1

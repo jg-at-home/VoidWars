@@ -27,7 +27,7 @@ public class ForceField3Y3 : MonoBehaviour
     public EffectActivation effectActivation;   //Effect activation (AlwaysOn or UserCall
     public bool hideObject = false;             //Hides the object when the effect is on and shows it again when is off.
 
-    private GameObject sphere;
+    [HideInInspector] public GameObject sphere;
     private Mesh theMesh;
     private bool EffectIsOn = false;
     private List<GameObject> allSubMeshes = new List<GameObject>();
@@ -125,6 +125,7 @@ public class ForceField3Y3 : MonoBehaviour
         // JG 13/5/18 kill the collider.
         var collider = sphere.GetComponent<SphereCollider>();
         Destroy(collider);
+        sphere.layer = LayerMask.NameToLayer("Ships");
 
         //Disable effect
         sphere.GetComponent<Renderer>().enabled = false;

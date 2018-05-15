@@ -365,7 +365,7 @@ namespace VoidWars {
             var cameoCam = cameraMount.AddComponent<Camera>();
             cameoCam.fieldOfView = 45.0f;
             cameoCam.targetTexture = renderTexture;
-            cameoCam.cullingMask = ~(1 << LayerMask.NameToLayer("Ships"));
+            cameoCam.cullingMask = 1 << LayerMask.NameToLayer("Ships");
             cameraMount.transform.position = new Vector3(0, 5f, 0);
             cameraMount.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
             cameraMount.transform.SetParent(ship.transform, false);

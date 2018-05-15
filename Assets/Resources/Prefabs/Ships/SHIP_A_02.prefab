@@ -32,7 +32,7 @@ GameObject:
   - component: {fileID: 400002}
   - component: {fileID: 3300000}
   - component: {fileID: 2300000}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: tangtagliaStarship07
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -132,7 +132,7 @@ GameObject:
   - component: {fileID: 4082865538299802}
   - component: {fileID: 33304132001560946}
   - component: {fileID: 23222674099065846}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: EngineFrontPlane
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -147,7 +147,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4558906575268874}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: NodeRear
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -164,7 +164,7 @@ GameObject:
   - component: {fileID: 4732490527384416}
   - component: {fileID: 33551914992083374}
   - component: {fileID: 23791743007633050}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: EngineEffect1Red
   m_TagString: Engine
   m_Icon: {fileID: 0}
@@ -179,7 +179,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4556791272593114}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: NodeFront
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -444,6 +444,7 @@ MonoBehaviour:
   effectMode: 0
   effectActivation: 1
   hideObject: 0
+  sphere: {fileID: 0}
 --- !u!114 &114378924771041436
 MonoBehaviour:
   m_ObjectHideFlags: 1
