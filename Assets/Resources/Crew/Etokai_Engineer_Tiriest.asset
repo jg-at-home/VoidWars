@@ -17,13 +17,13 @@ MonoBehaviour:
   Photo: {fileID: 21300000, guid: 8326e933187d8a645898dc7e9810bf6f, type: 3}
   Buffs:
   - Name: RechargeRate+5%
-    Target: 0
+    Target: 1
     TargetName: 
     Property: RechargeRate
     BuffType: 2
     Value: 5
-  - Name: CollingRate+5%
-    Target: 0
+  - Name: CoolingRate+5%
+    Target: 1
     TargetName: 
     Property: CoolingRate
     BuffType: 2

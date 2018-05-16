@@ -17,13 +17,13 @@ MonoBehaviour:
   Photo: {fileID: 21300000, guid: ebf350ea3e92de44da6a41026eb134a5, type: 3}
   Buffs:
   - Name: MaxHealth+5%
-    Target: 0
+    Target: 1
     TargetName: 
     Property: MaxHealth
     BuffType: 2
     Value: 5
-  - Name: MaxEergy+5%
-    Target: 0
+  - Name: MaxEnergy+5%
+    Target: 1
     TargetName: 
     Property: MaxEnergy
     BuffType: 2

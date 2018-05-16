@@ -38,10 +38,11 @@ namespace VoidWars {
     /// <summary>
     /// The things a buff can change.
     /// </summary>
+    [Flags]
     public enum BuffTarget {
-        Ship,
-        Auxiliary,
-        Weapon
+        Ship = 1,
+        Auxiliary = 2,
+        Weapon = 4
     }
 
     /// <summary>
@@ -53,7 +54,7 @@ namespace VoidWars {
         public string Name;
 
         [Tooltip("What type of thing the buff affects")]
-        public BuffTarget Target;
+        [EnumFlag] public BuffTarget Target;
 
         [Tooltip("The specific item to affect, or * to affect all")]
         public string TargetName;

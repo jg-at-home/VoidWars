@@ -17,7 +17,7 @@ MonoBehaviour:
   Photo: {fileID: 21300000, guid: 3c20e8f50c3fcc74ba8e87a84de32ff0, type: 3}
   Buffs:
   - Name: Accuracy+5%
-    Target: 2
+    Target: 4
     TargetName: '*'
     Property: Accuracy
     BuffType: 2

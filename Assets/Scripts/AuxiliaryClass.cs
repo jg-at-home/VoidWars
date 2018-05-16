@@ -18,6 +18,7 @@ namespace VoidWars {
         Shinobi = 64,
         PowerCell = 128,
         CoolingElement = 256,
+        ChaffLauncher = 512,
 
         // New items above here.
         NumTypes

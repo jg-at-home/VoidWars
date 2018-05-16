@@ -23,7 +23,7 @@ MonoBehaviour:
     BuffType: 2
     Value: -5
   - Name: RepairTurns-1
-    Target: 1
+    Target: -1
     TargetName: '*'
     Property: RepairTurns
     BuffType: 1

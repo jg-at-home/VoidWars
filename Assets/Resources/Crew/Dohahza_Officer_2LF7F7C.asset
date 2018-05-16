@@ -17,13 +17,13 @@ MonoBehaviour:
   Photo: {fileID: 21300000, guid: dde263c5eddc94749baa74d5b7935bbc, type: 3}
   Buffs:
   - Name: Accuracy-5%
-    Target: 2
+    Target: 4
     TargetName: '*'
     Property: Accuracy
     BuffType: 2
     Value: -5
   - Name: MaxDamage+10%
-    Target: 2
+    Target: 4
     TargetName: '*'
     Property: MaxDamage
     BuffType: 2

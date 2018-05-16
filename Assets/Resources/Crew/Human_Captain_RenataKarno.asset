@@ -17,7 +17,7 @@ MonoBehaviour:
   Photo: {fileID: 21300000, guid: 3c20e8f50c3fcc74ba8e87a84de32ff0, type: 3}
   Buffs:
   - Name: Shields+10%
-    Target: 0
+    Target: 1
     TargetName: 
     Property: MaxShieldEfficiency
     BuffType: 2

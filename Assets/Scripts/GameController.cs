@@ -357,10 +357,20 @@ namespace VoidWars {
         }
 
         #region Client Code
+        /// <summary>
+        /// Creates a cameo for a ship in the UI.
+        /// </summary>
+        /// <param name="ship">The ship to cameo.</param>
+        /// <returns></returns>
         public ShipCameo CreateShipCameo(ShipController ship) {
+            // Create the UI element.
             var shipCameo = Instantiate(ShipCameoPrefab, CameoPanel);
+
+            // Allocate a render target for the cameo camera to render into.
             var renderTexture = new RenderTexture(256, 256, 16, RenderTextureFormat.ARGB32);
             shipCameo.Initialize(renderTexture, ship.ShipData.Name);
+
+            // Mount the camera above the ship looking down.
             var cameraMount = new GameObject("CameoCam");
             var cameoCam = cameraMount.AddComponent<Camera>();
             cameoCam.fieldOfView = 45.0f;

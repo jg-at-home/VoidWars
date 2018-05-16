@@ -17,7 +17,7 @@ MonoBehaviour:
   Photo: {fileID: 21300000, guid: 1c0c65b83b41e564e9dd3ccee1d42486, type: 3}
   Buffs:
   - Name: Power-5%
-    Target: 1
+    Target: 3
     TargetName: '*'
     Property: PowerUsage
     BuffType: 2

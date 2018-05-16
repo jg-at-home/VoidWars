@@ -17,13 +17,13 @@ MonoBehaviour:
   Photo: {fileID: 21300000, guid: 72775608e6783704a9b9c4d1c4782778, type: 3}
   Buffs:
   - Name: WeaponRange+10%
-    Target: 2
+    Target: 4
     TargetName: '*'
     Property: Range
     BuffType: 2
     Value: 10
   - Name: Duration+1
-    Target: 2
+    Target: 6
     TargetName: '*'
     Property: DurationTurns
     BuffType: 1

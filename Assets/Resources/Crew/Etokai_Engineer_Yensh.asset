@@ -17,7 +17,7 @@ MonoBehaviour:
   Photo: {fileID: 21300000, guid: 5f59db45ea71b7549855a9a1df81ed91, type: 3}
   Buffs:
   - Name: MaxEnergy+10%
-    Target: 0
+    Target: 1
     TargetName: 
     Property: MaxEnergy
     BuffType: 2

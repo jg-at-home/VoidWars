@@ -17,13 +17,13 @@ MonoBehaviour:
   Photo: {fileID: 21300000, guid: ebf350ea3e92de44da6a41026eb134a5, type: 3}
   Buffs:
   - Name: Move+
-    Target: 0
+    Target: 1
     TargetName: 
     Property: MaxMoveSize
     BuffType: 1
     Value: 1
   - Name: Maneuver+
-    Target: 0
+    Target: 1
     TargetName: 
     Property: Maneuverability
     BuffType: 1
