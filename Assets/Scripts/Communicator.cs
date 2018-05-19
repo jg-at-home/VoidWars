@@ -8,13 +8,6 @@ namespace VoidWars {
     /// Basically, the networking side of the game controller. Acts as a bridge between clients and server.
     /// </summary>
     public class Communicator : VoidNetworkBehaviour {
-        /// <summary>
-        /// Gets the unique ID of this instance.
-        /// </summary>
-        public int ID {
-            get { return (int)netId.Value; }
-        }
-
         public override void OnStartLocalPlayer() {
             base.OnStartLocalPlayer();
             controller.SetCommunicator(this);
@@ -84,12 +77,20 @@ namespace VoidWars {
             controller.NextShipServer();
         }
 
+        /// <summary>
+        /// Sets the active ship on the server by index.
+        /// </summary>
+        /// <param name="index">The ship index.</param>
         [Command]
         public void CmdSetActiveShip(int index) {
             Debug.LogFormat("CmdSetActiveShip({0}", index);
             controller.SetActiveShipByIndex(index, false);
         }
 
+        /// <summary>
+        /// Teleports a ship.
+        /// </summary>
+        /// <param name="shipID">The ID of the ship to teleport.</param>
         [Command]
         public void CmdTeleportShip(int shipID) {
             var ship = controller.GetShip(shipID);
@@ -103,6 +104,21 @@ namespace VoidWars {
             var teleporter = (Teleporter)ship.GetAuxiliaryItem(AuxType.ERBInducer);
             teleporter.SetDestination(destination);
             ship.UseOneShotAuxiliary(AuxType.ERBInducer, () => controller.OnActionComplete());
+        }
+
+        /// <summary>
+        /// Requests a ship to launch chaff.
+        /// </summary>
+        /// <param name="shipID">The ship to launch the chaff.</param>
+        [Command]
+        public void CmdLaunchChaff(int shipID) {
+            var ship = controller.GetShip(shipID);
+            ship.UseOneShotAuxiliary(AuxType.ChaffLauncher, () => { RpcActionComplete(); });
+        }
+
+        [ClientRpc]
+        void RpcActionComplete() {
+            controller.OnActionComplete();
         }
 
         /// <summary>
@@ -140,6 +156,9 @@ namespace VoidWars {
             controller.ShowDamage(shipID, damage);
         }
 
+        /// <summary>
+        /// Update all the NPCs on the server.
+        /// </summary>
         [Command]
         public void CmdUpdateNPCs() {
             Debug.Log("CmdUpdateNPCs()");

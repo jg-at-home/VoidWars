@@ -7,6 +7,11 @@ namespace VoidWars {
     /// </summary>
     public class VoidNetworkBehaviour : NetworkBehaviour {
         /// <summary>
+        /// Gets the unique ID of this instance.
+        /// </summary>
+        public int ID {  get { return (int)netId.Value; } }
+
+        /// <summary>
         /// Gets the game controller.
         /// </summary>
         protected GameController controller {
@@ -19,6 +24,7 @@ namespace VoidWars {
                 return _controller;
             }
         }
+
         private GameController _controller;
     }
 }

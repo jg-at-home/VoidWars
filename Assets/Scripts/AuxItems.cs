@@ -11,6 +11,9 @@
                 case AuxType.ERBInducer:
                     return new Teleporter(auxClass);
 
+                case AuxType.ChaffLauncher:
+                    return new ChaffLauncher(auxClass);
+
                 default:
                     return new AuxItem(auxClass);
             }

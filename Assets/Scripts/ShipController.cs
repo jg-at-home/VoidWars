@@ -22,15 +22,6 @@ namespace VoidWars {
         public const int AI_OWNER = -1;
 
         /// <summary>
-        /// Gets the unique ID of the ship.
-        /// </summary>
-        public int ID {
-            get {
-                return (int)netId.Value;
-            }
-        }
-
-        /// <summary>
         /// Get / set the type of control on this ship (human or AI).
         /// </summary>
         [SyncVar]
@@ -967,6 +958,12 @@ namespace VoidWars {
             _audioSource = GetComponent<AudioSource>();
         }
 
+        private void OnDestroy() {
+            if (_cameo) {
+                Destroy(_cameo.gameObject);
+            }
+        }
+
         public override void OnStartServer() {
             base.OnStartServer();
 
@@ -1048,32 +1045,20 @@ namespace VoidWars {
                     foreach(var buffInfo in memberInfo.Buffs) {
                         Debug.LogFormat("Applying buff '{0}'", buffInfo.Name);
                         var buff = new Buff(buffInfo.Property, buffInfo.BuffType, buffInfo.Value, memberInfo);
-                        switch(buffInfo.Target) {
-                            case BuffTarget.Ship:
-                                _data.AddBuff(buff);
-                                break;
-
-                            case BuffTarget.Weapon: {
-                                    var weapons = GetWeaponsByName(buffInfo.TargetName);
-                                    foreach (var weapon in weapons) {
-                                        weapon.AddBuff(buff);
-                                    }
-                                }
-                                break;
-
-
-                            case BuffTarget.Auxiliary: {
-                                    var items = GetAuxiliaryItemsByName(buffInfo.TargetName);
-                                    foreach (var aux in items) {
-                                        aux.AddBuff(buff);
-                                    }
-                                }
-                                break;
-
-                            default:
-                                Debug.Assert(false);
-                                break;
-
+                        if ((buffInfo.Target & BuffTarget.Ship) != 0) {
+                            _data.AddBuff(buff);
+                        }
+                        if ((buffInfo.Target & BuffTarget.Weapon) != 0) {
+                            var weapons = GetWeaponsByName(buffInfo.TargetName);
+                            foreach (var weapon in weapons) {
+                                weapon.AddBuff(buff);
+                            }
+                        }
+                        if ((buffInfo.Target & BuffTarget.Auxiliary) != 0) {
+                            var items = GetAuxiliaryItemsByName(buffInfo.TargetName);
+                            foreach (var aux in items) {
+                                aux.AddBuff(buff);
+                            }
                         }
                     }
 
@@ -1148,6 +1133,11 @@ namespace VoidWars {
             }
         }
 
+        /// <summary>
+        /// Uses a one-shot auxiliary.
+        /// </summary>
+        /// <param name="type">The type to use.</param>
+        /// <param name="onCompletion">Callback for when the use completes.</param>
         public void UseOneShotAuxiliary(AuxType type, Action onCompletion) {
             Debug.LogFormat("ShipController: use {0}", type);
 

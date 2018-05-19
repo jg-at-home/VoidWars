@@ -67,9 +67,7 @@ namespace VoidWars {
             _turnCounter = launcher.DurationTurns;
             _distancePerTurn = launcher.GetFloat("DistancePerTurn");
             _state = State.Idle;
-
-            // Add to game controller so we can be serviced.
-            controller.AddNPC(this);
+            _targetInstanceId = NetworkInstanceId.Invalid;
         }
 
         public override void OnStartClient() {
@@ -83,7 +81,8 @@ namespace VoidWars {
             _targetIndicator = Instantiate(_targetIndicatorPrefab);
             var source = gameObject;
             var target = controller.GetShip(_targetID);
-            _targetIndicator.Initialize(source.gameObject, target.gameObject, markerColor);
+            _targetPosition = target.transform.position;
+            _targetIndicator.Initialize(source.transform.position, _targetPosition, markerColor);
         }
 
         [Server]
@@ -129,6 +128,9 @@ namespace VoidWars {
                     toDamage.Add(ship);
                 }
                 else if (collider.gameObject.CompareTag("Sun")) {
+                    collided = true;
+                }
+                else if (collider.gameObject.CompareTag("Chaff")) {
                     collided = true;
                 }
             }
@@ -193,16 +195,21 @@ namespace VoidWars {
                     yield break;
                 }
 
-                // Does my target still exist?
-                var target = controller.GetShip(_targetID);
-                if (target != null && !target.IsCloaked) {
+                var myPosition = _rb.position;
+                var target = computeTarget(myPosition);
+                if (target != null) {
                     // Compute the next move segment and smooth direction changes so we don't veer too sharply.
-                    var myPosition = _rb.position;
-                    var targetDir = (target.transform.position - myPosition).normalized;
                     var myDir = _velocity.normalized;
+                    var targetDir = (target.transform.position - myPosition).normalized;
                     var newDir = Vector3.Lerp(myDir, targetDir, DirectionSmoothing);
                     _velocity = newDir.normalized * Speed;
+                    _targetInstanceId = target.GetComponent<NetworkIdentity>().netId;
+                    _targetPosition = target.transform.position;
                 }
+                else {
+                    _targetInstanceId = NetworkInstanceId.Invalid;
+                }
+
 
                 _rb.velocity = _velocity;
 
@@ -222,12 +229,45 @@ namespace VoidWars {
             syncToken.Sync();
         }
 
+        private GameObject computeTarget(Vector3 myPos) {
+            // Check for chaff.
+            var myPosition = _rb.position;
+            var objectsInRange = Physics.OverlapSphere(myPosition, _launcher.Range, CollisionLayers);
+            foreach (var obj in objectsInRange) {
+                if (obj.gameObject.CompareTag("Chaff")) {
+                    // TODO: check that chaff is in the view cone.
+                    return obj.gameObject;
+                }
+            }
+
+            var target = controller.GetShip(_targetID);
+            if (target != null && !target.IsCloaked) {
+                return target.gameObject;
+            }
+
+            return null;
+        }
+
+        private void onTargetChanged(NetworkInstanceId targetId) {
+            if (targetId != _targetInstanceId) {
+                _targetInstanceId = targetId;
+                if (targetId != NetworkInstanceId.Invalid) {
+                    _target = ClientScene.FindLocalObject(targetId);
+                }
+                else {
+                    _target = null;
+                }
+            }
+        }
+
         private void LateUpdate() {
             if (_state == State.Launch || _state == State.Flight) {
-                var target = controller.GetShip(_targetID);
-                if (target != null) {
-                    _targetIndicator.Rebuild(_rb.position, target.transform.position);
+                var targetPos = _targetPosition;
+                if (_target != null) {
+                    targetPos = _target.transform.position;
                 }
+
+                _targetIndicator.Rebuild(_rb.position, targetPos);
             }
         }
 
@@ -256,5 +296,8 @@ namespace VoidWars {
         private HomingMissileLauncher _launcher;
         private Rigidbody _rb;
         private TargetIndicator _targetIndicator;
+        private GameObject _target;
+        [SyncVar(hook ="onTargetChanged")] private NetworkInstanceId _targetInstanceId;
+        [SyncVar] private Vector3 _targetPosition;
     }
 }

@@ -11,7 +11,7 @@ namespace VoidWars {
         /// </summary>
         /// <param name="command">The command to execute.</param>
         public void ExecuteCommand(string command) {
-            Debug.LogFormat("GameController.ExecuteCommand{0})", command);
+            Debug.LogFormat("GameController.ExecuteCommand({0})", command);
 
             var parts = command.ToLower().Split(' ');
             switch (parts[0]) {
@@ -63,6 +63,13 @@ namespace VoidWars {
                         complete = false;
                     }
                     break;
+
+                case "chafflauncher": {
+                        _communicator.CmdLaunchChaff(_activeShipID);
+                        complete = false;
+                    }
+                    break;
+
                 // TODO: everything else
             }
 

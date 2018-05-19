@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Name: ChaffLauncher
   m_EditorClassIdentifier: 
   Name: Chaff Launcher
-  Icon: {fileID: 21300000, guid: 7506364e125f91649bb0a200184bc6f6, type: 3}
+  Icon: {fileID: 21300000, guid: 9eef66cdb4e4d204390ef68055d585b5, type: 3}
   Description: chaff launcher
   Detail: Counter-measure against homing missiles
   Cost: 6
@@ -27,7 +27,7 @@ MonoBehaviour:
     Value: 2
   ItemType: 512
   Mode: 2
-  StartSoundClip: {fileID: 0}
+  StartSoundClip: {fileID: 8300000, guid: a254bf7cc6716ba45a7d7f16f8c8345a, type: 3}
   StopSoundClip: {fileID: 0}
-  EffectPrefab: {fileID: 1032472786116864, guid: 3cf0ce0f9c525c44195c642369d916f8,
+  EffectPrefab: {fileID: 1978462221216074, guid: b126016e3d22b46488485faa541d1d48,
     type: 2}

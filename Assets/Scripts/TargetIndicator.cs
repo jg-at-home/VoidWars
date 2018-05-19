@@ -11,37 +11,33 @@ namespace VoidWars {
         [SerializeField] private LineRenderer _circleRenderer;
 
         /// <summary>
-        /// Gets the target object.
-        /// </summary>
-        public GameObject Target {
-            get { return _target; }
-        }
-
-        /// <summary>
         /// Initializes the indicator.
         /// </summary>
         /// <param name="source">Source object.</param>
         /// <param name="target">Target object.</param>
-        public void Initialize(GameObject source, GameObject target, Color color) {
+        public void Initialize(Vector3 source, Vector3 target, Color color) {
+            _startPosition = source;
+            _targetPosition = target;
+
             _matProps = new MaterialPropertyBlock();
             setShared(_lineRenderer);
             setShared(_circleRenderer);
 
-            var delta = target.transform.position - source.transform.position;
+            var delta = target - source;
             var direction = delta.normalized;
 
             // Create the line.
             _lineRenderer.positionCount = 2;
-            Vector3 lineStart = source.transform.position + Radius * direction;
+            Vector3 lineStart = source + Radius * direction;
             _lineRenderer.SetPosition(0, lineStart);
-            Vector3 lineEnd = target.transform.position - Radius * direction;
+            Vector3 lineEnd = target - Radius * direction;
             _lineRenderer.SetPosition(1, lineEnd);
 
             // Now the circle.
             _circleRenderer.positionCount = NumCirclePoints;
             _circleRenderer.loop = true;
             Vector3 point;
-            point.y = target.transform.position.y;
+            point.y = target.y;
             float angleStep = Mathf.PI * 2f / NumCirclePoints;
             float angle = 0f;
             _circlePoints = new Vector3[NumCirclePoints];
@@ -49,13 +45,12 @@ namespace VoidWars {
                 var rcos = Radius*Mathf.Cos(angle);
                 var rsin = Radius*Mathf.Sin(angle);
                 _circlePoints[i] = new Vector3(rcos, 0f, rsin);
-                point.x = target.transform.position.x + rcos;
-                point.z = target.transform.position.z + rsin;
+                point.x = target.x + rcos;
+                point.z = target.z + rsin;
                 _circleRenderer.SetPosition(i, point);
                 angle += angleStep;
             }
 
-            _target = target;
             _color = color;
             checkLineValid();
         }
@@ -66,6 +61,8 @@ namespace VoidWars {
         /// <param name="start">Start position (world)</param>
         /// <param name="target">Target position (world)</param>
         public void Rebuild(Vector3 start, Vector3 target) {
+            _startPosition = start;
+            _targetPosition = target;
             _lineRenderer.SetPosition(0, start);
             var direction = (target - start).normalized;
             Vector3 lineEnd = target - Radius * direction;
@@ -91,7 +88,7 @@ namespace VoidWars {
 
         private void checkLineValid() {
             var start = _lineRenderer.GetPosition(0);
-            if (Vector3.Distance(start, _target.transform.position) <= Radius) {
+            if (Vector3.Distance(start, _targetPosition) <= Radius) {
                 _lineRenderer.enabled = false;
             }
             else {
@@ -129,7 +126,8 @@ namespace VoidWars {
         }
 
         private Vector2 _offset = new Vector2(0f, 0f);
-        private GameObject _target;
+        private Vector3 _startPosition;
+        private Vector3 _targetPosition;
         private Color _color;
         private Vector3[] _circlePoints;
         private MaterialPropertyBlock _matProps;

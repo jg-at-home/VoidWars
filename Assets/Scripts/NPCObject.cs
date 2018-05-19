@@ -35,5 +35,9 @@ namespace VoidWars {
         /// Has the NPC expired?
         /// </summary>
         public bool HasExpired { get; protected set; }
+
+        public override void OnStartServer() {
+            controller.AddNPC(this);
+        }
     }
 }

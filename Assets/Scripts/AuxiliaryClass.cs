@@ -91,6 +91,7 @@ namespace VoidWars {
             State = AuxState.Idle;
         }
 
+        public AuxiliaryClass Class {  get { return _class; } }
         public AuxMode Mode {  get { return _class.Mode; } }
         public AuxType ItemType {  get { return _class.ItemType; } }
         public AudioClip StartAudio { get { return _class.StartSoundClip; } }

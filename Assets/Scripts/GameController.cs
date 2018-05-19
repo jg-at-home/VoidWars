@@ -541,7 +541,7 @@ namespace VoidWars {
                             if (checkTargetGeometry(shipController, target.gameObject, weapon)) {
                                 var indicatorGO = Instantiate(TargetIndicatorPrefab);
                                 var indicator = indicatorGO.GetComponent<TargetIndicator>();
-                                indicator.Initialize(shipController.gameObject, target.gameObject, Color.red);
+                                indicator.Initialize(shipController.transform.position, target.transform.position, Color.red);
                                 _attackTargets.Add(indicator);
                             }
                         }
