@@ -36,6 +36,40 @@ namespace VoidWars {
             return sb.ToString();
         }
 
+        /// <summary>
+        /// Compute a weighted random selection from an array of items.
+        /// </summary>
+        /// <param name="weights">Item weights.</param>
+        /// <returns>Random weighted selection.</returns>
+        public static int RandomWeightedSelection(float[] weights) {
+            if (weights.Length == 1) {
+                return 0;
+            }
+
+            // Normalize the weights to add to 1.
+            var total = 0f;
+            foreach(var weight in weights) {
+                total += weight;
+            }
+
+            // Build accumulator table.
+            var cumulative = new float[weights.Length];
+            var accum = 0f;
+            for(int i = 0; i < weights.Length; ++i) {
+                accum += (weights[i] / total);
+                cumulative[i] = accum;
+            }
+
+            var r01 = Random.Range(0f, 1f);
+            for(int i = 0; i < cumulative.Length; ++i) {
+                if (r01 < cumulative[i]) {
+                    return i;
+                }
+            }
+
+            return weights.Length-1;
+        }
+
         private static GameController s_controller;
     }
 }

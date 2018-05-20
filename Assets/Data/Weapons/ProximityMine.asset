@@ -21,6 +21,7 @@ MonoBehaviour:
   MaxTemperature: 95
   RepairCost: 1
   RepairTurns: 1
+  BreakProbability: 0.15
   MetaItems:
   - Name: DurationTurns
     Type: 1

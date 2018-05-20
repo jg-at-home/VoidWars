@@ -21,6 +21,7 @@ MonoBehaviour:
   MaxTemperature: 101
   RepairCost: 3
   RepairTurns: 2
+  BreakProbability: 0.25
   MetaItems:
   - Name: FlashTime
     Type: 2

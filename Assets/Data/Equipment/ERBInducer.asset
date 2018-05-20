@@ -21,6 +21,7 @@ MonoBehaviour:
   MaxTemperature: 95
   RepairCost: 10
   RepairTurns: 5
+  BreakProbability: 0.2
   MetaItems: []
   ItemType: 2
   Mode: 2

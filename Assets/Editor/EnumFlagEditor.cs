@@ -9,6 +9,11 @@ namespace VoidWars {
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label) {
             EnumFlagAttribute flagSettings = (EnumFlagAttribute)attribute;
             Enum targetEnum = GetBaseProperty<Enum>(property);
+            // Yuk. As if this code wasn't broken enough, when you increase the size of an editor array, and it hits
+            // an item with an enum array in it, on the first draw it hasn't created the new item so this code throws
+            // an exception. Next time through seems fine.
+            if (targetEnum == null)
+                return;
 
             string propName = flagSettings.enumName;
             if (string.IsNullOrEmpty(propName))
@@ -21,6 +26,15 @@ namespace VoidWars {
         }
 
         static T GetBaseProperty<T>(SerializedProperty prop) {
+            try {
+                return GetBasePropertyInner<T>(prop);
+            }
+            catch {
+                return default(T);
+            }
+        }
+
+        static T GetBasePropertyInner<T>(SerializedProperty prop) {
             // Separate the steps it takes to get to this property
             string[] separatedPaths = prop.propertyPath.Split('.');
 

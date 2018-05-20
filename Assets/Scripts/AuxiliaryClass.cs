@@ -98,6 +98,7 @@ namespace VoidWars {
         public AudioClip StartAudio { get { return _class.StartSoundClip; } }
         public AudioClip StopAudio { get { return _class.StopSoundClip; } }
         public GameObject EffectPrefab { get { return _class.EffectPrefab; } }
+        public float BreakProbability {  get { return _class.BreakProbability; } }
 
         public virtual IEnumerator Use(ShipController ship, Action onCompletion) { yield break; }
 

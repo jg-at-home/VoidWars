@@ -5,7 +5,9 @@ public class csDemoScenceControl : MonoBehaviour {
 
     public GameObject[] AllEffect;
     int i;
+#pragma warning disable CS0618 // Type or member is obsolete
     public GUIText Text;
+#pragma warning restore CS0618 // Type or member is obsolete
     public Transform mg;
     GameObject MakedObject;
     public bool isIngredientScene;

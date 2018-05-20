@@ -658,13 +658,65 @@ namespace VoidWars {
             _hullTemperature = Mathf.Clamp(_hullTemperature + dT, 0f, 100f);
 
             // Whatever damage is left after the shields goes into the hull.
-            _health -= damage;
-            if (_health <= 0) {
+            var newHealth = _health - damage;
+            if (newHealth <= 0f) {
                 Debug.LogFormat("Ship {0} is DEAD!!!!", ID);
                 // TODO: explodify ship, remove from game, etc.
             }
+            else {
+                var oldHealthPercent = (int)(100f * _health / MaxHealth);
+                var newHealthPercent = (int)(100f * newHealth / MaxHealth);
+                if (newHealthPercent < 25 && oldHealthPercent >= 25) {
+                    RpcShowMessage("Hull integrity has dropped below 25%", Role.Engineer);
+                }
+                else if (newHealthPercent < 50 && oldHealthPercent > 50) {
+                    RpcShowMessage("Hull integrity has dropped below 50%", Role.Engineer);
+                }
+            }
+
+            // If there's a significant amount of damage, start breaking things.
+            var relativeChange = Mathf.Clamp01(damage / MaxHealth);
+            while(relativeChange > _data.DamageThreshold) {
+                // TOOD: include weapons in this (weapon breakabiity future task).
+                var operatingEquipment = _equipment.FindAll(e => e.State != AuxState.Broken);
+                var breakChance = UnityEngine.Random.Range(0f, 1f);
+                if (breakChance < relativeChange) {
+                    var weights = new float[operatingEquipment.Count];
+                    for(var i = 0; i < operatingEquipment.Count; ++i) {
+                        weights[i] = operatingEquipment[i].BreakProbability;
+                    }
+                    var breakIndex = Util.RandomWeightedSelection(weights);
+                    var itemToBreak = operatingEquipment[breakIndex].ItemType;
+                    RpcBreakItem(itemToBreak);
+                }
+                relativeChange -= breakChance;
+            }
+
+            _health = Mathf.Max(newHealth, 0f);
 
             return damage;
+        }
+
+        [ClientRpc]
+        void RpcBreakItem(AuxType itemType) {
+            var item = _equipment.Find(e => e.ItemType == itemType);
+            item.State = AuxState.Broken;
+            unapplyAuxiliary(item);
+            var msg = string.Format("{0} has broken!", item.Name);
+            showMessageIfOwner(msg, Role.Engineer);
+        }
+
+        [ClientRpc]
+        void RpcShowMessage(string msg, Role role) {
+            showMessageIfOwner(msg, role);
+        }
+
+        [Client]
+        private void showMessageIfOwner(string msg, Role role) {
+            if (controller.IsOwner(OwnerID)) {
+                var crewMember = GetCrewMember(role);
+                controller.ShowMsg(msg, crewMember.Photo);
+            }
         }
 
         /// <summary>

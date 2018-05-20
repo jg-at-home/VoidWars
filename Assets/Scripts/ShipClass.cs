@@ -73,6 +73,10 @@ namespace VoidWars {
         [Tooltip("Luck factor")]
         public float Luckiness;
 
+        [Tooltip("Damage fraction above which items will start breaking")]
+        [Range(0f, 1f)]
+        public float DamageThreshold;
+
         [Header("Sound effects")]
         public AudioClip EnginesClip;
         public AudioClip ShieldsClip;
@@ -100,6 +104,7 @@ namespace VoidWars {
             MaxMoveSize = _class.MaxMoveSize;
             Luckiness = _class.Luckiness;
             Maneuverability = _class.Maneuverability;
+            DamageThreshold = _class.DamageThreshold;
         }
 
         public Species Species {  get { return _class.Species; } }
@@ -159,6 +164,12 @@ namespace VoidWars {
         public int Maneuverability {
             get { return (int)getValue("Maneuverability"); }
             set { setValue("Maneuverability", value); }
+        }
+
+        [Stat(0f, 1f)]
+        public float DamageThreshold {
+            get { return getValue("DamageThreshold"); }
+            set { setValue("DamageThreshold", value); }
         }
 
         public float MaxFuelLevel {  get { return _class.MaxFuelLevel; } }

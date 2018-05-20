@@ -19,7 +19,12 @@ MonoBehaviour:
   Mass: 8
   PowerUsage: 0
   MaxTemperature: 95
-  Metadata: 
   RepairCost: 3
+  RepairTurns: 0
+  BreakProbability: 0.3
+  MetaItems: []
   ItemType: 1
   Mode: 0
+  StartSoundClip: {fileID: 0}
+  StopSoundClip: {fileID: 0}
+  EffectPrefab: {fileID: 0}

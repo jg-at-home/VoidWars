@@ -50,6 +50,10 @@ namespace VoidWars {
         [Tooltip("How many turns it takes to repair an item")]
         public int RepairTurns;
 
+        [Tooltip("Probability the item will break under significant stress")]
+        [Range(0f, 1f)]
+        public float BreakProbability;
+
         [Tooltip("Leaf data")]
         public MetaItem[] MetaItems;
     }

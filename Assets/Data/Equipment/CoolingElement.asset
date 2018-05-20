@@ -21,9 +21,13 @@ MonoBehaviour:
   MaxTemperature: 101
   RepairCost: 2
   RepairTurns: 0
+  BreakProbability: 0.2
   MetaItems:
   - Name: DeltaT
     Type: 2
     Value: 3
   ItemType: 256
   Mode: 0
+  StartSoundClip: {fileID: 0}
+  StopSoundClip: {fileID: 0}
+  EffectPrefab: {fileID: 0}

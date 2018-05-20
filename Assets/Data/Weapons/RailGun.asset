@@ -21,6 +21,7 @@ MonoBehaviour:
   MaxTemperature: 90
   RepairCost: 4
   RepairTurns: 3
+  BreakProbability: 0.33
   MetaItems:
   - Name: Speed
     Type: 2

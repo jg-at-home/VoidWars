@@ -21,6 +21,7 @@ MonoBehaviour:
   MaxTemperature: 70
   RepairCost: 4
   RepairTurns: 0
+  BreakProbability: 0.33
   MetaItems: []
   WeaponType: 16
   Cardinality: 0

@@ -22,4 +22,10 @@ MonoBehaviour:
     Property: MaxMoveSize
     BuffType: 1
     Value: 1
+  - Name: Resilience+
+    Target: 1
+    TargetName: 
+    Property: DamageThreshold
+    BuffType: 1
+    Value: 0.15
   Abilities: []

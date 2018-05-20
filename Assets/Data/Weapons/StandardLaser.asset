@@ -21,6 +21,7 @@ MonoBehaviour:
   MaxTemperature: 80
   RepairCost: 2
   RepairTurns: 0
+  BreakProbability: 0.05
   MetaItems:
   - Name: ThermalDamage
     Type: 2

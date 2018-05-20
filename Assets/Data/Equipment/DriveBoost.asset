@@ -21,9 +21,13 @@ MonoBehaviour:
   MaxTemperature: 101
   RepairCost: 5
   RepairTurns: 0
+  BreakProbability: 0.1
   MetaItems:
   - Name: Range
     Type: 1
     Value: 4
   ItemType: 8
   Mode: 0
+  StartSoundClip: {fileID: 0}
+  StopSoundClip: {fileID: 0}
+  EffectPrefab: {fileID: 0}

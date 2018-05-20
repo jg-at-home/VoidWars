@@ -167,7 +167,6 @@ namespace VoidWars {
         /// </summary>
         [Command]
         public void CmdUpdateNPCs() {
-            Debug.Log("CmdUpdateNPCs()");
             controller.UpdateNPCs();
         }
 
