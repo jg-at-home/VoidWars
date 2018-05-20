@@ -304,6 +304,16 @@ namespace VoidWars {
         public WeaponClass GetWeaponClass(WeaponType type) {
             return WeaponClasses[(int)type-1];
         }
+
+        /// <summary>
+        /// Gets the item class of the given type.
+        /// </summary>
+        /// <param name="type">The type.</param>
+        /// <returns>The assoicated item class.</returns>
+        public ItemClass GetItemClass(AuxType type) {
+            return ItemClasses.FirstOrDefault(c => c.ItemType == type);
+        }
+
         #endregion Database
 
         /// <summary>

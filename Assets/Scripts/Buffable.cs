@@ -224,6 +224,7 @@ namespace VoidWars {
     /// <summary>
     /// Attribute to apply to a buffable property.
     /// </summary>
+    [AttributeUsage(AttributeTargets.Property)]
     public class StatAttribute : Attribute {
         /// <summary>
         /// Construct a stat attribute.

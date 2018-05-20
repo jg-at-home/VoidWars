@@ -14,6 +14,9 @@
                 case AuxType.ChaffLauncher:
                     return new ChaffLauncher(auxClass);
 
+                case AuxType.MineLauncher:
+                    return new MineLauncher(auxClass);
+
                 default:
                     return new AuxItem(auxClass);
             }

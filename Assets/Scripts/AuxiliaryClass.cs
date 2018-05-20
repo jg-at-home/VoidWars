@@ -19,6 +19,7 @@ namespace VoidWars {
         PowerCell = 128,
         CoolingElement = 256,
         ChaffLauncher = 512,
+        MineLauncher = 1024,
 
         // New items above here.
         NumTypes

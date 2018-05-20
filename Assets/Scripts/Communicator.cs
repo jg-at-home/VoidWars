@@ -121,6 +121,12 @@ namespace VoidWars {
             controller.OnActionComplete();
         }
 
+        [Command]
+        public void CmdDeployMine(int shipID) {
+            var ship = controller.GetShip(shipID);
+            ship.UseOneShotAuxiliary(AuxType.MineLauncher, () => { RpcActionComplete(); });
+        }
+
         /// <summary>
         /// Called server-side to set the active ship.
         /// </summary>

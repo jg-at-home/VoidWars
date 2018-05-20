@@ -16,7 +16,6 @@ namespace VoidWars {
         /// <param name="source">Source object.</param>
         /// <param name="target">Target object.</param>
         public void Initialize(Vector3 source, Vector3 target, Color color) {
-            _startPosition = source;
             _targetPosition = target;
 
             _matProps = new MaterialPropertyBlock();
@@ -61,7 +60,6 @@ namespace VoidWars {
         /// <param name="start">Start position (world)</param>
         /// <param name="target">Target position (world)</param>
         public void Rebuild(Vector3 start, Vector3 target) {
-            _startPosition = start;
             _targetPosition = target;
             _lineRenderer.SetPosition(0, start);
             var direction = (target - start).normalized;
@@ -126,7 +124,6 @@ namespace VoidWars {
         }
 
         private Vector2 _offset = new Vector2(0f, 0f);
-        private Vector3 _startPosition;
         private Vector3 _targetPosition;
         private Color _color;
         private Vector3[] _circlePoints;

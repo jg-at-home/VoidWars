@@ -1,0 +1,134 @@
+fileFormatVersion: 2
+guid: 184eeebed934c184384b043c8ea7f933
+timeCreated: 1523436214
+licenseType: Store
+ModelImporter:
+  serializedVersion: 19
+  fileIDToRecycleName:
+    100000: SpaceMine1
+    100002: SpaceMine10
+    100004: SpaceMine11
+    100006: SpaceMine2
+    100008: SpaceMine3
+    100010: SpaceMine4
+    100012: SpaceMine5
+    100014: SpaceMine6
+    100016: SpaceMine7
+    100018: SpaceMine8
+    100020: SpaceMine9
+    100022: //RootNode
+    400000: SpaceMine1
+    400002: SpaceMine10
+    400004: SpaceMine11
+    400006: SpaceMine2
+    400008: SpaceMine3
+    400010: SpaceMine4
+    400012: SpaceMine5
+    400014: SpaceMine6
+    400016: SpaceMine7
+    400018: SpaceMine8
+    400020: SpaceMine9
+    400022: //RootNode
+    2300000: SpaceMine1
+    2300002: SpaceMine10
+    2300004: SpaceMine11
+    2300006: SpaceMine2
+    2300008: SpaceMine3
+    2300010: SpaceMine4
+    2300012: SpaceMine5
+    2300014: SpaceMine6
+    2300016: SpaceMine7
+    2300018: SpaceMine8
+    2300020: SpaceMine9
+    3300000: SpaceMine1
+    3300002: SpaceMine10
+    3300004: SpaceMine11
+    3300006: SpaceMine2
+    3300008: SpaceMine3
+    3300010: SpaceMine4
+    3300012: SpaceMine5
+    3300014: SpaceMine6
+    3300016: SpaceMine7
+    3300018: SpaceMine8
+    3300020: SpaceMine9
+    4300000: SpaceMine1
+    4300002: SpaceMine2
+    4300004: SpaceMine3
+    4300006: SpaceMine4
+    4300008: SpaceMine5
+    4300010: SpaceMine6
+    4300012: SpaceMine7
+    4300014: SpaceMine8
+    4300016: SpaceMine9
+    4300018: SpaceMine10
+    4300020: SpaceMine11
+    7400000: Take 001
+    9500000: //RootNode
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    importBlendShapes: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    serializedVersion: 2
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    rootMotionBoneName: 
+    rootMotionBoneRotation: {x: 0, y: 0, z: 0, w: 1}
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 2
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

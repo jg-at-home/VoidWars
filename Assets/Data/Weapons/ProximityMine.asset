@@ -12,17 +12,20 @@ MonoBehaviour:
   m_Name: ProximityMine
   m_EditorClassIdentifier: 
   Name: Proximity Mine
-  Icon: {fileID: 0}
-  Description: Drop a little present for enemy ships to run into
-  Detail: 
+  Icon: {fileID: 21300000, guid: 4becb73ef2d614045a18398a916b899f, type: 3}
+  Description: proximity mine
+  Detail: Drop a little present for enemy ships to run into
   Cost: 5
   Mass: 5
   PowerUsage: 5
   MaxTemperature: 95
   RepairCost: 1
-  RepairTurns: 0
-  MetaItems: []
-  WeaponType: 32
+  RepairTurns: 1
+  MetaItems:
+  - Name: DurationTurns
+    Type: 1
+    Value: 3
+  WeaponType: 6
   Cardinality: 1
   MaxDamage: 60
   Range: 0
@@ -30,6 +33,6 @@ MonoBehaviour:
   SecondaryAngle: 0
   RequiresLineOfSight: 0
   Accuracy: 0
-  TurnsBetweenUses: 1
-  SoundEffect: {fileID: 0}
-  Prefab: {fileID: 0}
+  TurnsBetweenUses: 3
+  SoundEffect: {fileID: 8300000, guid: fbcdb441f2f201e4c92c25f2e32c2a56, type: 3}
+  Prefab: {fileID: 1191518921394808, guid: bd7b56644d5de7f4ebd647973e28b217, type: 2}

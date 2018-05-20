@@ -70,6 +70,10 @@ namespace VoidWars {
                     }
                     break;
 
+                case "minelauncher": {
+                        _communicator.CmdDeployMine(_activeShipID);
+                    }
+                    break;
                 // TODO: everything else
             }
 
