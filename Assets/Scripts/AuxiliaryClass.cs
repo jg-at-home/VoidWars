@@ -92,15 +92,16 @@ namespace VoidWars {
             State = AuxState.Idle;
         }
 
-        public AuxiliaryClass Class {  get { return _class; } }
-        public AuxMode Mode {  get { return _class.Mode; } }
-        public AuxType ItemType {  get { return _class.ItemType; } }
+        public AuxiliaryClass Class { get { return _class; } }
+        public AuxMode Mode { get { return _class.Mode; } }
+        public AuxType ItemType { get { return _class.ItemType; } }
         public AudioClip StartAudio { get { return _class.StartSoundClip; } }
         public AudioClip StopAudio { get { return _class.StopSoundClip; } }
-        public GameObject EffectPrefab {  get { return _class.EffectPrefab; } }
+        public GameObject EffectPrefab { get { return _class.EffectPrefab; } }
 
         public virtual IEnumerator Use(ShipController ship, Action onCompletion) { yield break; }
 
         private readonly AuxiliaryClass _class;
     }
 }
+ 

@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using UnityEngine;
 
 namespace VoidWars {
     /// <summary>
@@ -11,6 +12,7 @@ namespace VoidWars {
 
         public void Sync() {
             --_count;
+            Debug.Assert(_count >= 0);
         }
 
         public bool IsSynced {

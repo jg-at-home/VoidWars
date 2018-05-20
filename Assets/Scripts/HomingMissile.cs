@@ -34,7 +34,7 @@ namespace VoidWars {
     /// <summary>
     /// NPC homing missile.
     /// </summary>
-    public class HomingMissile : NPCObject {
+    public class HomingMissile : TransientNPC {
         [Tooltip("How sharp turns are")]
         public float DirectionSmoothing;
 
@@ -58,13 +58,12 @@ namespace VoidWars {
 
         [Server]
         public void Initialize(HomingMissileLauncher launcher, Transform node, int ownerID, int targetID) {
-            // Set up other parameters.
+            setLifetime(launcher.DurationTurns);
             _launcher = launcher;
             _ownerID = ownerID;
             _targetID = targetID;
             HasExpired = false;
             _velocity = node.forward * Speed; ;
-            _turnCounter = launcher.DurationTurns;
             _distancePerTurn = launcher.GetFloat("DistancePerTurn");
             _state = State.Idle;
             _targetInstanceId = NetworkInstanceId.Invalid;
@@ -174,12 +173,11 @@ namespace VoidWars {
         [Server]
         public override IEnumerator PerTurnUpdate(NPCSyncToken syncToken) {
             // Have I expired? If so, fizzle out.
-            if (_turnCounter == 0) {
+            if (updateTurnCount()) { 
                 syncToken.Sync();
                 expire(true);
                 yield break;
             }
-            --_turnCounter;
 
             RpcSetLineBrightness(1f);
             var bounds = controller.GetBoardBounds();
@@ -288,7 +286,7 @@ namespace VoidWars {
         }
 
         [SyncVar] private State _state;
-        private int _turnCounter;
+ //       private int _turnCounter;
         private Vector3 _velocity;
         [SyncVar] private int _ownerID;
         [SyncVar] private int _targetID;

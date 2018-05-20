@@ -69,6 +69,9 @@ namespace VoidWars {
         public GameObject ScannerInfoPrefab;
         public ShipCameo ShipCameoPrefab;
 
+        [Header("Parameters")]
+        public float NPCUpdateTimeout = 10f;
+
         public void OnShieldsFailed(ShipController ship) {
             Debug.Log("Shields failed");
             _communicator.CmdSetShieldStatus(ship.ID, false);
@@ -931,12 +934,18 @@ namespace VoidWars {
             }
 
             // Wait for them all to complete.
+            var startTime = Time.time;
             while(!syncToken.IsSynced) {
                 yield return null;
+                var elapsed = Time.time - startTime;
+                if (elapsed > NPCUpdateTimeout) {
+                    Debug.LogError("Timeout waiting for NPC update sync");
+                    break;
+                }
             }
 
             // Clean up any expired ones.
-            for(int i = _npcs.Count-1; i >= 0; --i) {
+            for (int i = _npcs.Count-1; i >= 0; --i) {
                 if (_npcs[i].HasExpired) {
                     Destroy(_npcs[i].gameObject);
                     _npcs.RemoveAt(i);

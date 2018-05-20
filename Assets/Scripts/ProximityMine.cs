@@ -4,9 +4,8 @@ using UnityEngine.Networking;
 using System;
 
 namespace VoidWars {
-    public class MineLauncher : AuxItem {
+    public class MineLauncher : TransientItem {
         public MineLauncher(AuxiliaryClass auxClass) : base(auxClass) {
-            DurationTurns = GetInt("DurationTurns");
             MaxDamage = GetFloat("MaxDamage");
         }
 
@@ -21,19 +20,13 @@ namespace VoidWars {
         }
 
         [Stat]
-        public int DurationTurns {
-            get { return (int)getValue("DurationTurns"); }
-            set { setValue("DurationTurns", value); }
-        }
-
-        [Stat]
         public float MaxDamage {
             get { return (int)getValue("MaxDamage"); }
             set { setValue("MaxDamage", value); }
         }
     }
 
-    public class ProximityMine : NPCObject {
+    public class ProximityMine : TransientNPC {
         public float DeploymentSpeed = 3f;
         public float DeploymentDistance = 3.5f;
         public GameObject ExplosionPrefab;
@@ -44,9 +37,9 @@ namespace VoidWars {
 
         [Server]
         public void Initialize(MineLauncher launcher, ShipController launchingShip, Vector3 direction) {
+            setLifetime(launcher.DurationTurns);
             _launcher = launcher;
             _launchingShip = launchingShip;
-            _turnCounter = launcher.DurationTurns;
             _deployed = false;
             _direction = direction;
         }
@@ -64,20 +57,7 @@ namespace VoidWars {
             _deployed = true;
         }
 
-        [Server]
-        public override IEnumerator PerTurnUpdate(NPCSyncToken syncToken) {
-            if (_turnCounter > 0) {
-                --_turnCounter;
-                if (_turnCounter == 0) {
-                    HasExpired = true;
-                }
-            }
-
-            syncToken.Sync();
-            yield break;
-        }
-
-        private void OnTriggerEnter(Collider other) {
+         private void OnTriggerEnter(Collider other) {
             if (isServer) {
                 if (_deployed)  {
                     var ship = other.gameObject.GetComponent<ShipController>();
@@ -95,7 +75,6 @@ namespace VoidWars {
 
         private MineLauncher _launcher;
         private ShipController _launchingShip;
-        private int _turnCounter;
         private Rigidbody _rb;
         private bool _deployed;
         private Vector3 _direction;

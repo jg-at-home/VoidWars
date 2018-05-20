@@ -23,6 +23,8 @@ namespace VoidWars {
             if (_communicator != null && _showDebug) {
                 _printRect = new Rect(50, 40, 200, 20);
 
+                print(string.Format("Turn #{0}", _round + 1));
+                print("");
                 print(string.Format("Controller ID: {0}", _communicator.ID));
                 print(string.Format("Active Ship ID: {0}", _activeShipID));
                 print(string.Format("Game State: {0}", _state));

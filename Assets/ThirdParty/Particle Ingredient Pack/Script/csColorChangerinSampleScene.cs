@@ -107,7 +107,9 @@ public class csColorChangerinSampleScene : MonoBehaviour {
 
         foreach (ParticleSystem _ParticleSystem in ParticleSystems)
         {
+#pragma warning disable CS0618 // Type or member is obsolete
             _ParticleSystem.startColor = co;
+#pragma warning restore CS0618 // Type or member is obsolete
         }
     }
 }

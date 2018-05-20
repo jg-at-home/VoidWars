@@ -4,9 +4,8 @@ using System;
 using UnityEngine.Networking;
 
 namespace VoidWars {
-    public class ChaffLauncher : AuxItem {
+    public class ChaffLauncher : TransientItem  {
         public ChaffLauncher(AuxiliaryClass itemClass) : base(itemClass) {
-            DurationTurns = GetInt("DurationTurns");
         }
 
         public override IEnumerator Use(ShipController ship, Action onCompletion) {
@@ -18,15 +17,9 @@ namespace VoidWars {
             yield return chaff.Launch();
             onCompletion();
         }
-
-        [Stat]
-        public int DurationTurns {
-            get { return (int)getValue("DurationTurns"); }
-            set { setValue("DurationTurns", value); }
-        }
     }
 
-    public class Chaff : NPCObject {
+    public class Chaff : TransientNPC {
         public GameObject ChaffCloud;
         public GameObject ChaffRocket;
         public float RocketSpeed = 1f;
@@ -35,8 +28,9 @@ namespace VoidWars {
         public float ExpansionSpeed = 3.5f;
 
           public void Initialize(ChaffLauncher launcher, int shipID, Vector3 direction) {
-            _turnCounter = launcher.DurationTurns;
+            setLifetime(launcher.DurationTurns);
             _direction = direction;
+            _shipID = shipID;
         }
 
         [Server]
@@ -81,19 +75,6 @@ namespace VoidWars {
             ChaffRocket.SetActive(true);
         }
 
-        public override IEnumerator PerTurnUpdate(NPCSyncToken syncToken) {
-            if (_turnCounter > 0) {
-                --_turnCounter;
-                if (_turnCounter == 0) {
-                    HasExpired = true;
-                }
-            }
-
-            syncToken.Sync();
-            yield break;
-        }
-
-        private int _turnCounter;
         private Rigidbody _rb;
         private Vector3 _direction;
         private int _shipID;
