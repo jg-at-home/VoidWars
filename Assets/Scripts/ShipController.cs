@@ -674,7 +674,7 @@ namespace VoidWars {
                 }
             }
 
-            // If there's a significant amount of damage, start breaking things.
+            // If there's a significant amount of hull damage, start breaking things.
             var relativeChange = Mathf.Clamp01(damage / MaxHealth);
             while(relativeChange > _data.DamageThreshold) {
                 // TOOD: include weapons in this (weapon breakabiity future task).
