@@ -31,9 +31,9 @@ namespace VoidWars {
         public override IEnumerator PerTurnUpdate(NPCSyncToken syncToken) {
             if (updateTurnCount()) {
                 HasExpired = true;
-                syncToken.Sync();
             }
 
+            syncToken.Sync();
             yield break;
         }
 

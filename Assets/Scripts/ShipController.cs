@@ -352,13 +352,35 @@ namespace VoidWars {
         /// <param name="weaponSlot">The weapon slot.</param>
         /// <param name="weapon">The weapon to use.</param>
         /// <returns>Enumerator</returns>
+        [Client]
         public IEnumerator Attack(ShipController target, int weaponSlot, WeaponInstance weapon) {
             // Use up some juice.
-            _energy -= weapon.PowerUsage;
-            Debug.Assert(_energy >= 0f);
+            CmdUseEnergy(weapon.PowerUsage);
 
             // Do the attack.
             yield return weapon.Fire(this, weaponSlot, target, isServer);
+        }
+
+        [Command]
+        void CmdUseEnergy(float delta) {
+            useEnergy(delta);
+        }
+
+        [Server]
+        private void useEnergy(float delta) {
+            var thisEnergy = (int)(100f * (_energy / MaxEnergy));
+            var thatEnergy = (int)(100f * ((_energy - delta) / MaxEnergy));
+            if (thatEnergy < 25 && thisEnergy >= 25) {
+                RpcShowMessage("Energy has dropped below 25%", Role.Engineer);
+            }
+            else if (thatEnergy < 50 && thisEnergy >= 50) {
+                RpcShowMessage("Energy has dropped below 50%", Role.Engineer);
+            }
+
+            _energy -= delta;
+            if (_energy < 0) {
+                _energy = 0;
+            }
         }
 
         /// <summary>
@@ -451,8 +473,7 @@ namespace VoidWars {
                     applyAuxiliary(cloakItem);
 
                     // Use some power up now.
-                    _energy -= cloakItem.PowerUsage;
-                    Debug.Assert(_energy >= 0);
+                    useEnergy(cloakItem.PowerUsage);
                 }
                 else {
                     // Switch off.
@@ -917,12 +938,7 @@ namespace VoidWars {
         public void BeginMove(ShipMove move) {
             var energyForMove = GetEnergyForMove(move);
             Debug.LogFormat("Energy for move = {0}", energyForMove);
-            _energy -= energyForMove;
-            Debug.Assert(_energy >= 0f, "Energy negative?");
-            if (_energy < 0f) {
-                _energy = 0f;
-            }
-
+            useEnergy(energyForMove);
             updateSystemStatuses();
         }
 
