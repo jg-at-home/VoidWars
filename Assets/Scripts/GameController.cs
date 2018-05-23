@@ -330,6 +330,23 @@ namespace VoidWars {
         }
 
         /// <summary>
+        /// Called when an action is selected.
+        /// </summary>
+        /// <param name="action">The action as a string.</param>
+        /// <param name="energy">The energy cost of the action.</param>
+        public void OnActionSelected(string action, float energy) {
+            _energyAfterSelection = _energyAfterSelection - energy;
+            StatusPanelController.GoToPanel("Energy Use");
+        }
+
+        /// <summary>
+        /// Gets the energy for the active ship after a selection (move / action) has been selected.
+        /// </summary>
+        public float ShipEnergyAfterSelection {
+            get { return _energyAfterSelection; }
+        }
+
+        /// <summary>
         /// Sets the action complete flag.
         /// </summary>
         public void OnActionComplete() {
@@ -727,6 +744,8 @@ namespace VoidWars {
             else {
                 _activeShip = _ships.Find(s => s.ID == shipID);
                 _activeShipID = _activeShip.ID;
+                _energyAfterSelection = _activeShip.Energy;
+                _energyBeforeSelection = _activeShip.Energy;
                 _actionCount = 1;
                 if (_activeShip.ControlType == ControlType.HUMAN) {
                     // Fire up the UI.
@@ -806,7 +825,18 @@ namespace VoidWars {
         /// <summary>
         /// Get / set the selected move for the current ship.
         /// </summary>
-        public ShipMoveInstance SelectedMove { get; set; }
+        public ShipMoveInstance SelectedMove {
+            get { return _selectedMove; }
+            set {
+                _selectedMove = value;
+                var energyForMove = 0f;
+                if (_selectedMove.Move.MoveType != MoveType.None) {
+                    energyForMove = _activeShip.GetEnergyForMove(_selectedMove.Move);
+                }
+                _energyAfterSelection = Mathf.Max(_energyBeforeSelection - energyForMove, 0f);
+                StatusPanelController.GoToPanel("Energy Use");
+            }
+        }
 
         /// <summary>
         /// Sets the move for a ship.
@@ -1369,6 +1399,9 @@ namespace VoidWars {
         private int _activeWeapon;
         private GameObject _target;
         private bool _actionComplete;
+        private ShipMoveInstance _selectedMove;
+        private float _energyBeforeSelection;
+        private float _energyAfterSelection;
 
         private static readonly int[] s_p1StartPositions1 = new[] { 3 };
         private static readonly int[] s_p1StartPositions2 = new[] { 0, 1 };

@@ -30,6 +30,15 @@ namespace VoidWars {
             nextPanel();
         }
 
+        public void GoToPanel(string panelName) {
+            for(int i = 0; i < PanelPrefabs.Length; ++i) {
+                if (PanelPrefabs[i].Name == panelName) {
+                    onButtonClicked(false);
+                    setCurrentPanel(i, false);
+                }
+            }
+        }
+
         public void OnPrevButton() {
             onButtonClicked();
             var next = _currentPanelIndex - 1;
@@ -39,8 +48,10 @@ namespace VoidWars {
             setCurrentPanel(next, false);
         }
 
-        private void onButtonClicked() {
-            SendMessageUpwards("PlayButtonClick");
+        private void onButtonClicked(bool click = true) {
+            if (click) {
+                SendMessageUpwards("PlayButtonClick");
+            }
             _timer = 0;
             _canvasGroup.alpha = 1f;
             if (_scrolling) {

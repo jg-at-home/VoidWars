@@ -25,6 +25,11 @@ namespace VoidWars {
         public abstract void SelectAction();
 
         /// <summary>
+        /// Gets the energy cost for the action.
+        /// </summary>
+        public virtual float EnergyCost { get { return 0f; } }
+
+        /// <summary>
         /// Internal implementation.
         /// </summary>
         /// <param name="item">The item the planel is controlling</param>

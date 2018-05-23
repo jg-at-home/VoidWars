@@ -311,6 +311,7 @@ namespace VoidWars {
         /// server-authoratative model and we have to move them on their owner client).
         /// </summary>
         /// <param name="moves">List of moves.</param>
+        [Server]
         public void EnactMoves(List<ShipMoveInstance> moves) {
             foreach(var move in moves) {
                 if (move.Move.MoveType != MoveType.None) {

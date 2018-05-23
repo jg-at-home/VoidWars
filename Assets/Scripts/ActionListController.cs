@@ -63,6 +63,8 @@ namespace VoidWars {
             _current = panel.GetComponent<ActionDetailPanelController>();
             _current.Initialize(_parentController, item, prefabInfoParts);
             _currentItem = item;
+            var controller = Util.GetGameController();
+            controller.OnActionSelected(_currentItem.Action, _current.EnergyCost);
 
             foreach(var view in _views) {
                 view.IsSelected = (view.Item == _currentItem);

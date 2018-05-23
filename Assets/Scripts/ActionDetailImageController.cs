@@ -14,6 +14,13 @@ namespace VoidWars {
             enableSelectButton(true);
         }
 
+        public override float EnergyCost {
+            get {
+                var gameController = Util.GetGameController();
+                return gameController.GetEnergyCostForAction(Item.Action);
+            }
+        }
+
         public override void SelectAction() {
             var gameController = Util.GetGameController();
             gameController.ExecuteCommand(Item.Action);
