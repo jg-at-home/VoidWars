@@ -17,7 +17,16 @@ namespace VoidWars {
         public override float EnergyCost {
             get {
                 var gameController = Util.GetGameController();
-                return gameController.GetEnergyCostForAction(Item.Action);
+                var ship = gameController.GetActiveShip();
+                return ship.GetEnergyCostForAction(Item.Action);
+            }
+        }
+
+        public override float EnergyDrain {
+            get {
+                var gameController = Util.GetGameController();
+                var ship = gameController.GetActiveShip();
+                return ship.GetEnergyDrainForAction(Item.Action);
             }
         }
 

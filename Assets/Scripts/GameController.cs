@@ -334,8 +334,9 @@ namespace VoidWars {
         /// </summary>
         /// <param name="action">The action as a string.</param>
         /// <param name="energy">The energy cost of the action.</param>
-        public void OnActionSelected(string action, float energy) {
-            _energyAfterSelection = _energyAfterSelection - energy;
+        public void OnActionSelected(string action, float energy, float drain) {
+            _energyAfterSelection = Mathf.Max(_energyAfterSelection - energy, 0f);
+            _drainAfterSelection = Mathf.Max(_drainBeforeSelection + drain, 0f);
             StatusPanelController.GoToPanel("Energy Use");
         }
 
@@ -344,6 +345,13 @@ namespace VoidWars {
         /// </summary>
         public float ShipEnergyAfterSelection {
             get { return _energyAfterSelection; }
+        }
+
+        /// <summary>
+        /// Gets the energy drain for the active ship after an action has been selected.
+        /// </summary>
+        public float ShipEnergyDrainAfterSelection {
+            get { return _drainAfterSelection; }
         }
 
         /// <summary>
@@ -746,6 +754,8 @@ namespace VoidWars {
                 _activeShipID = _activeShip.ID;
                 _energyAfterSelection = _activeShip.Energy;
                 _energyBeforeSelection = _activeShip.Energy;
+                _drainBeforeSelection = _activeShip.EnergyDrainPerTurn;
+                _drainAfterSelection = _activeShip.EnergyDrainPerTurn;
                 _actionCount = 1;
                 if (_activeShip.ControlType == ControlType.HUMAN) {
                     // Fire up the UI.
@@ -1402,6 +1412,8 @@ namespace VoidWars {
         private ShipMoveInstance _selectedMove;
         private float _energyBeforeSelection;
         private float _energyAfterSelection;
+        private float _drainBeforeSelection;
+        private float _drainAfterSelection;
 
         private static readonly int[] s_p1StartPositions1 = new[] { 3 };
         private static readonly int[] s_p1StartPositions2 = new[] { 0, 1 };

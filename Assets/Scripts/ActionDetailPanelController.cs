@@ -25,9 +25,14 @@ namespace VoidWars {
         public abstract void SelectAction();
 
         /// <summary>
-        /// Gets the energy cost for the action.
+        /// Gets the one-off energy cost for the action.
         /// </summary>
         public virtual float EnergyCost { get { return 0f; } }
+
+        /// <summary>
+        /// Gets the one-off energy cost for the action.
+        /// </summary>
+        public virtual float EnergyDrain { get { return 0f; } }
 
         /// <summary>
         /// Internal implementation.

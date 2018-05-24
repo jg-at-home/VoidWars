@@ -64,7 +64,7 @@ namespace VoidWars {
             _current.Initialize(_parentController, item, prefabInfoParts);
             _currentItem = item;
             var controller = Util.GetGameController();
-            controller.OnActionSelected(_currentItem.Action, _current.EnergyCost);
+            controller.OnActionSelected(_currentItem.Action, _current.EnergyCost, _current.EnergyDrain);
 
             foreach(var view in _views) {
                 view.IsSelected = (view.Item == _currentItem);

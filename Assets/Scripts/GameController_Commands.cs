@@ -6,66 +6,6 @@ namespace VoidWars {
     public partial class GameController {
         private delegate void ActionFunc(ShipController ship, bool status);
 
-        /// <summary>
-        /// Gets the cost in energy for an action (note: not the additional drain, just the one-off hit).
-        /// </summary>
-        /// <param name="action">An action string.</param>
-        /// <returns>The energy cost.</returns>
-        public float GetEnergyCostForAction(string action) {
-            var parts = action.ToLower().Split(' ');
-            switch (parts[0]) {
-                case "pass":
-                case "shields": 
-                        return 0f;
-
-                case "aux":
-                    return auxCost(parts);
-            }
-
-            return 0f;
-        }
-
-        private float auxCost(string[] parts) {
-            AuxType auxType = AuxType.None;
-            switch (parts[1]) {
-                case "shinobi":
-                    auxType = AuxType.Shinobi;
-                    break;
-
-                case "scanners":
-                    auxType = AuxType.Scanners;
-                    break;
-
-                case "flarelauncher":
-                    auxType = AuxType.FlareLauncher;
-                    break;
-
-                case "erbinducer":
-                    auxType = AuxType.ERBInducer;
-                    break;
-
-                case "chafflauncher":
-                    auxType = AuxType.ChaffLauncher;
-                    break;
-
-                case "minelauncher":
-                    auxType = AuxType.MineLauncher;
-                    break;
-
-                default:
-                    return 0f;
-            }
-
-            var aux = _activeShip.GetAuxiliaryItem(auxType);
-            var cost = aux.PowerUsage;
-
-            // If we're switching it off, we're going up.
-            if (!bool.Parse(parts[2])) {
-                cost = -cost;
-            }
-
-            return cost;
-        }
 
         /// <summary>
         /// Executes the command string provided.

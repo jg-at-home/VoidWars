@@ -134,6 +134,13 @@ namespace VoidWars {
         }
 
         /// <summary>
+        /// Gets the amount of energy drained per turn as a result of installed equipment.
+        /// </summary>
+        public float EnergyDrainPerTurn {
+            get { return _powerDrain; }
+        }
+
+        /// <summary>
         /// Gets the number of actions the ship can perform this turn.
         /// </summary>
         public int ActionsThisTurn { get { return _actionsThisTurn; } }
