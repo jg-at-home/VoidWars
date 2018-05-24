@@ -14,9 +14,6 @@
                 case WeaponType.UVLaser:
                     return new Laser(weaponClass);
 
-                case WeaponType.EMP:
-                    return new EmpWeapon(weaponClass);
-
                 case WeaponType.RailGun:
                     return new RailGun(weaponClass);
 

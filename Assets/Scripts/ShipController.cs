@@ -544,6 +544,17 @@ namespace VoidWars {
         [Server]
         public void RespondToEmp(int numTurns) {
             Debug.Assert(isServer);
+
+            // If we're resistant to EMP and shields are up, just take some of the shields away and we're done.
+            var chance = UnityEngine.Random.Range(0f, 1f);
+            if (chance > _data.EMPResistance) {
+                if (_shieldState == AuxState.Operational) {
+                    _shieldPercent *= _data.EMPResistance;
+                }
+                return;
+            }
+
+            // Otherwise: knock out the shields for a few turns.
             if (_shieldState == AuxState.Operational) {
                 _shieldState = AuxState.Disabled;
                 var restoreTask = new Task(numTurns, restoreShields);

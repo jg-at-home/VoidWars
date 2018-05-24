@@ -77,6 +77,10 @@ namespace VoidWars {
         [Range(0f, 1f)]
         public float DamageThreshold;
 
+        [Tooltip("Resistance to EMP")]
+        [Range(0.5f, 0.95f)]
+        public float EMPResistance;
+
         [Header("Sound effects")]
         public AudioClip EnginesClip;
         public AudioClip ShieldsClip;
@@ -105,6 +109,7 @@ namespace VoidWars {
             Luckiness = _class.Luckiness;
             Maneuverability = _class.Maneuverability;
             DamageThreshold = _class.DamageThreshold;
+            EMPResistance = _class.EMPResistance;
         }
 
         public Species Species {  get { return _class.Species; } }
@@ -170,6 +175,12 @@ namespace VoidWars {
         public float DamageThreshold {
             get { return getValue("DamageThreshold"); }
             set { setValue("DamageThreshold", value); }
+        }
+
+        [Stat(0f, 1f)]
+        public float EMPResistance {
+            get { return getValue("EMPResistance"); }
+            set { setValue("EMPResistance", value); }
         }
 
         public float MaxFuelLevel {  get { return _class.MaxFuelLevel; } }

@@ -10,9 +10,7 @@ namespace VoidWars {
         Laser,
         RailGun,
         HomingMissile,
-        EMP,
         UVLaser,
-        ProximityMine,
 
         // More above here.
         NumTypes

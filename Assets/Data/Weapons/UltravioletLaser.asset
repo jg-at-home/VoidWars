@@ -23,7 +23,7 @@ MonoBehaviour:
   RepairTurns: 0
   BreakProbability: 0.33
   MetaItems: []
-  WeaponType: 16
+  WeaponType: 4
   Cardinality: 0
   MaxDamage: 100
   Range: 15

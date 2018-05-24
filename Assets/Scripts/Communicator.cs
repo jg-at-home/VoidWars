@@ -106,6 +106,23 @@ namespace VoidWars {
             ship.UseOneShotAuxiliary(AuxType.ERBInducer, () => controller.OnActionComplete());
         }
 
+        [Command]
+        public void CmdGenerateEMP(int shipID) {
+            RpcGenerateEmp(shipID);
+        }
+
+        [ClientRpc]
+        void RpcGenerateEmp(int shipID) {
+            var ship = controller.GetShip(shipID);
+            ship.UseOneShotAuxiliary(AuxType.EMPGenerator, () => {
+                if (isServer) {
+                    var emp = (EMPGenerator)ship.GetAuxiliaryItem(AuxType.EMPGenerator);
+                    emp.ApplyEffects(ship);
+                }
+                controller.OnActionComplete();
+            });
+        }
+
         /// <summary>
         /// Requests a ship to launch chaff.
         /// </summary>

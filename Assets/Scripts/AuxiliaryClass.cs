@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using UnityEngine;
-using UnityEngine.Networking;
 
 namespace VoidWars {
     /// <summary>
@@ -20,6 +19,7 @@ namespace VoidWars {
         CoolingElement = 256,
         ChaffLauncher = 512,
         MineLauncher = 1024,
+        EMPGenerator = 2048,
 
         // New items above here.
         NumTypes

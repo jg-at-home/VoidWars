@@ -17,6 +17,9 @@
                 case AuxType.MineLauncher:
                     return new MineLauncher(auxClass);
 
+                case AuxType.EMPGenerator:
+                    return new EMPGenerator(auxClass);
+
                 default:
                     return new AuxItem(auxClass);
             }

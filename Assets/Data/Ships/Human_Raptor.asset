@@ -21,6 +21,7 @@ MonoBehaviour:
   MaxTemperature: 0
   RepairCost: 0
   RepairTurns: 3
+  BreakProbability: 0
   MetaItems: []
   Species: 0
   ModelName: SHIP_A_02
@@ -42,6 +43,8 @@ MonoBehaviour:
   CoolingRate: 1
   MaxShieldEfficiency: 0.8
   Luckiness: 0.925
+  DamageThreshold: 0.3
+  EMPResistance: 0.9
   EnginesClip: {fileID: 8300000, guid: 0c4600c967b091a4691184cf5d2b70a5, type: 3}
   ShieldsClip: {fileID: 8300000, guid: 2107713c3479c714aae06a0b628da212, type: 3}
   CloakClip: {fileID: 8300000, guid: c8e3bc4da9f59ed40a1e2bf58339eeca, type: 3}

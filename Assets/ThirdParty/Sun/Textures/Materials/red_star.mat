@@ -29,7 +29,7 @@ Material:
     - _MainTex:
         m_Texture: {fileID: 2800000, guid: cde6f5eda4854a34ea16f99ca40e0986, type: 3}
         m_Scale: {x: 0.125, y: 0.125}
-        m_Offset: {x: 0.125, y: 0.125}
+        m_Offset: {x: 0.875, y: 0.375}
     m_Floats:
     - _Brightness: 0.33928573
     - _Contour: 0.60714287

@@ -75,6 +75,12 @@ namespace VoidWars {
                         _communicator.CmdDeployMine(_activeShipID);
                     }
                     break;
+
+                case "empgenerator": {
+                        _communicator.CmdGenerateEMP(_activeShipID);
+                    }
+                    break;
+
                     // TODO: everything else
             }
 
