@@ -123,8 +123,9 @@ namespace VoidWars {
             if ((_currentPanelIndex != panel) || force) {
                 var panelInstance = _panels[_currentPanelIndex];
                 if (panelInstance != null) {
+                    var rt = panelInstance.gameObject.GetComponent<RectTransform>();
+                    rt.SetParent(null, false);
                     panelInstance.OnDeactivation();
-                    panelInstance.GetComponent<RectTransform>().SetParent(null, false);
                 }
 
                 _currentPanelIndex = panel;
