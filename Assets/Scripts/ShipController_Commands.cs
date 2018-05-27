@@ -21,16 +21,6 @@ namespace VoidWars {
                 EditorPrefabInfo = "RerouteEnergyPanel"
             });
 
-            if (_energy < _maxEnergy) {
-                actions.Add(new ActionItem {
-                    Action = "recharge",
-                    Description = "Recover some power",
-                    Detail = "Regain some additional energy",
-                    Icon = ImageManager.GetImage("EnergyIcon"),
-                    EditorPrefabInfo = "ImageDetailPanel RechargeImage"
-                });
-            }
-
             // Shields.
             if (_shieldPercent > 0f) {
                 if (_shieldState == AuxState.Operational) {
