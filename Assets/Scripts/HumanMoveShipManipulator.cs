@@ -12,6 +12,9 @@ namespace VoidWars {
         }
 
         private void Start() {
+            var aoLayerMask = 1 << LayerMask.NameToLayer("ActiveObjects");
+            var shipLayerMask = 1 << LayerMask.NameToLayer("Ships");
+            _layerMask = aoLayerMask | shipLayerMask;
             _shipController = gameObject.GetComponent<ShipController>();
             _gameController = Util.GetGameController();
             _bounds = _gameController.GetBoardBounds();
@@ -136,8 +139,7 @@ namespace VoidWars {
             var collider = gameObject.GetComponent<Collider>();
             var colliderSize = collider.bounds.size;
             var radius = Mathf.Max(colliderSize.x, colliderSize.y, colliderSize.z) / 2f;
-            var layerMask = 1 << LayerMask.NameToLayer("ActiveObjects");
-            var overlaps = Physics.OverlapSphere(worldEndPosition, radius, layerMask);
+            var overlaps = Physics.OverlapSphere(worldEndPosition, radius, _layerMask);
             if ((overlaps != null) && (overlaps.Length > 0)) {
                 // Colliding with something - discount oneself, though.
                 foreach(var overlap in overlaps) {
@@ -169,5 +171,6 @@ namespace VoidWars {
         private ShipController _shipController;
         private GameController _gameController;
         private Rect _bounds;
+        private int _layerMask;
     }
 }

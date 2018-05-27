@@ -304,5 +304,33 @@ namespace VoidWars {
             foo.RemoveBuffsWithOwner(this);
             Assert.AreEqual(1, foo.BuffCount);
         }
+
+        [Test]
+        public void TestFix1() {
+            var foo = new Foo();
+            var fix = new Buff("Bar", BuffType.Fix, 27f, this);
+            foo.AddBuff(fix);
+            Assert.AreEqual(27f, foo.Bar);
+        }
+
+        [Test]
+        public void TestFix2() {
+            var foo = new Foo();
+            var add1 = new Buff("Bar", BuffType.Additive, 1f, this);
+            foo.AddBuff(add1);
+            var fix = new Buff("Bar", BuffType.Fix, 27f, this);
+            foo.AddBuff(fix);
+            Assert.AreEqual(27f, foo.Bar);
+        }
+
+        [Test]
+        public void TestFix3() {
+            var foo = new Foo();
+            var add1 = new Buff("Bar", BuffType.Percentage, 50f, this);
+            foo.AddBuff(add1);
+            var fix = new Buff("Bar", BuffType.Fix, 27f, this);
+            foo.AddBuff(fix);
+            Assert.AreEqual(27f, foo.Bar);
+        }
     }
 }

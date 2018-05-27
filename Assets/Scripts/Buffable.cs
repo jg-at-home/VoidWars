@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System;
 using UnityEngine;
+using System.Linq;
 
 namespace VoidWars {
     /// <summary>
@@ -170,6 +171,10 @@ namespace VoidWars {
         }
 
         private void evaluate() {
+            // Sort buffs so that 'fix' types are always at the end.
+            _buffs.OrderBy(b=> b.BuffType == BuffType.Fix ? 1 : 0);
+
+            // Re-evaluate.
             _valueCache = _baseValue;
             var prevType = BuffType.None;
             var cumulativePercent = 0f;
@@ -195,7 +200,7 @@ namespace VoidWars {
 
                         case BuffType.Fix:
                             _valueCache = buff.Value;
-                            return;
+                            break;
 
                         default:
                             break;

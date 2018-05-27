@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1ef9869d461ac3b4eb72df86eac649b0, type: 3}
+  m_Name: EMPGenerator
+  m_EditorClassIdentifier: 
+  Name: EMP Generator
+  Icon: {fileID: 21300000, guid: 0325e82232e635f47b513bc4981cedfb, type: 3}
+  Description: EMP generator
+  Detail: A good chance of knocking opponent's shields out
+  Cost: 5
+  Mass: 15
+  PowerUsage: 0
+  MaxTemperature: 65
+  RepairCost: 8
+  RepairTurns: 2
+  BreakProbability: 0.33
+  MetaItems:
+  - Name: EffectDuration
+    Type: 2
+    Value: 2
+  - Name: Range
+    Type: 2
+    Value: 50
+  - Name: DurationTurns
+    Type: 1
+    Value: 2
+  ItemType: 2048
+  Mode: 2
+  StartSoundClip: {fileID: 8300000, guid: fe6e090fae301324e8e114b58819389d, type: 3}
+  StopSoundClip: {fileID: 0}
+  EffectPrefab: {fileID: 135402, guid: 998ef3fe491ebd34f892fe6a98ad74f5, type: 2}
