@@ -77,6 +77,14 @@ namespace VoidWars {
         [Range(0f, 1f)]
         public float DamageThreshold;
 
+        [Tooltip("If damage is over this level, there's a chance the propulsion will suffer damage.")]
+        [Range(0f, 1f)]
+        public float PropulsionDamageThreshold;
+
+        [Tooltip("The number of turns it takes to repair the engines")]
+        [Range(1, 5)]
+        public int EngineRepairTurns;
+
         [Tooltip("Resistance to EMP")]
         [Range(0.5f, 0.95f)]
         public float EMPResistance;
@@ -110,6 +118,7 @@ namespace VoidWars {
             Maneuverability = _class.Maneuverability;
             DamageThreshold = _class.DamageThreshold;
             EMPResistance = _class.EMPResistance;
+            EngineRepairTurns = _class.EngineRepairTurns;
         }
 
         public Species Species {  get { return _class.Species; } }
@@ -183,6 +192,12 @@ namespace VoidWars {
             set { setValue("EMPResistance", value); }
         }
 
+        [Stat(1f, float.PositiveInfinity)]
+        public int EngineRepairTurns {
+            get { return (int)getValue("EngineRepairTurns"); }
+            set { setValue("EngineRepairTurns", value); }
+        }
+
         public float MaxFuelLevel {  get { return _class.MaxFuelLevel; } }
         public int NumAuxiliarySlots {  get { return _class.NumAuxiliarySlots; } }
         public bool Stealth { get { return _class.Stealth; } }
@@ -190,6 +205,7 @@ namespace VoidWars {
         public float MoveDrainRate { get { return _class.MoveDrainRate; } }
         public float LifeSupportDrainRate {  get { return _class.LifeSupportDrainRate; } }
         public float ShieldDrainRate { get { return _class.ShieldDrainRate; } }
+        public float PropulsionDamageThreshold {  get { return _class.PropulsionDamageThreshold; } }
         public AudioClip EnginesClip { get { return _class.EnginesClip; } }
         public AudioClip ShieldsClip { get { return _class.ShieldsClip; } }
         public AudioClip CloakClip {  get { return _class.CloakClip; } }

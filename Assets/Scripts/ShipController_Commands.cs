@@ -44,6 +44,17 @@ namespace VoidWars {
                 }
             }
 
+            // Propulsion.
+            if ((_propulsionState == AuxState.Broken) && _canRepairItems) {
+                actions.Add(new ActionItem {
+                    Action = "repair propulsion",
+                    Description = "Repair broken engines",
+                    Detail = string.Format("Repairs your critically damaged engines in {0} turns", _data.EngineRepairTurns),
+                    Icon = ImageManager.GetImage("RepairIcon"),
+                    EditorPrefabInfo = "ImageDetailPanel BrokenEnginesImage"
+                });
+            }
+
             // Auxiliary items.
             for(var i = 0; i < _equipment.Count; ++i) {
                 var auxItem = _equipment[i];

@@ -33,7 +33,11 @@ namespace VoidWars {
                     }
                     break;
 
-                    // TODO: everything else
+                case "repair":
+                    // TODO: repair tasks.
+                    break;
+
+                // TODO: everything else
             }
         }
 

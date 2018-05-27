@@ -179,17 +179,10 @@ namespace VoidWars {
         }
 
         /// <summary>
-        /// Life support working?
+        /// Gets the state of the propulsion.
         /// </summary>
-        public bool IsLifeSupportOK {
-            get { return _lifeSupportLevel >= _data.LifeSupportDrainRate; }
-        }
-
-        /// <summary>
-        /// Drive working?
-        /// </summary>
-        public bool IsPropulsionOK {
-            get { return _propulsionLevel >= MassRatio * _data.MoveDrainRate; }
+        public AuxState PropulsionState {
+            get { return _propulsionState; }
         }
 
         /// <summary>
@@ -715,9 +708,24 @@ namespace VoidWars {
 
             // If there's a significant amount of hull damage, start breaking things.
             var relativeChange = Mathf.Clamp01(damage / MaxHealth);
+
+            // Damage to propulsion?.
+            if (relativeChange > _data.PropulsionDamageThreshold) {
+                if (UnityEngine.Random.Range(0f, 1f) > _data.PropulsionDamageThreshold) {
+                    _propulsionState = AuxState.Broken;
+                    _maxMoveSize = 1;
+                    RpcShowMessage("Our engines have been critically damaged", Role.Engineer);
+                }
+            }
+               
             while(relativeChange > _data.DamageThreshold) {
                 // TOOD: include weapons in this (weapon breakabiity future task).
                 var operatingEquipment = _equipment.FindAll(e => e.State != AuxState.Broken);
+                if (operatingEquipment.Count == 0) {
+                    // Nothing to break!
+                    break; // ironically.
+                }
+
                 var breakChance = UnityEngine.Random.Range(0f, 1f);
                 if (breakChance < relativeChange) {
                     var weights = new float[operatingEquipment.Count];
@@ -857,7 +865,7 @@ namespace VoidWars {
             switch (state) {
                 case AuxState.Idle:
                     if (_weaponsLevel >= weaponClass.PowerUsage) {                        
-                            state = AuxState.Operational;
+                        state = AuxState.Operational;
                     }
                     break;
 
@@ -1356,6 +1364,7 @@ namespace VoidWars {
         private bool _lifeSupportOK = true;
         private AuxState _primaryWeaponState;
         private AuxState _secondaryWeaponState;
+        [SyncVar] private AuxState _propulsionState;
         private bool _propulsionOK = true;
         private int _roundsWithoutLifeSupport;
         private Pilot _pilot;
