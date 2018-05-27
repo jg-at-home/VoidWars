@@ -56,14 +56,14 @@ namespace VoidWars {
 
                     case MoveType.GentleTurnLeft:
                     case MoveType.GentleTurnRight:
-                        return Size * (CostScale * Mathf.PI / 4f);
+                        return Size * (CostScale * Mathf.PI / 2f);
 
                     case MoveType.SharpTurnLeft:
                     case MoveType.SharpTurnRight:
-                        return Size * (CostScale * Mathf.PI / 2f);
+                        return Size * (CostScale * Mathf.PI);
 
                     case MoveType.TurnAbout:
-                        return Size * (3f * CostScale);
+                        return Size * (5f * CostScale);
 
                     default:
                         Debug.Assert(false, "Huh?");
