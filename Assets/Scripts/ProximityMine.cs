@@ -57,20 +57,33 @@ namespace VoidWars {
             _deployed = true;
         }
 
-         private void OnTriggerEnter(Collider other) {
+        public override float ComputeDamage(float damage, float dT) {
+            if (damage > 0f) {
+                explode();
+            }
+
+            return base.ComputeDamage(damage, dT);
+        }
+
+        private void OnTriggerEnter(Collider other) {
             if (isServer) {
                 if (_deployed)  {
                     var ship = other.gameObject.GetComponent<ShipController>();
                     if (ship != null) {
-                        var explosion = Instantiate(ExplosionPrefab, _rb.position, Quaternion.identity);
-                        NetworkServer.Spawn(explosion);
-                        Destroy(explosion, 3f);
-                        Destroy(gameObject);
+                        explode();
                         var damage = _launchingShip.LuckRoll * _launcher.MaxDamage;
-                        controller.ApplyDamageToShip(ship.ID, damage, 0f);
+                        controller.ApplyDamage(ship.ID, damage, 0f);
                     }
                 }
             }
+        }
+
+        [Server]
+        private void explode() {
+            var explosion = Instantiate(ExplosionPrefab, _rb.position, Quaternion.identity);
+            NetworkServer.Spawn(explosion);
+            Destroy(explosion, 3f);
+            NetworkServer.Destroy(gameObject);
         }
 
         private MineLauncher _launcher;

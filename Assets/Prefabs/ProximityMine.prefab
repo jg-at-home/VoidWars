@@ -30,7 +30,7 @@ GameObject:
   - component: {fileID: 114231705430016680}
   m_Layer: 8
   m_Name: ProximityMine
-  m_TagString: Untagged
+  m_TagString: Targetable
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

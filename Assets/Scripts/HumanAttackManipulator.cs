@@ -29,9 +29,7 @@ namespace VoidWars {
                     if (Physics.Raycast(ray, out hit, 100.0f)) {
                         var rootObj = hit.collider.transform.root.gameObject;
                         Debug.Log("You clicked on " + rootObj.name);
-                        // TODO: allow us to hit other things, too!
-                        var ship = rootObj.GetComponent<ShipController>();
-                        if (ship != null) {
+                        if (rootObj.CompareTag("Targetable")) { 
                             _gameController.SelectTarget(rootObj);
                         }
                     }

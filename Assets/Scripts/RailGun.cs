@@ -16,14 +16,14 @@ namespace VoidWars {
             }
         }
 
-        protected override IEnumerator attack(ShipController ship, int slot, ShipController target, bool applyDamage) {
+        protected override IEnumerator attack(ShipController ship, int slot, VoidWarsObject target, bool applyDamage) {
             ship.AudioPlayer.PlayOneShot(SoundEffect);
             var node = ship.GetWeaponNode(slot);
             var start = node.position;
             var projectile = Object.Instantiate(Prefab, start, Quaternion.identity);
             var rb = projectile.GetComponent<Rigidbody>();
             var controller = projectile.GetComponent<ProjectileController>();
-            controller.CollisionHandler = onShipProjectileCollision;
+            controller.CollisionHandler = onProjectileCollision;
             controller.SourceShip = ship.gameObject;
 
             // Depending on the accuracy of the source ship, the defensive stats of the target, and (TODO) crew buffs,
@@ -56,11 +56,11 @@ namespace VoidWars {
 
                 // Push to clients.
                 var gameController = Util.GetGameController();
-                gameController.ApplyDamageToShip(target.ID, damage, 0f);
+                gameController.ApplyDamage(target.ID, damage, 0f);
             }
         }
 
-        private void onShipProjectileCollision(GameObject collider, Vector3 position) {
+        private void onProjectileCollision(GameObject collider, Vector3 position) {
             _collided = true;
             _collisionPoint = position;
         }

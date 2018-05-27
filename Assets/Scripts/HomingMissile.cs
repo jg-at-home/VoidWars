@@ -12,7 +12,7 @@ namespace VoidWars {
             DurationTurns = GetInt("DurationTurns");
         }
 
-        protected override IEnumerator attack(ShipController ship, int slot, ShipController target, bool server) {
+        protected override IEnumerator attack(ShipController ship, int slot, VoidWarsObject target, bool server) {
             ship.AudioPlayer.PlayOneShot(SoundEffect);
             if (server) {
                 var node = ship.GetWeaponNode(slot);
@@ -70,6 +70,8 @@ namespace VoidWars {
         }
 
         public override void OnStartClient() {
+            base.OnStartClient();
+
             // Set particle color. Don't use full-range RGB as it will lose the white core effect.
             var markerColor = controller.GetShipMarkerColor(_ownerID);
             var particleSystem = GetComponentInChildren<ParticleSystem>().main;
@@ -79,7 +81,7 @@ namespace VoidWars {
 
             _targetIndicator = Instantiate(_targetIndicatorPrefab);
             var source = gameObject;
-            var target = controller.GetShip(_targetID);
+            var target = controller.GetObjectWithID(_targetID);
             _targetPosition = target.transform.position;
             _targetIndicator.Initialize(source.transform.position, _targetPosition, markerColor);
         }
@@ -111,7 +113,7 @@ namespace VoidWars {
         }
 
         private bool checkCollision() {
-            var toDamage = new List<ShipController>();
+            var toDamage = new List<VoidWarsObject>();
             var colliders = Physics.OverlapSphere(transform.position, Radius, CollisionLayers);
             bool collided = false;
             foreach(var collider in colliders) {
@@ -125,6 +127,10 @@ namespace VoidWars {
 
                     collided = true;
                     toDamage.Add(ship);
+                }
+                else if (collider.gameObject.CompareTag("Targetable")) {
+                    collided = true;
+                    toDamage.Add(collider.gameObject.GetComponent<VoidWarsObject>());
                 }
                 else if (collider.gameObject.CompareTag("Sun")) {
                     collided = true;
@@ -140,8 +146,8 @@ namespace VoidWars {
                     // I hit one or more ships.
                     var launchShip = controller.GetShip(_ownerID);
                     var damage = launchShip.LuckRoll * _launcher.MaxDamage;
-                    foreach (var ship in toDamage) {
-                        controller.ApplyDamageToShip(ship.ID, damage, 0f);
+                    foreach (var obj in toDamage) {
+                        controller.ApplyDamage(obj.ID, damage, 0f);
                     }
 
                     // Create an explosion.
@@ -286,7 +292,6 @@ namespace VoidWars {
         }
 
         [SyncVar] private State _state;
- //       private int _turnCounter;
         private Vector3 _velocity;
         [SyncVar] private int _ownerID;
         [SyncVar] private int _targetID;

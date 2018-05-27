@@ -25,7 +25,7 @@ namespace VoidWars {
     /// <summary>
     /// Base class for an NPC object synced over the network.
     /// </summary>
-    public abstract class NPCObject : VoidNetworkBehaviour {
+    public abstract class NPCObject : VoidWarsObject {
         /// <summary>
         /// Does a single turn update of the NPC.
         /// </summary>
@@ -38,8 +38,12 @@ namespace VoidWars {
         /// </summary>
         public bool HasExpired { get; protected set; }
 
-        public override void OnStartServer() {
+        public override void OnStartClient() {
             controller.AddNPC(this);
+        }
+
+        public override void OnNetworkDestroy() {
+            controller.RemoveNPC(this);
         }
     }
 }

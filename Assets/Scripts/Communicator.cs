@@ -7,7 +7,7 @@ namespace VoidWars {
     /// <summary>
     /// Basically, the networking side of the game controller. Acts as a bridge between clients and server.
     /// </summary>
-    public class Communicator : VoidNetworkBehaviour {
+    public class Communicator : VoidWarsObject {
         public override void OnStartLocalPlayer() {
             base.OnStartLocalPlayer();
             controller.SetCommunicator(this);
@@ -52,11 +52,11 @@ namespace VoidWars {
         /// Performs an attack.
         /// </summary>
         /// <param name="sourceID">The ID of the attacking ship.</param>
-        /// <param name="targetID">The ID of the target ship.</param>
+        /// <param name="targetID">The ID of the target object.</param>
         /// <param name="weaponSlot">0=front, 1=rear</param>
         [Command]
         public void CmdPerformAttack(int sourceID, int targetID, int weaponSlot) {
-            // Generate a random seed. All client must agree on what will happen next, so all
+            // Generate a random seed. All clients must agree on what will happen next, so all
             // the stochastic bits of calculations must be identical. This seed then is used
             // to init the .NET rng on all clients to get the desired result.
             var rngSeed = (int)Time.time;
@@ -162,16 +162,18 @@ namespace VoidWars {
         }
 
         /// <summary>
-        /// Applies damage to a ship on the server.
+        /// Applies damage to an objecton the server.
         /// </summary>
-        /// <param name="shipID">The ship's ID</param>
+        /// <param name="objID">The object's ID</param>
         /// <param name="damage">The amount of damage to do.</param>
         /// <param name="dT">The temperature effect/</param>
         [Command]
-        public void CmdApplyDamageToShip(int shipID, float damage, float dT) {
-            var ship = controller.GetShip(shipID);
-            damage = ship.ComputeDamage(damage, dT);
-            RpcShowDamagePopup(shipID, damage);
+        public void CmdApplyDamage(int objID, float damage, float dT) {
+            var obj = controller.GetObjectWithID(objID);
+            damage = obj.ComputeDamage(damage, dT);
+            if (obj is ShipController) {
+                RpcShowDamagePopup(objID, damage);
+            }
         }
 
         [ClientRpc]

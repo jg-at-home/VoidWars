@@ -11,9 +11,12 @@ namespace VoidWars {
         /// </summary>
         /// <param name="weaponClass">Weapon data.</param>
         public Laser(WeaponClass weaponClass) : base(weaponClass) {
+            var aoLayerMask = 1 << LayerMask.NameToLayer("ActiveObjects");
+            var shipLayerMask = 1 << LayerMask.NameToLayer("Ships");
+            _layerMask = aoLayerMask | shipLayerMask;
         }
 
-        protected override IEnumerator attack(ShipController ship, int slot, ShipController target, bool applyDamage) {
+        protected override IEnumerator attack(ShipController ship, int slot, VoidWarsObject target, bool applyDamage) {
             var sourceNode = ship.GetWeaponNode(slot);
             var sourcePoint = sourceNode.position;
             var laserGob = Object.Instantiate(Prefab);
@@ -22,8 +25,7 @@ namespace VoidWars {
             var direction = (targetPoint - sourcePoint).normalized;
             RaycastHit hit;
             var ray = new Ray(sourcePoint, direction);
-            var layer = 1 << LayerMask.NameToLayer("ActiveObjects");
-            Physics.Raycast(ray, out hit, layer);
+            Physics.Raycast(ray, out hit, _layerMask);
             var color = (WeaponType == WeaponType.Laser) ? Color.red : Color.magenta;
             laser.Run(color, sourcePoint, hit.point);
             ship.AudioPlayer.PlayOneShot(SoundEffect);
@@ -57,8 +59,10 @@ namespace VoidWars {
 
                 // Push to server.
                 var gameController = Util.GetGameController();
-                gameController.ApplyDamageToShip(target.ID, damage, dT);
+                gameController.ApplyDamage(target.ID, damage, dT);
             }
         }
+
+        private int _layerMask;
     }
 }

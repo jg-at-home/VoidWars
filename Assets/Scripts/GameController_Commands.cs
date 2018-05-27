@@ -73,6 +73,7 @@ namespace VoidWars {
 
                 case "minelauncher": {
                         _communicator.CmdDeployMine(_activeShipID);
+                        complete = false;
                     }
                     break;
 

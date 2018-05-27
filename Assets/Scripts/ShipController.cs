@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 
 namespace VoidWars {
-    public partial class ShipController : VoidNetworkBehaviour {
+    public partial class ShipController : VoidWarsObject {
         /// <summary>
         /// Front node where movement indicators attach.
         /// </summary>
@@ -355,12 +355,12 @@ namespace VoidWars {
         /// <summary>
         /// Coroutine for performing an attack.
         /// </summary>
-        /// <param name="target">The target ship</param>
+        /// <param name="target">The target object</param>
         /// <param name="weaponSlot">The weapon slot.</param>
         /// <param name="weapon">The weapon to use.</param>
         /// <returns>Enumerator</returns>
         [Client]
-        public IEnumerator Attack(ShipController target, int weaponSlot, WeaponInstance weapon) {
+        public IEnumerator Attack(VoidWarsObject target, int weaponSlot, WeaponInstance weapon) {
             // Use up some juice.
             CmdUseEnergy(weapon.PowerUsage);
 
@@ -672,7 +672,7 @@ namespace VoidWars {
         /// <param name="dT">The temperature effect/</param>
         /// <returns>The amount of damage done</returns>
         [Server]
-        public float ComputeDamage(float damage, float dT) {
+        public override float ComputeDamage(float damage, float dT) {
             Debug.LogFormat("Ship ID {0} took {1} damage", ID, damage);
 
             // How much the shields reduce damage by at 100% when energy is nominally distributed (25%)

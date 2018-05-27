@@ -62,6 +62,7 @@ namespace VoidWars {
         public UIAudioPlayer UIAudioPlayer;
         public MessagePanelController MessagePanelController;
         public RectTransform CameoPanel;
+        public PowerMeter PowerMeter;
 
         [Header("Prefabs")]
         public GameObject MapPinPrefab;
@@ -317,6 +318,27 @@ namespace VoidWars {
             return ItemClasses.FirstOrDefault(c => c.ItemType == type);
         }
 
+        /// <summary>
+        /// Finds the object (ship or NPC) with the given ID.
+        /// </summary>
+        /// <param name="objID">Target ID.</param>
+        /// <returns>The object, or null.</returns>
+        public VoidWarsObject GetObjectWithID(int objID) {
+            return objects.FirstOrDefault(o => o.ID == objID);
+        }
+
+        private IEnumerable<VoidWarsObject> objects {
+            get {
+                foreach(var ship in _ships) {
+                    yield return ship;
+                }
+
+                foreach(var npc in _npcs) {
+                    yield return npc;
+                }
+            }
+        }
+
         #endregion Database
 
         /// <summary>
@@ -443,13 +465,6 @@ namespace VoidWars {
         /// Ses the selected target for something.
         /// </summary>
         public void SelectTarget(GameObject target) {
-            // If the ship is one of "ours", bail.
-            var targetShip = target.GetComponent<ShipController>();
-            if ((targetShip == null) || (targetShip.OwnerID == _communicator.ID)) {
-                UIAudioPlayer.PlayErrorSound();
-                return;
-            }
-
             // Check power requirements.
             var weaponType = _activeShip.GetWeaponType(_activeWeapon);
             var weaponClass = GetWeaponClass(weaponType);
@@ -477,7 +492,7 @@ namespace VoidWars {
         }
 
         private IEnumerator attackCoroutine(int sourceID, int targetID, int weaponSlot) {
-            const float margin = 2f;
+            const float margin = 10f;
 
             // Stash the current camera state.
             var oldCameraPos = CameraRig.transform.position;
@@ -487,9 +502,9 @@ namespace VoidWars {
             var sourceShip = GetShip(sourceID);
             var aspectRatio = Screen.width / Screen.height;
             var tanFOV = Mathf.Tan(Mathf.Deg2Rad * Camera.main.fieldOfView / 2.0f);
-            var targetShip = GetShip(targetID);
+            var target = GetObjectWithID(targetID);
             var sourceObj = sourceShip.gameObject;
-            var targetObj = targetShip.gameObject;
+            var targetObj = target.gameObject;
             var sourcePos = sourceObj.transform.position;
             var targetPos = targetObj.transform.position;
             var delta = targetPos - sourcePos;
@@ -507,7 +522,7 @@ namespace VoidWars {
             }
 
             var weapon = sourceShip.GetWeapon(weaponSlot);
-            yield return sourceShip.Attack(targetShip, weaponSlot, weapon);
+            yield return sourceShip.Attack(target, weaponSlot, weapon);
 
             // TODO: if target is wiped, do death stuff.
 
@@ -563,16 +578,18 @@ namespace VoidWars {
             if (!shipController.IsCloaked) {
                 var weapon = shipController.GetWeapon(_activeWeapon);
                 if (weapon.IsAvailable) { 
-                var range = weapon.Range;
-                var position = shipController.gameObject.transform.position;
-                var objectsInRange = Physics.OverlapSphere(position, range);
+                    var range = weapon.Range;
+                    var position = shipController.gameObject.transform.position;
+                    var objectsInRange = Physics.OverlapSphere(position, range);
                     foreach (var target in objectsInRange) {
                         if ((target.gameObject != shipController.gameObject) &&
                             (target.gameObject.CompareTag("Targetable"))) {
-                            // Can't target cloaked vessels.
                             var targetShip = target.GetComponent<ShipController>();
-                            if ((targetShip != null) && targetShip.IsCloaked) {
-                                continue;
+                            if (targetShip != null) {
+                                // Can't attack your own side or cloaked vessels
+                                if (IsOwner(targetShip.ID) || targetShip.IsCloaked) {
+                                    continue;
+                                }
                             }
 
                             // Target in range, but we need to check the angles.
@@ -590,24 +607,26 @@ namespace VoidWars {
         }
 
         /// <summary>
-        /// Applies damage to a ship.
+        /// Applies damage to an object.
         /// </summary>
-        /// <param name="shipID">The ID of the ship to damage.</param>
+        /// <param name="objID">The ID of the object to damage.</param>
         /// <param name="damage">The amount of damage to apply.</param>
         /// <param name="dT">Change in temerpature of the ship as a result of the attack.</param>
-        public void ApplyDamageToShip(int shipID, float damage, float dT) {
+        public void ApplyDamage(int objID, float damage, float dT) {
             // Do damage on server.
-            _communicator.CmdApplyDamageToShip(shipID, damage, dT);
+            _communicator.CmdApplyDamage(objID, damage, dT);
         }
 
         /// <summary>
-        /// Creates a damage indicator sprite.
+        /// Creates a damage indicator sprite for a ship.
         /// </summary>
-        /// <param name="shipID">The ID of the damaged ship.</param>
+        /// <param name="objID">The ID of the damaged object.</param>
         /// <param name="damage">The amount of damage.</param>
-        public void ShowDamage(int shipID, float damage) {
-            var ship = GetShip(shipID);
-            DamageIndicator.SetValue(ship.gameObject.transform.position, (int)damage);
+        public void ShowDamage(int objID, float damage) {
+            var ship = GetShip(objID);
+            if (ship != null) {
+                DamageIndicator.SetValue(ship.gameObject.transform.position, (int)damage);
+            }
         }
 
         /// <summary>
@@ -644,7 +663,7 @@ namespace VoidWars {
                 return false;
             }
 
-            if (Mathf.Acos(cosAngle) > angle/2f) {
+            if (Mathf.Acos(cosAngle) > angle) {
                 return false;
             }
 
@@ -953,6 +972,14 @@ namespace VoidWars {
         }
 
         /// <summary>
+        /// Removes an NPC from the controlled set.
+        /// </summary>
+        /// <param name="npc">The NPC to remove.</param>
+        public void RemoveNPC(NPCObject npc) {
+            _npcs.Remove(npc);
+        }
+
+        /// <summary>
         /// Updates the NPCs.
         /// </summary>
         public void UpdateNPCs() {
@@ -986,9 +1013,9 @@ namespace VoidWars {
 
             // Clean up any expired ones.
             for (int i = _npcs.Count-1; i >= 0; --i) {
-                if (_npcs[i].HasExpired) {
-                    Destroy(_npcs[i].gameObject);
-                    _npcs.RemoveAt(i);
+                var npc = _npcs[i];
+                if (npc.HasExpired) {
+                    NetworkServer.Destroy(npc.gameObject);
                 }
             }
 
@@ -1367,8 +1394,8 @@ namespace VoidWars {
 
         private void performAttack() {
             clearAttackTargets();
-            var targetShip = _target.GetComponent<ShipController>();
-            _communicator.CmdPerformAttack(_activeShipID, targetShip.ID, _activeWeapon);
+            var targetObj = _target.GetComponent<VoidWarsObject>();
+            _communicator.CmdPerformAttack(_activeShipID, targetObj.ID, _activeWeapon);
         }
 
         private void Start() {

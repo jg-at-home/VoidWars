@@ -128,12 +128,12 @@ namespace VoidWars {
         /// <param name="target">The target ship.</param>
         /// <param name="applyDamage">If true, compute damage.</param>
         /// <returns>Enumerator.</returns>
-        public IEnumerator Fire(ShipController ship, int slot, ShipController target, bool applyDamage) {
+        public IEnumerator Fire(ShipController ship, int slot, VoidWarsObject target, bool applyDamage) {
             _turnCounter = _class.TurnsBetweenUses;
             yield return attack(ship, slot, target, applyDamage);
         }
 
-        protected abstract IEnumerator attack(ShipController ship, int slot, ShipController target, bool applyDamage);
+        protected abstract IEnumerator attack(ShipController ship, int slot, VoidWarsObject target, bool applyDamage);
 
         private readonly WeaponClass _class;
         private int _turnCounter;
