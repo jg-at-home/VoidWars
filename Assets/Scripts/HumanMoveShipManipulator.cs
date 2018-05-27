@@ -23,24 +23,45 @@ namespace VoidWars {
             showTemplate();
         }
 
-        private void Update() {
-            int next = _currentMove;
-            if (Input.GetKeyDown(KeyCode.LeftArrow)) {
-                _gameController.UIAudioPlayer.PlayButtonClick();
-                next = _currentMove - 1;
-                if (next < 0) {
-                    next = _legalMoves.Count - 1;
-                }
-            }
-            else if (Input.GetKeyDown(KeyCode.RightArrow)) {
-                _gameController.UIAudioPlayer.PlayButtonClick();
-                next = _currentMove + 1;
+        private int nextMove(params MoveType [] types) {
+            var next = _currentMove;
+            while(true) {
+                ++next;
                 if (next == _legalMoves.Count) {
                     next = 0;
                 }
+
+                // Have we looped around?
+                if (next == _currentMove) {
+                    return next;
+                }
+
+                var nextMove = _legalMoves[next];
+                foreach(var type in types) {
+                    if (type == nextMove.MoveType) {
+                        return next;
+                    }
+                }
+            }
+        }
+
+        private void Update() {
+            int next = _currentMove;
+            if (Input.GetKeyDown(KeyCode.LeftArrow)) {
+                next = nextMove(MoveType.GentleTurnLeft, MoveType.SharpTurnLeft);
+            }
+            else if (Input.GetKeyDown(KeyCode.RightArrow)) {
+                next = nextMove(MoveType.GentleTurnRight, MoveType.SharpTurnRight);
+            }
+            else if (Input.GetKeyDown(KeyCode.UpArrow)) {
+                next = nextMove(MoveType.Forward);
+            }
+            else if (Input.GetKeyDown(KeyCode.UpArrow)) {
+                next = nextMove(MoveType.Reverse, MoveType.TurnAbout);
             }
 
             if (next != _currentMove) {
+                _gameController.UIAudioPlayer.PlayButtonClick();
                 _currentMove = next;
                 showTemplate();
             }
@@ -141,9 +162,10 @@ namespace VoidWars {
             var radius = Mathf.Max(colliderSize.x, colliderSize.y, colliderSize.z) / 2f;
             var overlaps = Physics.OverlapSphere(worldEndPosition, radius, _layerMask);
             if ((overlaps != null) && (overlaps.Length > 0)) {
-                // Colliding with something - discount oneself, though.
+                // Colliding with something - discount oneself and the board, though.
                 foreach(var overlap in overlaps) {
-                    if (!ReferenceEquals(overlap.gameObject, gameObject)) {
+                    if (!ReferenceEquals(overlap.gameObject, gameObject) && 
+                        !overlap.gameObject.CompareTag("Board")) {
                         return false;
                     }
                 }
