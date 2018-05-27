@@ -1,4 +1,4 @@
-﻿using System;
+﻿//#define VERBOSE
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -83,7 +83,9 @@ namespace VoidWars {
         /// <param name="index">The ship index.</param>
         [Command]
         public void CmdSetActiveShip(int index) {
+            #if VERBOSE
             Debug.LogFormat("CmdSetActiveShip({0}", index);
+            #endif
             controller.SetActiveShipByIndex(index, false);
         }
 
@@ -151,13 +153,17 @@ namespace VoidWars {
         /// <param name="shipID"></param>
         public void NotifyActiveShip(int ownerID, int shipID) {
             Debug.Assert(isServer);
+            #if VERBOSE
             Debug.LogFormat("NotifyActiveShip({0}, {1}) (ID={2})", ownerID, shipID, ID);
+            #endif
             RpcNotifyActiveShip(ownerID, shipID);
         }
 
         [ClientRpc]
         void RpcNotifyActiveShip(int ownerID, int shipID) {
+            #if VERBOSE
             Debug.LogFormat("RpcNotifyActiveShip({0}, {1}) (ID={2})", ownerID, shipID, ID);
+            #endif
             controller.NotifyActiveShip(ownerID, shipID);
         }
 

@@ -1,4 +1,5 @@
-﻿using System;
+﻿//#define VERBOSE
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -106,7 +107,9 @@ namespace VoidWars {
         /// </summary>
         /// <param name="level">The level of zoom {0,1,2}</param>
         public void SetZoomLevel(int level) {
+            #if VERBOSE
             Debug.LogFormat("GameController.SetZoomLevel({0})", level);
+            #endif
 
             if (_activeShip != null) {
                 CameraRig.ZoomTo(_activeShip.transform.position, level);
@@ -742,7 +745,9 @@ namespace VoidWars {
             Debug.Assert(!_ships.Contains(ship), "Duplicate controller?");
 
             // Implementation.
+            #if VERBOSE
             Debug.LogFormat("GameController.RegisterShip()");
+            #endif
 
             _ships.Add(ship);
 
@@ -828,7 +833,9 @@ namespace VoidWars {
         /// move on to the next ship.
         /// </summary>
         public void NextAction() {
+            #if VERBOSE
             Debug.Log("GameController.NextAction()");
+            #endif
 
             ++_actionCount;
             if (_actionCount > _activeShip.ActionsThisTurn) {
@@ -846,7 +853,9 @@ namespace VoidWars {
         /// updates the phase / state as required.
         /// </summary>
         public void NextShip() {
+            #if VERBOSE
             Debug.Log("GameController.NextShip()");
+            #endif
 
             _communicator.CmdNextShip();
         }
@@ -890,7 +899,9 @@ namespace VoidWars {
         /// Called to perform client work at the start of a round.
         /// </summary>
         public void BeginRoundClient() {
+            #if VERBOSE
             Debug.Log("GameController.BeginRoundClient()");
+            #endif
 
             // Update ships.
             foreach(var ship in _ships) {
@@ -904,7 +915,9 @@ namespace VoidWars {
         /// Called to perform client work at the end of a round.
         /// </summary>
         public void EndRoundClient() {
+            #if VERBOSE
             Debug.Log("GameController.EndRoundClient()");
+            #endif
         }
 
         /// <summary>
@@ -983,7 +996,9 @@ namespace VoidWars {
         /// Updates the NPCs.
         /// </summary>
         public void UpdateNPCs() {
+            #if VERBOSE
             Debug.Log("GameController.UpdateNPCs()");
+            #endif
             var numNPCs = _npcs.Count;
             if (numNPCs > 0) {
                 var syncToken = new NPCSyncToken(numNPCs);
@@ -1035,7 +1050,9 @@ namespace VoidWars {
         /// Called when a round begins.
         /// </summary>
         public void BeginRoundServer() {
+            #if VERBOSE
             Debug.LogFormat("GameController.BeginRoundServer({0})", _round);
+            #endif
 
             foreach (var shipController in _ships) {
                 shipController.BeginRound(_round);
@@ -1047,7 +1064,9 @@ namespace VoidWars {
         /// Called when a round ends.
         /// </summary>
         public void EndRoundServer() {
+            #if VERBOSE
             Debug.Log("GameController.EndRoundServer()");
+            #endif
             _selectedMoves.Clear();
         }
 
@@ -1070,7 +1089,9 @@ namespace VoidWars {
         /// Updates the game when a turn ends.
         /// </summary>
         public void AdvanceGame() {
+            #if VERBOSE
             Debug.Log("GameController.AdvanceGame()");
+            #endif
             switch(_state) {
                 case GameState.SETUP:
                     // Setup is done. Time to play!
@@ -1129,7 +1150,9 @@ namespace VoidWars {
         /// </summary>
         /// <param name="player">The player to add.</param>
         public void AddPlayer(PlayerServerRep player) {
+            #if VERBOSE
             Debug.LogFormat("GameController.AddPlayer({0})", player.PlayerID);
+            #endif
             _players.Add(player);
         }
 
@@ -1138,7 +1161,9 @@ namespace VoidWars {
         /// </summary>
         /// <param name="playerID">The player's ID.</param>
         public void RemovePlayer(int playerID) {
+            #if VERBOSE
             Debug.LogFormat("GameController.RemovePlayer({0})", playerID);
+            #endif
             var index = _players.FindIndex(p => p.PlayerID == playerID);
             if (index >= 0) {
                 _players.RemoveAt(index);
@@ -1255,7 +1280,9 @@ namespace VoidWars {
         /// </summary>
         /// <param name="shipID">The ship ID.</param>
         public void MoveFinished(int shipID) {
+            #if VERBOSE
             Debug.LogFormat("GameController.MoveFinished({0})", shipID);
+            #endif
             --_movesToMake;
             Debug.Assert(_movesToMake >= 0);
         }
@@ -1268,7 +1295,9 @@ namespace VoidWars {
         /// <param name="notify">If true, all clients are notified of the change.</param>
         public void SetState(GameState newState, bool notify) {
             if (_state != newState) {
+                #if VERBOSE
                 Debug.LogFormat("GameController.SetState({0})", newState);
+                #endif
                 _state = newState;
                 _activeShipIndex = 0;
                 if (notify) {
@@ -1309,7 +1338,9 @@ namespace VoidWars {
         /// <param name="notify">If true, all clients are notified of the change.</param>
         public void SetPlayPhase(PlayPhase newPhase, bool notify) {
             if (_playPhase != newPhase) {
+                #if VERBOSE
                 Debug.LogFormat("GameController.SetPlayPhase({0})", newPhase);
+                #endif
                 onExitPhase(_playPhase);
                 _playPhase = newPhase;
                 _activeShipIndex = 0;
@@ -1321,7 +1352,9 @@ namespace VoidWars {
         }
 
         private void onEnterPhase(PlayPhase newPhase) {
-            Debug.LogFormat("GameController.onEnterPhase{0})", newPhase);
+            #if VERBOSE
+            Debug.LogFormat("GameController.onEnterPhase({0})", newPhase);
+            #endif
 
             // TODO: Always reset zoom?
             var zoomControl = ControlPanel.GetComponentInChildren<ZoomButtonController>();
@@ -1346,7 +1379,9 @@ namespace VoidWars {
         }
 
         private void onExitPhase(PlayPhase oldPhase) {
-            Debug.LogFormat("GameController.onExitPhase{0})", oldPhase);
+            #if VERBOSE
+            Debug.LogFormat("GameController.onExitPhase({0})", oldPhase);
+            #endif
 
             switch(oldPhase) {
                 case PlayPhase.SELECTING_MOVES:

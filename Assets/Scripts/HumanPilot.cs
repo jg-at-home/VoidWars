@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿//#define VERBOSE
+using UnityEngine;
 
 namespace VoidWars {
     /// <summary>
@@ -6,7 +7,9 @@ namespace VoidWars {
     /// </summary>
     public class HumanPilot : Pilot {
         public override void OnShipActivation(GameController gameController, ShipController shipController) {
+            #if VERBOSE
             Debug.Log("HumanPilot.OnShipActivation()");
+            #endif
 
             // Ship has become active. Pick a manipulator depending on what state the game is in.
             var ship = shipController.gameObject;
@@ -38,7 +41,9 @@ namespace VoidWars {
         }
 
         public override void OnShipDeactivation(GameController gameController, ShipController shipController) {
+            #if VERBOSE
             Debug.Log("HumanPilot.OnShipDeactivation()");
+            #endif
 
             if (_current != null) {
                 _current.OnDeactivation();
