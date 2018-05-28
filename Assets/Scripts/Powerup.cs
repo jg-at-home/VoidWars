@@ -3,7 +3,7 @@ using UnityEngine.Networking;
 
 namespace VoidWars {
     /// <summary>
-    /// An ability conferred to a ship via a powerup.
+    /// An ability conferred to a ship via a powerup. Server-side record.
     /// </summary>
     public class PowerupAbilityServer {
         public readonly string PowerupID;
@@ -76,10 +76,11 @@ namespace VoidWars {
         }
 
         private void onCollection(ShipController ship) {
+            var controller = Util.GetGameController();
             switch(_info.Mode) {
                 case PowerupMode.Instantaneous:
                     // Has an immediate effect and then vanishes.
-                    Powerups.RunPayload(ship, _info.CollectAction);
+                    controller.ExecuteCommand(ship, _info.CollectAction);
                     break;
 
                 case PowerupMode.Cachable:

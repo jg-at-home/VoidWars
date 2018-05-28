@@ -12,7 +12,9 @@ MonoBehaviour:
   m_Name: ShipHealthPlus10Percent
   m_EditorClassIdentifier: 
   Name: Health+10%
-  CollectAction: ship health +0.1
+  DetailText: Increases health by 10% up to max
+  CollectAction: ship health_percent 10
   Frequency: 5
   Mode: 0
   TurnLimit: 0
+  Icon: {fileID: 21300000, guid: 40430cf47fb41004cba3650516f29506, type: 3}

@@ -12,6 +12,9 @@ namespace VoidWars {
         [Tooltip("The name of the powerup")]
         public string Name;
 
+        [Tooltip("Detailed description of the powerup")]
+        public string DetailText;
+
         [Tooltip("The action command")]
         public string CollectAction;
 
@@ -23,5 +26,8 @@ namespace VoidWars {
 
         [Tooltip("If mode is turn-limited, how long the powerup can be held")]
         public int TurnLimit;
+
+        [Tooltip("Icon for the ability")]
+        public Sprite Icon;
     }
 }

@@ -168,6 +168,19 @@ namespace VoidWars {
         }
 
         /// <summary>
+        /// Shows chnage in health for a ship.
+        /// </summary>
+        /// <param name="shipID">The ship ID.</param>
+        /// <param name="delta">The change in health.</param>
+        [Command]
+        public void CmdShowValueChange(int shipID, float delta, char symbol) {
+            var color = delta < 0 ? Color.red : Color.green;
+            var value = (int)Mathf.Abs(delta);
+            string text = string.Format("{0}:{1}", symbol, value.ToString());
+            RpcShowPopupIndicator(shipID, text, color);
+        }
+
+        /// <summary>
         /// Applies damage to an objecton the server.
         /// </summary>
         /// <param name="objID">The object's ID</param>
@@ -178,13 +191,13 @@ namespace VoidWars {
             var obj = controller.GetObjectWithID(objID);
             damage = obj.ComputeDamage(damage, dT);
             if (obj is ShipController) {
-                RpcShowDamagePopup(objID, damage);
+                RpcShowPopupIndicator(objID, ((int)damage).ToString(), Color.white);
             }
         }
 
         [ClientRpc]
-        void RpcShowDamagePopup(int shipID, float damage) {
-            controller.ShowDamage(shipID, damage);
+        void RpcShowPopupIndicator(int shipID, string text, Color color) {
+            controller.ShowPopupIndicator(shipID, text, color);
         }
 
         /// <summary>

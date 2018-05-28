@@ -103,6 +103,18 @@ namespace VoidWars {
                 }
             }
 
+            // Abilities.
+            foreach(var ability in _powerupAbilitiesClient) {
+                var info = controller.GetPowerupInfo(ability);
+                actions.Add(new ActionItem {
+                    Action = info.CollectAction,
+                    Description = info.Name,
+                    Detail = info.DetailText,
+                    Icon = info.Icon,
+                    EditorPrefabInfo = "AbilityPanel"
+                });
+            }
+
             // You can always pass!
             actions.Add(new ActionItem {
                 Action = "pass",

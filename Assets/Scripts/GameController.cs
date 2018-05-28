@@ -622,6 +622,15 @@ namespace VoidWars {
         }
 
         /// <summary>
+        /// Shows a change in health of a ship. 
+        /// </summary>
+        /// <param name="shipID">The ship ID.</param>
+        /// <param name="delta">The change in health.</param>
+        public void ShowHealthChange(int shipID, float delta) {
+            _communicator.CmdShowValueChange(shipID, delta, 'H');
+        }
+
+        /// <summary>
         /// Applies damage to an object.
         /// </summary>
         /// <param name="objID">The ID of the object to damage.</param>
@@ -633,14 +642,15 @@ namespace VoidWars {
         }
 
         /// <summary>
-        /// Creates a damage indicator sprite for a ship.
+        /// Creates an indicator sprite for a ship or object.
         /// </summary>
-        /// <param name="objID">The ID of the damaged object.</param>
-        /// <param name="damage">The amount of damage.</param>
-        public void ShowDamage(int objID, float damage) {
+        /// <param name="objID">The ID of the object.</param>
+        /// <param name="text">The text to show.</param>
+        /// <param name="color">The text color.</param>
+        public void ShowPopupIndicator(int objID, string text, Color color) {
             var ship = GetShip(objID);
             if (ship != null) {
-                DamageIndicator.SetValue(ship.gameObject.transform.position, (int)damage);
+                DamageIndicator.SetValue(ship.gameObject.transform.position, text, color);
             }
         }
 

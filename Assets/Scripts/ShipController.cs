@@ -90,10 +90,11 @@ namespace VoidWars {
         }
 
         /// <summary>
-        /// Gets the ship's health level.
+        /// Gets / sets the ship's health level.
         /// </summary>
         public float Health {
             get { return _health; }
+            set { _health = value; }
         }
 
         /// <summary>
@@ -348,16 +349,6 @@ namespace VoidWars {
         [Client]
         public IList<string> GetPowerupAbilities() {
             return _powerupAbilitiesClient;
-        }
-
-        /// <summary>
-        /// Changes health, up to the assigned max and never less than 1.
-        /// </summary>
-        /// <param name="percent">Percentage change.</param>
-        [Server]
-        public void AdjustHealth(float percent) {
-            var newHealth = _health * (1f + (percent / 100f));
-            _health = Mathf.Clamp(newHealth, 1f, MaxHealth);
         }
 
         /// <summary>

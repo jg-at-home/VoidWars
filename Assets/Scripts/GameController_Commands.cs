@@ -10,8 +10,9 @@ namespace VoidWars {
         /// <summary>
         /// Executes the command string provided.
         /// </summary>
+        /// <param name="ship">The ship to affect.</param>
         /// <param name="command">The command to execute.</param>
-        public void ExecuteCommand(string command) {
+        public void ExecuteCommand(ShipController ship, string command) {
             Debug.LogFormat("GameController.ExecuteCommand({0})", command);
 
             var parts = command.ToLower().Split(' ');
@@ -23,12 +24,12 @@ namespace VoidWars {
 
                 case "shields": {
                         var status = bool.Parse(parts[1]);
-                        StartCoroutine(executeCloseup(_activeShipID, status, executeShields, 1f));
+                        StartCoroutine(executeCloseup(ship.ID, status, executeShields, 1f));
                     }
                     break;
 
                 case "aux":
-                    if (handleAuxCommand(parts)) {
+                    if (handleAuxCommand(ship, parts)) {
                         _actionComplete = true;
                     }
                     break;
@@ -37,52 +38,64 @@ namespace VoidWars {
                     // TODO: repair tasks.
                     break;
 
-                // TODO: everything else
+                case "health_percent": {
+                        float percent = float.Parse(parts[2]);
+                        float oldHealth = ship.Health;
+                        float delta = oldHealth * percent / 100f;
+                        float newHealth = Mathf.Clamp(oldHealth + delta, 0f, ship.MaxHealth);
+                        if (newHealth != oldHealth) {
+                            ship.Health = newHealth;
+                            ShowHealthChange(ship.ID, newHealth - oldHealth);
+                        }
+                    }
+                    break;
+
+                    // TODO: everything else
             }
         }
 
-        private bool handleAuxCommand(string[] parts) {
+        private bool handleAuxCommand(ShipController ship, string[] parts) {
             var complete = true;
             switch (parts[1]) {
                 case "shinobi": {
                         var status = bool.Parse(parts[2]);
-                        executeCloak(_activeShip, status);
+                        executeCloak(ship, status);
                     }
                     break;
 
                 case "scanners": {
                         var status = bool.Parse(parts[2]);
-                        executeScanners(_activeShip, status);
+                        executeScanners(ship, status);
                     }
                     break;
 
                 case "flarelauncher": {
                         // It's a one-shot so no need to parse the argument.
-                        _activeShip.UseOneShotAuxiliary(AuxType.FlareLauncher, () => _actionComplete = true);
+                        ship.UseOneShotAuxiliary(AuxType.FlareLauncher, () => _actionComplete = true);
                         complete = false;
                     }
                     break;
 
                 case "erbinducer": {
-                        _communicator.CmdTeleportShip(_activeShipID);
+                        _communicator.CmdTeleportShip(ship.ID);
                         complete = false;
                     }
                     break;
 
                 case "chafflauncher": {
-                        _communicator.CmdLaunchChaff(_activeShipID);
+                        _communicator.CmdLaunchChaff(ship.ID);
                         complete = false;
                     }
                     break;
 
                 case "minelauncher": {
-                        _communicator.CmdDeployMine(_activeShipID);
+                        _communicator.CmdDeployMine(ship.ID);
                         complete = false;
                     }
                     break;
 
                 case "empgenerator": {
-                        _communicator.CmdGenerateEMP(_activeShipID);
+                        _communicator.CmdGenerateEMP(ship.ID);
                     }
                     break;
 

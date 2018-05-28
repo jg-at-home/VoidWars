@@ -5,19 +5,22 @@ using UnityEngine;
 namespace VoidWars {
     public static class Util {
         /// <summary>
-        /// Shuffles a list of things.
+        /// Shuffles a list of things using Fisher-Yates.
         /// </summary>
         /// <typeparam name="T">Element type</typeparam>
         /// <param name="input">Unshuffled list.</param>
         /// <returns>The shuffled list.</returns>
         public static IList<T> Shuffled<T>(this IList<T> input) {
             var result = new List<T>(input);
-            for(var i = 0; i < result.Count; ++i) {
-                var j = Random.Range(0, result.Count);
-                var tmp = result[i];
-                result[i] = result[j];
-                result[j] = tmp;
+            var n = result.Count;
+            while(n > 1) {
+                --n;
+                var k = Random.Range(0, n + 1);
+                var tmp = result[k];
+                result[k] = result[n];
+                result[n] = tmp;
             }
+
             return result;
         }
 

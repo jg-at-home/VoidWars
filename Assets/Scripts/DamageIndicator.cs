@@ -20,7 +20,7 @@ namespace VoidWars {
             _text.enabled = false;
         }
 
-        public void SetValue(Vector3 position, int value) {
+        public void SetValue(Vector3 position, string value, Color color) {
             var viewportPosition = Camera.main.WorldToViewportPoint(position);
 
             // Bias towards centre of screen.
@@ -32,7 +32,8 @@ namespace VoidWars {
                                          (viewportPosition.y * _canvasRT.sizeDelta.y) - (_canvasRT.sizeDelta.y * 0.5f));
             _myRT.anchoredPosition = uiPosition;
 
-            _text.text = value.ToString();
+            _text.text = value;
+            _text.color = color;
             _text.enabled = true;
             _animation.Play();
             StartCoroutine(disableOnFinish());
