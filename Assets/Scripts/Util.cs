@@ -5,6 +5,23 @@ using UnityEngine;
 namespace VoidWars {
     public static class Util {
         /// <summary>
+        /// Shuffles a list of things.
+        /// </summary>
+        /// <typeparam name="T">Element type</typeparam>
+        /// <param name="input">Unshuffled list.</param>
+        /// <returns>The shuffled list.</returns>
+        public static IList<T> Shuffled<T>(this IList<T> input) {
+            var result = new List<T>(input);
+            for(var i = 0; i < result.Count; ++i) {
+                var j = Random.Range(0, result.Count);
+                var tmp = result[i];
+                result[i] = result[j];
+                result[j] = tmp;
+            }
+            return result;
+        }
+
+        /// <summary>
         /// Gets the singleton game controller.
         /// </summary>
         /// <returns>The game controller instance.</returns>

@@ -44,6 +44,7 @@ namespace VoidWars {
         public AuxiliaryClass[] ItemClasses;
         public GameObject[] StartPositions;
         public MoveTemplate[] MoveTemplates;
+        public PowerupInfo[] Powerups;
 
         [Header("Configuration")]
         public GameConfig Configuration;
@@ -70,9 +71,11 @@ namespace VoidWars {
         public GameObject TargetIndicatorPrefab;
         public GameObject ScannerInfoPrefab;
         public ShipCameo ShipCameoPrefab;
+        public GameObject PickupPrefab;
 
         [Header("Parameters")]
         public float NPCUpdateTimeout = 10f;
+        public float PowerupSpawnChance = 0.25f;
 
         public void OnShieldsFailed(ShipController ship) {
             Debug.Log("Shields failed");
@@ -340,6 +343,15 @@ namespace VoidWars {
                     yield return npc;
                 }
             }
+        }
+
+        /// <summary>
+        /// Gets power-up info by name.
+        /// </summary>
+        /// <param name="infoName">The name of the powerup.</param>
+        /// <returns>The info for the power-up, or null.</returns>
+        public PowerupInfo GetPowerupInfo(string infoName) {
+            return Powerups.FirstOrDefault(p => p.Name == infoName);
         }
 
         #endregion Database
@@ -939,6 +951,49 @@ namespace VoidWars {
 
         #region Server code
         /// <summary>
+        /// Gets the location for a pickup to appear in a pseudo-random fashion.
+        /// </summary>
+        /// <param name="location">The resulting location.</param>
+        /// <returns>If false, a location couldn't be found.</returns>
+        public bool GetPickupLocation(out Vector3 location) {
+            var layerMask = 1 << LayerMask.NameToLayer("Ships");
+            layerMask |= 1 << LayerMask.NameToLayer("ActiveObjects");
+
+            var points = _teleportPoints.Shuffled();
+            foreach(var point in points) {
+                if (!checkForNeaarbyObjects(point, 1f, layerMask)) {
+                    location = point;
+                    return true;
+                }
+            }
+
+            Debug.Log("Couldn't find a place for a pickup");
+            location = Vector3.zero;
+            return false;
+        }
+
+        private string choosePickupPayload() {
+            // TODO: implement me.
+            return Powerups[0].Name;
+
+        }
+
+        private bool checkForNeaarbyObjects(Vector3 position, float radius, int layerMask) {
+            var nearby = Physics.OverlapSphere(position, radius, layerMask);
+            if (nearby == null || nearby.Length == 0) {
+                return false;
+            }
+
+            foreach(var proximate in nearby) {
+                if (!proximate.gameObject.CompareTag("Board")) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
         /// Computes a destination position for teleporting to.
         /// </summary>
         /// <param name="ship">The teleporting ship.</param>
@@ -958,7 +1013,7 @@ namespace VoidWars {
                 }
 
                 if (distance > bestDistance) {
-                    if (!Physics.CheckSphere(point, 1f, layerMask)) {
+                    if (!checkForNeaarbyObjects(point, 1f, layerMask)) {
                         bestDistance = distance;
                         bestPoint = i;
                     }
@@ -1054,10 +1109,26 @@ namespace VoidWars {
             Debug.LogFormat("GameController.BeginRoundServer({0})", _round);
             #endif
 
+            // Ships.
             foreach (var shipController in _ships) {
                 shipController.BeginRound(_round);
             }
             ++_round;
+
+            // Powerups.
+            if (_activePowerup == null) {
+                var chance = UnityEngine.Random.Range(0f, 1f);
+                if (chance < PowerupSpawnChance) {
+                    // Pick an unoccupied teleport point at random to spawn the pickup.
+                    Vector3 position;
+                    if (GetPickupLocation(out position)) {
+                        _activePowerup = Instantiate(PickupPrefab, position, Quaternion.identity);
+                        var powerupData = _activePowerup.GetComponent<Powerup>();
+                        powerupData.PowerupID = choosePickupPayload();
+                        NetworkServer.Spawn(_activePowerup);
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -1456,6 +1527,7 @@ namespace VoidWars {
         private int _movesToMake;
         private readonly List<NPCObject> _npcs = new List<NPCObject>();
         private Vector3[] _teleportPoints;
+        private GameObject _activePowerup;
         #endregion Server Data
 
         private Communicator _communicator;

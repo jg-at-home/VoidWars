@@ -162,10 +162,11 @@ namespace VoidWars {
             var radius = Mathf.Max(colliderSize.x, colliderSize.y, colliderSize.z) / 2f;
             var overlaps = Physics.OverlapSphere(worldEndPosition, radius, _layerMask);
             if ((overlaps != null) && (overlaps.Length > 0)) {
-                // Colliding with something - discount oneself and the board, though.
+                // Colliding with something - discount oneself. pickups and the board, though.
                 foreach(var overlap in overlaps) {
                     if (!ReferenceEquals(overlap.gameObject, gameObject) && 
-                        !overlap.gameObject.CompareTag("Board")) {
+                        !overlap.gameObject.CompareTag("Board") &&
+                        !overlap.gameObject.CompareTag("Powerup")) {
                         return false;
                     }
                 }

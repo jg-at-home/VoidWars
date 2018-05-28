@@ -12,6 +12,7 @@ TagManager:
   - Teleport
   - Chaff
   - Board
+  - Powerup
   layers:
   - Default
   - TransparentFX

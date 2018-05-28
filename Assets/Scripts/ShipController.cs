@@ -345,6 +345,32 @@ namespace VoidWars {
             return result;
         }
 
+        [Client]
+        public IList<string> GetPowerupAbilities() {
+            return _powerupAbilitiesClient;
+        }
+
+        /// <summary>
+        /// Changes health, up to the assigned max and never less than 1.
+        /// </summary>
+        /// <param name="percent">Percentage change.</param>
+        [Server]
+        public void AdjustHealth(float percent) {
+            var newHealth = _health * (1f + (percent / 100f));
+            _health = Mathf.Clamp(newHealth, 1f, MaxHealth);
+        }
+
+        /// <summary>
+        /// Adds a powerup ability that can be used on later turns as an action.
+        /// </summary>
+        /// <param name="info">Data about the powerup.</param>
+        [Server]
+        public void AddPowerupAbility(PowerupInfo info) {
+            var ability = new PowerupAbilityServer(info.Name, info.Mode, info.TurnLimit);
+            _powerupAbilitiesServer.Add(ability);
+            _powerupAbilitiesClient.Add(info.Name);
+        }
+
         /// <summary>
         /// Coroutine for performing an attack.
         /// </summary>
@@ -776,7 +802,8 @@ namespace VoidWars {
             // Run tasks.
             serviceTasks();
 
-            // Update skills.
+            // Update abilities.
+            serviceAbilities();
 
             // Drain some power, recharge some power.
             if (round > 0) {
@@ -798,6 +825,19 @@ namespace VoidWars {
                 task.OnTurnStart();
                 if (task.HasExpired) {
                     _tasks.RemoveAt(i);
+                }
+            }
+        }
+
+        [Server]
+        private void serviceAbilities() {
+            for(var i = _powerupAbilitiesServer.Count-1; i >= 0; --i) {
+                var ability = _powerupAbilitiesServer[i];
+                ability.PerTurnUpdate();
+                if (ability.HasExpired) {
+                    Debug.LogFormat("Ability '{0}' has expired", ability.PowerupID);
+                    _powerupAbilitiesServer.RemoveAt(i);
+                    _powerupAbilitiesClient.RemoveAt(i);
                 }
             }
         }
@@ -1384,5 +1424,7 @@ namespace VoidWars {
         private List<Task> _tasks;
         private readonly CrewMember[] _crew = new CrewMember[3];
         private ShipCameo _cameo;
+        private readonly List<PowerupAbilityServer> _powerupAbilitiesServer = new List<PowerupAbilityServer>();
+        private readonly SyncListString _powerupAbilitiesClient = new SyncListString();
     }
 }
