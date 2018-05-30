@@ -56,7 +56,7 @@ namespace VoidWars {
 
                 // Push to clients.
                 var gameController = Util.GetGameController();
-                gameController.ApplyDamage(target.ID, damage, 0f);
+                gameController.ApplyDamage(ship.ID, target.ID, damage, 0f);
             }
         }
 

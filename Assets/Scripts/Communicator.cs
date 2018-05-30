@@ -187,9 +187,10 @@ namespace VoidWars {
         /// <param name="damage">The amount of damage to do.</param>
         /// <param name="dT">The temperature effect/</param>
         [Command]
-        public void CmdApplyDamage(int objID, float damage, float dT) {
+        public void CmdApplyDamage(int sourceID, int objID, float damage, float dT) {
+            var src = controller.GetObjectWithID(sourceID);
             var obj = controller.GetObjectWithID(objID);
-            damage = obj.ComputeDamage(damage, dT);
+            damage = obj.ComputeDamage(src, damage, dT);
             if (obj is ShipController) {
                 RpcShowPopupIndicator(objID, ((int)damage).ToString(), Color.white);
             }

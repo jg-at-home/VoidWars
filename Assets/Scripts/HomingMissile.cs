@@ -147,7 +147,7 @@ namespace VoidWars {
                     var launchShip = controller.GetShip(_ownerID);
                     var damage = launchShip.LuckRoll * _launcher.MaxDamage;
                     foreach (var obj in toDamage) {
-                        controller.ApplyDamage(obj.ID, damage, 0f);
+                        controller.ApplyDamage(_ownerID, obj.ID, damage, 0f);
                     }
 
                     // Create an explosion.

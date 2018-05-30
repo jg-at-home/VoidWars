@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.Networking;
 
 namespace VoidWars {
     /// <summary>
@@ -124,6 +126,64 @@ namespace VoidWars {
                 EditorPrefabInfo = "ImageDetailPanel PassImage"
             });
             return actions;
+        }
+
+        /// <summary>
+        /// Executes a command.
+        /// </summary>
+        /// <param name="args">Command arguments.</param>
+        [Command]
+        public void CmdExecuteCommand(string args) {
+            var parts = args.Split(' ');
+            switch(parts[1]) {
+                case "health": {
+                        var delta = getDelta(parts[2], _health);
+                        var oldHealth = _health;
+                        var newHealth = Mathf.Clamp(_health + delta, 1f, MaxHealth);
+                        if (Mathf.Abs(oldHealth - newHealth) >= 1.0e-5f) {
+                            _health = newHealth;
+                            var color = delta < 0f ? Color.red : Color.green;
+                            var msg = string.Format("H:{0:+#;-#}", (int)delta);
+                            RpcShowPopupIndicator(msg, color);
+                        }
+                    }
+                    break;
+
+                case "energy": {
+                        var delta = getDelta(parts[2], _health);
+                        var oldEnergy = _energy;
+                        var newEnergy = Mathf.Clamp(_energy+ delta, 1f, MaxEnergy);
+                        if (Mathf.Abs(oldEnergy - newEnergy) >= 1.0e-5f) {
+                            _energy = newEnergy;
+                            var color = delta < 0f ? Color.red : Color.green;
+                            var msg = string.Format("E:{0:+#;-#}", (int)delta);
+                            RpcShowPopupIndicator(msg, color);
+                        }
+                    }
+                    break;
+
+                case "penetrate-shields":
+                    break;
+            }
+        }
+
+        private static float getDelta(string amount, float current) {
+            float delta;
+            if (amount[amount.Length - 1] == '%') {
+                amount = amount.Substring(0, amount.Length - 1);
+                var percent = float.Parse(amount);
+                delta = (current * percent / 100f);
+            }
+            else {
+                delta = float.Parse(amount);
+            }
+
+            return delta;
+        }
+
+        [ClientRpc]
+        void RpcShowPopupIndicator(string text, Color color) {
+            controller.ShowPopupIndicator(ID, text, color);
         }
     }
 }

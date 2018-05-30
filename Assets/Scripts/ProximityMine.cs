@@ -57,12 +57,12 @@ namespace VoidWars {
             _deployed = true;
         }
 
-        public override float ComputeDamage(float damage, float dT) {
+        public override float ComputeDamage(VoidWarsObject source, float damage, float dT) {
             if (damage > 0f) {
                 explode();
             }
 
-            return base.ComputeDamage(damage, dT);
+            return base.ComputeDamage(source, damage, dT);
         }
 
         private void OnTriggerEnter(Collider other) {
@@ -72,7 +72,7 @@ namespace VoidWars {
                     if (ship != null) {
                         explode();
                         var damage = _launchingShip.LuckRoll * _launcher.MaxDamage;
-                        controller.ApplyDamage(ship.ID, damage, 0f);
+                        controller.ApplyDamage(_launchingShip.ID, ship.ID, damage, 0f);
                     }
                 }
             }

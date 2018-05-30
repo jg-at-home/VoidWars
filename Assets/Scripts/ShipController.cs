@@ -5,6 +5,14 @@ using UnityEngine;
 using UnityEngine.Networking;
 
 namespace VoidWars {
+    [Flags]
+    public enum StatusFlag {
+        None = 0,
+        PenetrateShields = 1,
+
+        // More above here.
+    }
+
     public partial class ShipController : VoidWarsObject {
         /// <summary>
         /// Front node where movement indicators attach.
@@ -346,6 +354,31 @@ namespace VoidWars {
             return result;
         }
 
+        /// <summary>
+        /// Sets a status flag.
+        /// </summary>
+        /// <param name="flag">The flag to set.</param>
+        public void SetStatuFlag(StatusFlag flag) {
+            _statusFlags |= flag;
+        }
+
+        /// <summary>
+        /// Clears a status flag.
+        /// </summary>
+        /// <param name="flag">The flag to clear.</param>
+        public void ClearStatusFlag(StatusFlag flag) {
+            _statusFlags &= ~flag;
+        }
+
+        /// <summary>
+        /// Checks if a flag is set.
+        /// </summary>
+        /// <param name="flag">The flag to check.</param>
+        /// <returns>True if flag is set.</returns>
+        public bool IsStatusFlagSet(StatusFlag flag) {
+            return (_statusFlags & flag) != 0;
+        }
+
         [Client]
         public IList<string> GetPowerupAbilities() {
             return _powerupAbilitiesClient;
@@ -675,18 +708,21 @@ namespace VoidWars {
             }
         }
 
-        /// <summary>
-        /// Computes and applies damage to the ship.
-        /// </summary>
-        /// <param name="damage">The amount of damage to apply.</param>
-        /// <param name="dT">The temperature effect/</param>
-        /// <returns>The amount of damage done</returns>
         [Server]
-        public override float ComputeDamage(float damage, float dT) {
+        public override float ComputeDamage(VoidWarsObject source, float damage, float dT) {
             Debug.LogFormat("Ship ID {0} took {1} damage", ID, damage);
 
             // How much the shields reduce damage by at 100% when energy is nominally distributed (25%)
-            if (ShieldsActive) {
+            var ignoreShields = false;
+            var sourceShip = source.GetComponent<ShipController>();
+            if (sourceShip != null) {
+                if (sourceShip.IsStatusFlagSet(StatusFlag.PenetrateShields)) {
+                    ignoreShields = true;
+                    sourceShip.ClearStatusFlag(StatusFlag.PenetrateShields);
+                }
+            }
+
+            if (ShieldsActive && !ignoreShields) {
                 var shieldFrac = _shieldPercent / 100f;
                 var shieldEfficiency = Mathf.Min(_data.MaxShieldEfficiency, 1f) * (_energyBudget.Available(EnergyConsumer.Shields)/0.25f);
                 var shieldReduction = Mathf.Clamp01(shieldFrac * shieldEfficiency);
@@ -826,10 +862,32 @@ namespace VoidWars {
                 var ability = _powerupAbilitiesServer[i];
                 ability.PerTurnUpdate();
                 if (ability.HasExpired) {
-                    Debug.LogFormat("Ability '{0}' has expired", ability.PowerupID);
+                    var msg = string.Format("Ability '<color=orange>{0}<.color> has expired", ability.PowerupID);
+                    RpcShowMsg(msg, Role.Captain);
+
                     _powerupAbilitiesServer.RemoveAt(i);
                     _powerupAbilitiesClient.RemoveAt(i);
                 }
+            }
+        }
+
+        /// <summary>
+        /// Removes a named ability from the ship.
+        /// </summary>
+        /// <param name="name">The ability name.</param>
+        [Command]
+        public void CmdRemoveAbility(string name) {
+            var index = _powerupAbilitiesServer.FindIndex(a => a.PowerupID == name);
+            Debug.Assert(index >= 0);
+            _powerupAbilitiesServer.RemoveAt(index);
+            _powerupAbilitiesClient.RemoveAt(index);
+        }
+
+        [ClientRpc]
+        void RpcShowMsg(string msg, Role role) {
+            if (controller.IsOwner(ID)) {
+                var crewMember = GetCrewMember(role);
+                controller.ShowMsg(msg, crewMember.Photo);
             }
         }
 
@@ -1392,6 +1450,7 @@ namespace VoidWars {
         [SyncVar] private float _shieldPercent;
         [SyncVar(hook="onHullTemperatureChanged")] private float _hullTemperature;
         [SyncVar] private float _health;
+        [SyncVar] private StatusFlag _statusFlags = StatusFlag.None;
         private bool _lifeSupportOK = true;
         private AuxState _primaryWeaponState;
         private AuxState _secondaryWeaponState;

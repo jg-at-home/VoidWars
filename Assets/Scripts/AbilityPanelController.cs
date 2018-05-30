@@ -1,4 +1,5 @@
-﻿using TMPro;
+﻿using System;
+using TMPro;
 using UnityEngine.UI;
 
 namespace VoidWars {
@@ -11,7 +12,8 @@ namespace VoidWars {
         public override void SelectAction() {
             var controller = Util.GetGameController();
             var ship = controller.GetActiveShip();
-            controller.ExecuteCommand(ship, Item.Action);
+            ship.CmdExecuteCommand(Item.Action);
+            ship.CmdRemoveAbility(Item.Description);
         }
 
         protected override void initializeInner(ActionItem item, string[] args) {

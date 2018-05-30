@@ -622,23 +622,15 @@ namespace VoidWars {
         }
 
         /// <summary>
-        /// Shows a change in health of a ship. 
-        /// </summary>
-        /// <param name="shipID">The ship ID.</param>
-        /// <param name="delta">The change in health.</param>
-        public void ShowHealthChange(int shipID, float delta) {
-            _communicator.CmdShowValueChange(shipID, delta, 'H');
-        }
-
-        /// <summary>
         /// Applies damage to an object.
         /// </summary>
+        /// <param name="sourceID">The ID of the object causing the damage.</param>
         /// <param name="objID">The ID of the object to damage.</param>
         /// <param name="damage">The amount of damage to apply.</param>
         /// <param name="dT">Change in temerpature of the ship as a result of the attack.</param>
-        public void ApplyDamage(int objID, float damage, float dT) {
+        public void ApplyDamage(int sourceID, int objID, float damage, float dT) {
             // Do damage on server.
-            _communicator.CmdApplyDamage(objID, damage, dT);
+            _communicator.CmdApplyDamage(sourceID, objID, damage, dT);
         }
 
         /// <summary>

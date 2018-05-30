@@ -38,18 +38,6 @@ namespace VoidWars {
                     // TODO: repair tasks.
                     break;
 
-                case "health_percent": {
-                        float percent = float.Parse(parts[2]);
-                        float oldHealth = ship.Health;
-                        float delta = oldHealth * percent / 100f;
-                        float newHealth = Mathf.Clamp(oldHealth + delta, 0f, ship.MaxHealth);
-                        if (newHealth != oldHealth) {
-                            ship.Health = newHealth;
-                            ShowHealthChange(ship.ID, newHealth - oldHealth);
-                        }
-                    }
-                    break;
-
                     // TODO: everything else
             }
         }
