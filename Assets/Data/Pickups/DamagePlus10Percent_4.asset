@@ -9,12 +9,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9eb11ab5883862647a61ba250f23557e, type: 3}
-  m_Name: ShipShieldPenetratingWeapons
+  m_Name: DamagePlus10Percent_4
   m_EditorClassIdentifier: 
-  Name: ShieldPenetrator
-  DetailText: Next weapon attack penetrates shields
-  CollectAction: ship penetrate-shields
-  Frequency: 1
+  Name: Damage+10%
+  DetailText: Increases max damage by 10%
+  CollectAction: ship MaxDamage 10% 4
+  Frequency: 5
   Mode: 2
-  TurnLimit: 3
-  Icon: {fileID: 21300000, guid: c0f6d5f55123f6948a66ec9c9f1f2cf3, type: 3}
+  TurnLimit: 4
+  Icon: {fileID: 21300000, guid: 1882d0876f8e99f4fb27b8643da0a9d5, type: 3}

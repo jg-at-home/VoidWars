@@ -76,18 +76,30 @@ namespace VoidWars {
         }
 
         private void onCollection(ShipController ship) {
-            var controller = Util.GetGameController();
             switch(_info.Mode) {
                 case PowerupMode.Instantaneous:
                     // Has an immediate effect and then vanishes.
-                    controller.ExecuteCommand(ship, _info.CollectAction);
+                    ship.ExecuteCommand(_info.CollectAction);
                     break;
 
                 case PowerupMode.Cachable:
-                case PowerupMode.TurnLimited:
-                    // The collecting ship can keep hold of the conferred ability.
-                    ship.AddPowerupAbility(_info);
+                case PowerupMode.TurnLimited: {
+                        // The collecting ship can keep hold of the conferred ability.
+                        ship.AddPowerupAbility(_info);
+                        var msg = string.Format("Acquired powerup <color=orange>{0}</color>", ToString());
+                        ship.ShowMessage(msg, Role.Captain);
+                    }
                     break;
+
+            }
+        }
+
+        public override string ToString() {
+            if (_info.Mode == PowerupMode.TurnLimited) {
+                return string.Format("{0} ({1})", _info.Name, _info.TurnLimit);
+            }
+            else {
+                return _info.Name;
             }
         }
 

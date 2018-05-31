@@ -1,4 +1,5 @@
-﻿using System;
+﻿//#define VERBOSE
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -358,7 +359,7 @@ namespace VoidWars {
         /// Sets a status flag.
         /// </summary>
         /// <param name="flag">The flag to set.</param>
-        public void SetStatuFlag(StatusFlag flag) {
+        public void SetStatusFlag(StatusFlag flag) {
             _statusFlags |= flag;
         }
 
@@ -797,6 +798,11 @@ namespace VoidWars {
             return damage;
         }
 
+        [Server]
+        public void ShowMessage(string msg, Role role) {
+            RpcShowMessage(msg, role);
+        }
+
         [ClientRpc]
         void RpcBreakItem(AuxType itemType) {
             var item = _equipment.Find(e => e.ItemType == itemType);
@@ -863,31 +869,11 @@ namespace VoidWars {
                 ability.PerTurnUpdate();
                 if (ability.HasExpired) {
                     var msg = string.Format("Ability '<color=orange>{0}<.color> has expired", ability.PowerupID);
-                    RpcShowMsg(msg, Role.Captain);
+                    RpcShowMessage(msg, Role.Captain);
 
                     _powerupAbilitiesServer.RemoveAt(i);
                     _powerupAbilitiesClient.RemoveAt(i);
                 }
-            }
-        }
-
-        /// <summary>
-        /// Removes a named ability from the ship.
-        /// </summary>
-        /// <param name="name">The ability name.</param>
-        [Command]
-        public void CmdRemoveAbility(string name) {
-            var index = _powerupAbilitiesServer.FindIndex(a => a.PowerupID == name);
-            Debug.Assert(index >= 0);
-            _powerupAbilitiesServer.RemoveAt(index);
-            _powerupAbilitiesClient.RemoveAt(index);
-        }
-
-        [ClientRpc]
-        void RpcShowMsg(string msg, Role role) {
-            if (controller.IsOwner(ID)) {
-                var crewMember = GetCrewMember(role);
-                controller.ShowMsg(msg, crewMember.Photo);
             }
         }
 
@@ -995,7 +981,9 @@ namespace VoidWars {
 
         [Client]
         private void onHullTemperatureChanged(float temperature) {
+#           if VERBOSE
             Debug.LogFormat("Ship #{0}: T_hull = {1}", ID, temperature);
+#           endif
 
             _hullTemperature = temperature;
 
@@ -1052,7 +1040,9 @@ namespace VoidWars {
         [Server]
         public void BeginMove(ShipMove move) {
             var energyForMove = GetEnergyForMove(move);
+#           if VERBOSE
             Debug.LogFormat("Energy for move = {0}", energyForMove);
+#           endif
             useEnergy(energyForMove);
             updateSystemStatuses();
         }
@@ -1132,7 +1122,9 @@ namespace VoidWars {
             finishedHandler(ID);
 
             // Dump some stats.
+#           if VERBOSE
             Debug.LogFormat("Ship ID: {0}; energy = {1}", ID, _energy);
+#           endif
         }
 
         private void Awake() {
@@ -1221,12 +1213,16 @@ namespace VoidWars {
                 if (!string.IsNullOrEmpty(memberName)) {
                     // Load resource data.
                     var memberInfo = Resources.Load<CrewMember>("Crew/" + memberName);
+#                   if VERBOSE
                     Debug.LogFormat("Ship #{0}: {1} is {2}", ID, memberInfo.Role, memberInfo.Name);
+#                   endif
                     _crew[(int)memberInfo.Role] = memberInfo;
 
                     // Init buffs.
                     foreach(var buffInfo in memberInfo.Buffs) {
+#                       if VERBOSE
                         Debug.LogFormat("Applying buff '{0}'", buffInfo.Name);
+#                       endif
                         var buff = new Buff(buffInfo.Property, buffInfo.BuffType, buffInfo.Value, memberInfo);
                         if ((buffInfo.Target & BuffTarget.Ship) != 0) {
                             _data.AddBuff(buff);
@@ -1247,7 +1243,9 @@ namespace VoidWars {
 
                     // Abilities.
                     foreach(var ability in memberInfo.Abilities) {
+#                       if VERBOSE
                         Debug.LogFormat("Applying ability '{0}'", ability.Type);
+#                       endif
                         Abilities.Apply(this, ability);
                     }
                 }
@@ -1322,7 +1320,9 @@ namespace VoidWars {
         /// <param name="type">The type to use.</param>
         /// <param name="onCompletion">Callback for when the use completes.</param>
         public void UseOneShotAuxiliary(AuxType type, Action onCompletion) {
+#           if VERBOSE
             Debug.LogFormat("ShipController: use {0}", type);
+#           endif
 
             var auxItem = _equipment.Find(item => item.ItemType == type);
             Debug.Assert(auxItem.Mode == AuxMode.OneShot);
@@ -1336,7 +1336,9 @@ namespace VoidWars {
         /// <param name="type">The type of item.</param>
         /// <param name="enable">Enable / disable flag.</param>
         public void EnableAuxiliary(AuxType type, bool enable) {
+#           if VERBOSE
             Debug.LogFormat("ShipController: aux {0} enabled = {1}", type, enable);
+#           endif
 
             var auxItem = _equipment.Find(item => item.ItemType == type);
             Debug.Assert(auxItem.Mode == AuxMode.Switchable);
@@ -1353,7 +1355,9 @@ namespace VoidWars {
         }
 
         private void applyAuxiliary(AuxItem aux) {
+#           if VERBOSE
             Debug.LogFormat("Applying auxiliary '{0}'", aux.Name);
+#           endif
 
             // Everything has an effect on power.
             _powerDrain += aux.PowerUsage;
@@ -1394,7 +1398,9 @@ namespace VoidWars {
         }
 
         private void unapplyAuxiliary(AuxItem aux) {
+#           if VERBOSE
             Debug.LogFormat("Unapplying auxiliary '{0}'", aux.Name);
+#           endif
 
             // Everything has an effect on power.
             _powerDrain -= aux.PowerUsage;

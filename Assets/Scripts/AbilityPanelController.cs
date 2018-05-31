@@ -12,8 +12,7 @@ namespace VoidWars {
         public override void SelectAction() {
             var controller = Util.GetGameController();
             var ship = controller.GetActiveShip();
-            ship.CmdExecuteCommand(Item.Action);
-            ship.CmdRemoveAbility(Item.Description);
+            ship.CmdExecuteAbility(Item.Description, Item.Action);
         }
 
         protected override void initializeInner(ActionItem item, string[] args) {

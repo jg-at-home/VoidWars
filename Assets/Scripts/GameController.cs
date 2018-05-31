@@ -963,7 +963,7 @@ namespace VoidWars {
 
             var points = _teleportPoints.Shuffled();
             foreach(var point in points) {
-                if (!checkForNeaarbyObjects(point, 1f, layerMask)) {
+                if (!checkForNearbyObjects(point, 1f, layerMask)) {
                     location = point;
                     return true;
                 }
@@ -975,12 +975,12 @@ namespace VoidWars {
         }
 
         private string choosePickupPayload() {
-            // TODO: implement me.
-            return Powerups[0].Name;
-
+            var index = Util.RandomWeightedSelection(_powerupWeights);
+            Debug.Log("Spawned powerup: " + Powerups[index].Name);
+            return Powerups[index].Name;
         }
 
-        private bool checkForNeaarbyObjects(Vector3 position, float radius, int layerMask) {
+        private bool checkForNearbyObjects(Vector3 position, float radius, int layerMask) {
             var nearby = Physics.OverlapSphere(position, radius, layerMask);
             if (nearby == null || nearby.Length == 0) {
                 return false;
@@ -1015,7 +1015,7 @@ namespace VoidWars {
                 }
 
                 if (distance > bestDistance) {
-                    if (!checkForNeaarbyObjects(point, 1f, layerMask)) {
+                    if (!checkForNearbyObjects(point, 1f, layerMask)) {
                         bestDistance = distance;
                         bestPoint = i;
                     }
@@ -1516,6 +1516,17 @@ namespace VoidWars {
             for(int i = 0; i < _teleportPoints.Length; ++i) {
                 _teleportPoints[i] = teleportGOs[i].transform.position;
             }
+
+            // Pre-process powerup info.
+            _powerupWeights = new float[Powerups.Length];
+            float accum = 0f;
+            foreach(var powerupInfo in Powerups) {
+                accum += powerupInfo.Frequency;
+            }
+
+            for(int i = 0; i < _powerupWeights.Length; ++i) {
+                _powerupWeights[i] = Powerups[i].Frequency / accum;
+            }
         }
 
         #region Server Data
@@ -1550,6 +1561,7 @@ namespace VoidWars {
         private float _energyAfterSelection;
         private float _drainBeforeSelection;
         private float _drainAfterSelection;
+        private float [] _powerupWeights;
 
         private static readonly int[] s_p1StartPositions1 = new[] { 3 };
         private static readonly int[] s_p1StartPositions2 = new[] { 0, 1 };
