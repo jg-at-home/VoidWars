@@ -48,16 +48,16 @@ namespace VoidWars {
         private void Update() {
             int next = _currentMove;
             if (Input.GetKeyDown(KeyCode.LeftArrow)) {
-                next = nextMove(MoveType.GentleTurnLeft, MoveType.SharpTurnLeft);
+                next = nextMove(MoveType.GentleTurnLeft, MoveType.SharpTurnLeft, MoveType.None);
             }
             else if (Input.GetKeyDown(KeyCode.RightArrow)) {
-                next = nextMove(MoveType.GentleTurnRight, MoveType.SharpTurnRight);
+                next = nextMove(MoveType.GentleTurnRight, MoveType.SharpTurnRight, MoveType.None);
             }
             else if (Input.GetKeyDown(KeyCode.UpArrow)) {
-                next = nextMove(MoveType.Forward);
+                next = nextMove(MoveType.Forward, MoveType.None);
             }
             else if (Input.GetKeyDown(KeyCode.UpArrow)) {
-                next = nextMove(MoveType.Reverse, MoveType.TurnAbout);
+                next = nextMove(MoveType.Reverse, MoveType.TurnAbout, MoveType.None);
             }
 
             if (next != _currentMove) {
