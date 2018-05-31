@@ -47,14 +47,28 @@ namespace VoidWars {
             }
 
             // Propulsion.
-            if ((_propulsionState == AuxState.Broken) && _canRepairItems) {
-                actions.Add(new ActionItem {
-                    Action = "repair propulsion",
-                    Description = "Repair broken engines",
-                    Detail = string.Format("Repairs your critically damaged engines in {0} turns", _data.EngineRepairTurns),
-                    Icon = ImageManager.GetImage("RepairIcon"),
-                    EditorPrefabInfo = "ImageDetailPanel BrokenEnginesImage"
-                });
+            if (_propulsionState == AuxState.Broken) {
+                if (_canRepairItems) {
+                    actions.Add(new ActionItem {
+                        Action = "repair propulsion",
+                        Description = "Repair broken engines",
+                        Detail = string.Format("Repairs your critically damaged engines in {0} turns", _data.EngineRepairTurns),
+                        Icon = ImageManager.GetImage("RepairIcon"),
+                        EditorPrefabInfo = "ImageDetailPanel BrokenEnginesImage"
+                    });
+                }
+            }
+            else {
+                // Turn about action: rotate ship 180 degrees at the cost of 50% energy.
+                if (_energy >= 2f) {
+                    actions.Add(new ActionItem {
+                        Action = "yaw180",
+                        Description = "Turn through 180 degrees",
+                        Detail = "Get out of a tight spot - at the cost of half your energy",
+                        Icon = ImageManager.GetImage("Yaw180Icon"),
+                        EditorPrefabInfo = "ImageDetailPanel Yaw180Image"
+                    });
+                }
             }
 
             // Auxiliary items.

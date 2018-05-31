@@ -38,7 +38,11 @@ namespace VoidWars {
                     // TODO: repair tasks.
                     break;
 
-                    // TODO: everything else
+                case "yaw180":
+                    StartCoroutine(executeCloseup(ship.ID, true, (s,x) => { s.CmdYaw180();} , 2f));
+                    break;
+
+                // TODO: everything else
             }
         }
 

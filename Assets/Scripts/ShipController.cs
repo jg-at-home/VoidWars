@@ -412,6 +412,29 @@ namespace VoidWars {
             yield return weapon.Fire(this, weaponSlot, target, isServer);
         }
 
+        /// <summary>
+        /// Rotates ship by 180 degrees about y. At the cost of 50% of your energy, though.
+        /// </summary>
+        [Command]
+        public void CmdYaw180() {
+            StartCoroutine(yaw180());
+            useEnergy(0.5f * _energy);
+        }
+
+        private IEnumerator yaw180() {
+            var totalAngle = 0f;
+            var axis = Vector3.up;
+            while(totalAngle < 180f) {
+                var step = 180f * Time.deltaTime;
+                totalAngle += step;
+                if (totalAngle > 180f) {
+                    step -= (totalAngle - 180f);
+                }
+                transform.Rotate(step * axis);
+                yield return null;
+            }
+        }
+
         [Command]
         void CmdUseEnergy(float delta) {
             useEnergy(delta);
