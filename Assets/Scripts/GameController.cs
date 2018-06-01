@@ -65,6 +65,7 @@ namespace VoidWars {
         public MessagePanelController MessagePanelController;
         public RectTransform CameoPanel;
         public PowerMeter PowerMeter;
+        public RectTransform Overlay;
 
         [Header("Prefabs")]
         public GameObject MapPinPrefab;
@@ -72,6 +73,7 @@ namespace VoidWars {
         public GameObject ScannerInfoPrefab;
         public ShipCameo ShipCameoPrefab;
         public GameObject PickupPrefab;
+        public DamageIndicator PopupIndicatorPrefab;
 
         [Header("Parameters")]
         public float NPCUpdateTimeout = 10f;
@@ -640,9 +642,10 @@ namespace VoidWars {
         /// <param name="text">The text to show.</param>
         /// <param name="color">The text color.</param>
         public void ShowPopupIndicator(int objID, string text, Color color) {
-            var ship = GetShip(objID);
-            if (ship != null) {
-                DamageIndicator.SetValue(ship.gameObject.transform.position, text, color);
+            var obj = GetObjectWithID(objID);
+            if (obj != null) {
+                var popup = Instantiate(PopupIndicatorPrefab, Overlay);
+                popup.SetValue(obj.gameObject.transform.position, text, color);
             }
         }
 

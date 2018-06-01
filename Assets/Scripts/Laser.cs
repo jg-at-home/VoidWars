@@ -32,6 +32,7 @@ namespace VoidWars {
             yield return new WaitForSeconds(laser.Duration);
             laser.Stop();
             ship.AudioPlayer.Stop();
+            GameObject.Destroy(laser.gameObject);
 
             if (applyDamage) {
                 /* Compute the amount of damage to do and push that to the server. */
