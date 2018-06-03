@@ -3,7 +3,7 @@ namespace VoidWars {
     /// <summary>
     /// Delegate for a task.
     /// </summary>
-    public delegate void TaskFunc();
+    public delegate void TaskFunc(Task task);
 
     /// <summary>
     /// A job that gets postponed for a number of turns.
@@ -20,13 +20,19 @@ namespace VoidWars {
         }
 
         /// <summary>
+        /// Number of turns left for the task to run.
+        /// </summary>
+        public int TurnsLeft {  get { return _turnsLeft; } }
+
+        /// <summary>
         /// Called at the start of each turn.
         /// </summary>
-        public void OnTurnStart() {
+        /// <param name="ship">The ship running the task.</param>
+        public virtual void OnTurnStart(ShipController ship) {
             Debug.Assert(_turnsLeft > 0);
             --_turnsLeft;
             if (_turnsLeft == 0) {
-                _func();
+                _func(this);
             }
         }
 

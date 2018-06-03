@@ -85,6 +85,9 @@ namespace VoidWars {
         [Range(1, 5)]
         public int EngineRepairTurns;
 
+        [Tooltip("Energy cost of engine repair")]
+        public float EngineRepairCost;
+
         [Tooltip("Resistance to EMP")]
         [Range(0.5f, 0.95f)]
         public float EMPResistance;
@@ -206,13 +209,14 @@ namespace VoidWars {
         public float LifeSupportDrainRate {  get { return _class.LifeSupportDrainRate; } }
         public float ShieldDrainRate { get { return _class.ShieldDrainRate; } }
         public float PropulsionDamageThreshold {  get { return _class.PropulsionDamageThreshold; } }
+        public float EngineRepairCost {  get { return _class.EngineRepairCost; } }
         public AudioClip EnginesClip { get { return _class.EnginesClip; } }
         public AudioClip ShieldsClip { get { return _class.ShieldsClip; } }
         public AudioClip CloakClip {  get { return _class.CloakClip; } }
         public AudioClip ScannersClip {  get { return _class.ScannersClip; } }
         public Material CloakEffect {  get { return _class.CloakEffect; } }
         public Material ShieldEffect {  get { return _class.ShieldEffect; } }
-        public GameObject EmpPrefab {  get { return _class.EmpPrefab; } }
+        public GameObject EmpPrefab {  get { return _class.EmpPrefab; } }        
 
         private ShipClass _class;
     }

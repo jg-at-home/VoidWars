@@ -1,4 +1,5 @@
 ﻿
+using System;
 using System.Collections;
 using UnityEngine;
 
@@ -15,8 +16,8 @@ namespace VoidWars {
         public void ExecuteCommand(ShipController ship, string command) {
             Debug.LogFormat("GameController.ExecuteCommand({0})", command);
 
-            var parts = command.ToLower().Split(' ');
-            switch (parts[0]) {
+            var parts = command.Split(' ');
+            switch (parts[0].ToLower()) {
                 case "pass":
                     // Nothing to do, carry on.
                     _actionComplete = true;
@@ -35,7 +36,8 @@ namespace VoidWars {
                     break;
 
                 case "repair":
-                    // TODO: repair tasks.
+                    createRepairTask(ship, parts);
+                    _actionComplete = true;
                     break;
 
                 case "yaw180":
@@ -43,6 +45,16 @@ namespace VoidWars {
                     break;
 
                 // TODO: everything else
+            }
+        }
+
+        private void createRepairTask(ShipController ship, string[] parts) {
+            if (parts[1] == "propulsion") {
+                ship.CmdScheduleEngineRepairs();
+            }
+            else {
+                var itemType = (AuxType)Enum.Parse(typeof(AuxType), parts[1]);
+                ship.CmdScheduleRepairForItems(itemType);
             }
         }
 

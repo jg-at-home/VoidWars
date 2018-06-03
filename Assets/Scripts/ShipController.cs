@@ -283,15 +283,6 @@ namespace VoidWars {
         }
 
         /// <summary>
-        /// Gets the state of an equipped aux item by index.
-        /// </summary>
-        /// <param name="index"></param>
-        /// <returns></returns>
-        public AuxState GetAuxiliaryItemState(int index) {
-            return _equipment[index].State;
-        }
-
-        /// <summary>
         /// Gets items by name.
         /// </summary>
         /// <param name="name">The name of the item ,or '*' to select all.</param>
@@ -308,6 +299,85 @@ namespace VoidWars {
                 }
             }
             return items;
+        }
+
+        /// <summary>
+        /// Schedules repairs for equipment.
+        /// </summary>
+        /// <param name="itemType">The item tyhpe to repair.</param>
+        [Command]
+        public void CmdScheduleRepairForItems(AuxType itemType) {
+            var item = GetAuxiliaryItem(itemType);
+            Debug.Assert(item.State == AuxState.Broken);
+            var task = new RepairTask(item.RepairTurns, repairItem, itemType);
+            _tasks.Add(task);
+            // TODO: use energy, or credits?
+            useEnergy(item.RepairCost);
+            RpcScheduleRepair(itemType);
+        }
+
+        [Command]
+        public void CmdScheduleEngineRepairs() {
+            var task = new RepairEnginesTask(_data.EngineRepairTurns, repairEngines, t => { --_engineRepairTurns; }) ;
+            _tasks.Add(task);
+            useEnergy(_data.EngineRepairCost);
+            RpcScheduleEngineRepair();
+        }
+
+        [Server]
+        private void repairEngines(Task task) {
+            _propulsionState = AuxState.Operational;
+            RpcShowMessage("Engines have been repaired", Role.Engineer);
+        }
+
+        /// <summary>
+        /// Sets the number of turns left for an iterm repair.
+        /// </summary>
+        /// <param name="itemType">The item type.</param>
+        /// <param name="turnsLeft">The number of repair turns left.</param>
+        [ClientRpc]
+        public void RpcSetItemRepairTurns(AuxType itemType, int turnsLeft) {
+            var item = GetAuxiliaryItem(itemType);
+            item.TurnsUntilRepaired = turnsLeft;
+        }
+
+        private void repairItem(Task task) {
+            var repairTask = (RepairTask)task;
+            RpcRepairItem(repairTask.ItemType);
+        }
+
+        [ClientRpc]
+        void RpcScheduleRepair(AuxType itemType) {
+            var item = GetAuxiliaryItem(itemType);
+            item.State = AuxState.UnderRepair;
+            item.TurnsUntilRepaired = item.RepairTurns;
+
+            var msg = string.Format("Repairs for <color=orange>{0}</color> under way",
+                Util.PascalToSpaced(itemType.ToString()));
+            showMessageIfOwner(msg, Role.Engineer);
+        }
+
+        [ClientRpc]
+        void RpcScheduleEngineRepair() {
+            _engineRepairTurns = _data.EngineRepairTurns;
+            var msg = "Repairs for <color=orange>engines</color> under way";
+            showMessageIfOwner(msg, Role.Engineer);
+        }
+
+        [ClientRpc]
+        void RpcRepairItem(AuxType itemType) {
+            var item = GetAuxiliaryItem(itemType);
+            Debug.Assert(item.State == AuxState.UnderRepair);
+            if (item.Mode == AuxMode.Continuous) {
+                item.State = AuxState.Operational;
+            }
+            else {
+                item.State = AuxState.Idle;
+            }
+            applyAuxiliary(item);
+            var msg = string.Format("Repairs for <color=orange>{0}</color> complete", 
+                Util.PascalToSpaced(itemType.ToString()));
+            showMessageIfOwner(msg, Role.Engineer);
         }
 
         /// <summary>
@@ -632,7 +702,7 @@ namespace VoidWars {
             }
         }
 
-        private void restoreShields() {
+        private void restoreShields(Task t) {
             _shieldState = AuxState.Idle;
             var controller = Util.GetGameController();
             var msg = string.Format("Ship <color=orange>{0}</color>'s shields have been restored", _data.Name);
@@ -787,14 +857,17 @@ namespace VoidWars {
             var relativeChange = Mathf.Clamp01(damage / MaxHealth);
 
             // Damage to propulsion?.
-            if (relativeChange > _data.PropulsionDamageThreshold) {
-                if (UnityEngine.Random.Range(0f, 1f) > _data.PropulsionDamageThreshold) {
-                    _propulsionState = AuxState.Broken;
-                    _maxMoveSize = 1;
-                    RpcShowMessage("Our engines have been critically damaged", Role.Engineer);
+            if (_propulsionState != AuxState.Broken) {
+                if (relativeChange > _data.PropulsionDamageThreshold) {
+                    if (UnityEngine.Random.Range(0f, 1f) > _data.PropulsionDamageThreshold) {
+                        _propulsionState = AuxState.Broken;
+                        _maxMoveSize = 1;
+                        RpcShowMessage("Our engines have been critically damaged", Role.Engineer);
+                    }
                 }
             }
-               
+
+            var brokenItems = new HashSet<int>();
             while(relativeChange > _data.DamageThreshold) {
                 // TOOD: include weapons in this (weapon breakabiity future task).
                 var operatingEquipment = _equipment.FindAll(e => e.State != AuxState.Broken);
@@ -809,9 +882,13 @@ namespace VoidWars {
                     for(var i = 0; i < operatingEquipment.Count; ++i) {
                         weights[i] = operatingEquipment[i].BreakProbability;
                     }
+
                     var breakIndex = Util.RandomWeightedSelection(weights);
-                    var itemToBreak = operatingEquipment[breakIndex].ItemType;
-                    RpcBreakItem(itemToBreak);
+                    if (!brokenItems.Contains(breakIndex)) {
+                        brokenItems.Add(breakIndex);
+                        var itemToBreak = operatingEquipment[breakIndex].ItemType;
+                        RpcBreakItem(itemToBreak);
+                    }
                 }
                 relativeChange -= breakChance;
             }
@@ -878,7 +955,7 @@ namespace VoidWars {
         private void serviceTasks() {
             for(var i = _tasks.Count-1; i >= 0; --i) {
                 var task = _tasks[i];
-                task.OnTurnStart();
+                task.OnTurnStart(this);
                 if (task.HasExpired) {
                     _tasks.RemoveAt(i);
                 }
@@ -1170,6 +1247,8 @@ namespace VoidWars {
 
         public override void OnStartClient() {
             base.OnStartClient();
+
+            _canRepairItems = true;
 
             // SyncVars should be good now.
             createPilot();
@@ -1496,6 +1575,7 @@ namespace VoidWars {
         private float _coolingRate;
         private EnergyBudget _energyBudget;
         private bool _canRepairItems;
+        private int _engineRepairTurns;
         private int _actionsThisTurn = 1;
         private GameObject[] _engineFX;
         private AudioSource _audioSource;

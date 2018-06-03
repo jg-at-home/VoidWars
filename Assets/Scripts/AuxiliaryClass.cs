@@ -71,6 +71,7 @@ namespace VoidWars {
         Operational,
         Overheated,
         Broken,
+        UnderRepair,
         Disabled
     }
 
@@ -82,6 +83,11 @@ namespace VoidWars {
         /// The item's state.
         /// </summary>
         public AuxState State;
+
+        /// <summary>
+        /// If state is broken, this many turns until the item is repaired.
+        /// </summary>
+        public int TurnsUntilRepaired;
 
         /// <summary>
         /// Construct an item.

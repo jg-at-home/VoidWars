@@ -25,7 +25,7 @@ namespace VoidWars {
         public float RocketSpeed = 1f;
         public float DeploymentDistance = 3.5f;
         public float CloudRadius = 5f;
-        public float ExpansionSpeed = 3.5f;
+        public float ExpansionSpeed = 1f;
 
           public void Initialize(ChaffLauncher launcher, int shipID, Vector3 direction) {
             setLifetime(launcher.DurationTurns);
@@ -54,12 +54,12 @@ namespace VoidWars {
             StartCoroutine(expand(0.1f, CloudRadius, ExpansionSpeed));
         }
 
-        private IEnumerator expand(float startScale, float endScale, float time) {
+        private IEnumerator expand(float startScale, float endScale, float speed) {
             var scale = startScale;
             while(scale < endScale) {
                 ChaffCloud.transform.localScale = new Vector3(scale, scale, scale);
                 yield return null;
-                scale += Time.deltaTime;
+                scale += speed*Time.deltaTime;
             }
         }
 

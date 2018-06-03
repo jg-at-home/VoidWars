@@ -49,10 +49,11 @@ namespace VoidWars {
             // Propulsion.
             if (_propulsionState == AuxState.Broken) {
                 if (_canRepairItems) {
+                    var turns = _data.EngineRepairTurns;
                     actions.Add(new ActionItem {
                         Action = "repair propulsion",
                         Description = "Repair broken engines",
-                        Detail = string.Format("Repairs your critically damaged engines in {0} turns", _data.EngineRepairTurns),
+                        Detail = string.Format("Repairs your critically damaged engines in {0} turn{1}", turns, turns > 1 ? "s" : ""),
                         Icon = ImageManager.GetImage("RepairIcon"),
                         EditorPrefabInfo = "ImageDetailPanel BrokenEnginesImage"
                     });
@@ -75,46 +76,59 @@ namespace VoidWars {
             for(var i = 0; i < _equipment.Count; ++i) {
                 var auxItem = _equipment[i];
                 var auxState = auxItem.State;
-                if (auxItem.Mode == AuxMode.Switchable) {
-                    if (auxState == AuxState.Operational) {
-                        actions.Add(new ActionItem {
-                            Action = string.Format("aux {0} false", auxItem.ItemType),
-                            Description = string.Format("Disable {0}", auxItem.Description),
-                            Detail = auxItem.Detail,
-                            Icon = auxItem.Icon,
-                            EditorPrefabInfo = string.Format("ImageDetailPanel {0}Image", auxItem.ItemType)
-                        });
-                    }
-                    else if ((auxState == AuxState.Idle) && (_energy >= auxItem.PowerUsage)) {
-                        actions.Add(new ActionItem {
-                            Action = string.Format("aux {0} true", auxItem.ItemType),
-                            Description = string.Format("Enable {0}", auxItem.Description),
-                            Detail = auxItem.Detail,
-                            Icon = auxItem.Icon,
-                            EditorPrefabInfo = string.Format("ImageDetailPanel {0}Image", auxItem.ItemType)
-                        });
-                    }
-                }
-                else if (auxItem.Mode == AuxMode.OneShot) {
-                    if (_energy >= auxItem.PowerUsage) {
-                        actions.Add(new ActionItem {
-                            Action = string.Format("aux {0} true", auxItem.ItemType),
-                            Description = string.Format("Use {0}", auxItem.Description),
-                            Detail = auxItem.Detail,
-                            Icon = auxItem.Icon,
-                            EditorPrefabInfo = string.Format("ImageDetailPanel {0}Image", auxItem.ItemType)
-                        });
-                    }
-                }
-                else if (auxState == AuxState.Broken) {
+                if (auxState == AuxState.Broken) {
                     if (_canRepairItems && (_energy >= auxItem.RepairCost)) {
                         actions.Add(new ActionItem {
                             Action = string.Format("repair {0}", auxItem.ItemType),
                             Description = string.Format("Repair {0}", auxItem.ItemType),
-                            Detail = "Restore function of this device at some cost to your energy",
+                            Detail = string.Format("Restore function of this device at some cost to your energy ({0} turns)", auxItem.RepairTurns),
                             Icon = ImageManager.GetImage("RepairIcon"),
+                            // TODO: nice to have a view of energy cost and number of turns
                             EditorPrefabInfo = "ImageDetailPanel RepairImage"
                         });
+                    }
+                }
+                else if (auxState == AuxState.Overheated) {
+                    // Anything?
+                }
+                else if (auxState == AuxState.UnderRepair) {
+                    // Anything?
+                }
+                else if (auxState == AuxState.Disabled) {
+                    // Anything?
+                }
+                else { 
+                    // Item is functional.
+                    if (auxItem.Mode == AuxMode.Switchable) {
+                        if (auxState == AuxState.Operational) {
+                            actions.Add(new ActionItem {
+                                Action = string.Format("aux {0} false", auxItem.ItemType),
+                                Description = string.Format("Disable {0}", auxItem.Description),
+                                Detail = auxItem.Detail,
+                                Icon = auxItem.Icon,
+                                EditorPrefabInfo = string.Format("ImageDetailPanel {0}Image", auxItem.ItemType)
+                            });
+                        }
+                        else if ((auxState == AuxState.Idle) && (_energy >= auxItem.PowerUsage)) {
+                            actions.Add(new ActionItem {
+                                Action = string.Format("aux {0} true", auxItem.ItemType),
+                                Description = string.Format("Enable {0}", auxItem.Description),
+                                Detail = auxItem.Detail,
+                                Icon = auxItem.Icon,
+                                EditorPrefabInfo = string.Format("ImageDetailPanel {0}Image", auxItem.ItemType)
+                            });
+                        }
+                    }
+                    else if (auxItem.Mode == AuxMode.OneShot) {
+                        if (_energy >= auxItem.PowerUsage) {
+                            actions.Add(new ActionItem {
+                                Action = string.Format("aux {0} true", auxItem.ItemType),
+                                Description = string.Format("Use {0}", auxItem.Description),
+                                Detail = auxItem.Detail,
+                                Icon = auxItem.Icon,
+                                EditorPrefabInfo = string.Format("ImageDetailPanel {0}Image", auxItem.ItemType)
+                            });
+                        }
                     }
                 }
             }
@@ -208,7 +222,7 @@ namespace VoidWars {
                 if (parts.Length == 4) {
                     // Has a duration in terms of turns.
                     var duration = int.Parse(parts[3]);
-                    var removeBuffTask = new Task(duration, () => weapon.RemoveBuff(buff));
+                    var removeBuffTask = new Task(duration, t => weapon.RemoveBuff(buff));
                     _tasks.Add(removeBuffTask);
                 }
             }

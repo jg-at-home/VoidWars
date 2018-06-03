@@ -10,11 +10,13 @@ namespace VoidWars {
         public Sprite OkImage;
         public Sprite BrokenImage;
         public Sprite OverheatImage;
+        public Sprite RepairImage;
         public Sprite OnImage;
         public Sprite OffImage;
 
         [SerializeField] private TextMeshProUGUI[] _text;
         [SerializeField] private Image[] _icons;
+        [SerializeField] private Text[] _counters;
         [SerializeField] private RectTransform[] _rows;
         
         protected override void initialize() {
@@ -28,11 +30,17 @@ namespace VoidWars {
                 int i = 0;
                 for(; i < numAux; ++i) {
                     _rows[i].gameObject.SetActive(true);
+                    _counters[i].gameObject.SetActive(false);
                     var auxItem = ship.GetAuxiliaryItem(i);
                     _text[i].text = auxItem.Name;
-                    var auxState = ship.GetAuxiliaryItemState(i);
+                    var auxState = auxItem.State;
                     if (auxState == AuxState.Broken) {
                         _icons[i].sprite = BrokenImage;
+                    }
+                    else if (auxState == AuxState.UnderRepair) {
+                        _counters[i].gameObject.SetActive(true);
+                        _counters[i].text = auxItem.TurnsUntilRepaired.ToString();
+                        _icons[i].sprite = RepairImage;
                     }
                     else if (auxState == AuxState.Overheated) {
                         _icons[i].sprite = OverheatImage;

@@ -1,4 +1,6 @@
-﻿namespace VoidWars {
+﻿using System;
+
+namespace VoidWars {
     public static class ShipExt {
         /// <summary>
         /// Gets the cost in energy for an action (note: not the additional drain, just the one-off hit).
@@ -6,17 +8,31 @@
         /// <param name="action">An action string.</param>
         /// <returns>The energy cost.</returns>
         public static float GetEnergyCostForAction(this ShipController ship, string action) {
-            var parts = action.ToLower().Split(' ');
-            switch (parts[0]) {
+            var parts = action.Split(' ');
+            switch (parts[0].ToLower()) {
                 case "pass":
                 case "shields":
                     return 0f;
+
+                case "repair":
+                    return repairCost(ship, parts);
 
                 case "aux":
                     return auxCost(ship, parts);
             }
 
             return 0f;
+        }
+
+        private static float repairCost(ShipController ship, string[] parts) {
+            if (parts[1].ToLower() == "propulsion") {
+                return ship.ShipData.EngineRepairCost;
+            }
+            else {
+                var itemType = (AuxType)Enum.Parse(typeof(AuxType), parts[1]);
+                var item = ship.GetAuxiliaryItem(itemType);
+                return item.RepairCost;
+            }
         }
 
         private static float auxCost(ShipController ship, string[] parts) {
