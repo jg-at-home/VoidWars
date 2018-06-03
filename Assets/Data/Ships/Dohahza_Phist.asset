@@ -45,7 +45,7 @@ MonoBehaviour:
   Luckiness: 0.925
   DamageThreshold: 0.3
   PropulsionDamageThreshold: 0
-  EngineRepairTurns: 0
+  EngineRepairTurns: 3
   EngineRepairCost: 10
   EMPResistance: 0.9
   EnginesClip: {fileID: 8300000, guid: 0c4600c967b091a4691184cf5d2b70a5, type: 3}
