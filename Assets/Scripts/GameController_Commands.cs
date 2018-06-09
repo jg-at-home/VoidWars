@@ -44,6 +44,22 @@ namespace VoidWars {
                     StartCoroutine(executeCloseup(ship.ID, true, (s,x) => { s.CmdYaw180();} , 2f));
                     break;
 
+                case "refuel": {
+                        // TODO: some kind of animation.
+                        var targetID = int.Parse(parts[1]);
+                        ship.CmdTransferEnergy(targetID);
+                        _actionComplete = true;
+                    }
+                    break;
+
+                case "heal": {
+                        // TODO: some kind of animation.
+                        var targetID = int.Parse(parts[1]);
+                        ship.CmdTransferHealth(targetID);
+                        _actionComplete = true;
+                    }
+                    break;
+
                 // TODO: everything else
             }
         }

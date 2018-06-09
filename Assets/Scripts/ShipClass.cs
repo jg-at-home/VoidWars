@@ -64,6 +64,7 @@ namespace VoidWars {
         [Tooltip("Recharge rate")]
         public float RechargeRate;
 
+        [Header("Other")]
         [Tooltip("Cooling rate")]
         public float CoolingRate;
 
@@ -92,11 +93,21 @@ namespace VoidWars {
         [Range(0.5f, 0.95f)]
         public float EMPResistance;
 
+        [Tooltip("Distance within which you can assist another friendly ship")]
+        public float AssistanceRadius;
+
+        [Tooltip("Amount of energy you refuel a friendly ship by")]
+        public float EnergyRefuelAmount;
+
+        [Tooltip("Percent of health you refuel a friendly ship by")]
+        public float HealthRefuelAmount;
+
         [Header("Sound effects")]
         public AudioClip EnginesClip;
         public AudioClip ShieldsClip;
         public AudioClip CloakClip;
         public AudioClip ScannersClip;
+        public AudioClip RechargeClip;
 
         [Header("Visual Effects")]
         public Material CloakEffect;
@@ -210,10 +221,14 @@ namespace VoidWars {
         public float ShieldDrainRate { get { return _class.ShieldDrainRate; } }
         public float PropulsionDamageThreshold {  get { return _class.PropulsionDamageThreshold; } }
         public float EngineRepairCost {  get { return _class.EngineRepairCost; } }
+        public float AssistanceRadius {  get { return _class.AssistanceRadius; } }
+        public float EnergyRefuelAmount {  get { return _class.EnergyRefuelAmount; } }
+        public float HealthRefuelAmount { get { return _class.HealthRefuelAmount; } }
         public AudioClip EnginesClip { get { return _class.EnginesClip; } }
         public AudioClip ShieldsClip { get { return _class.ShieldsClip; } }
         public AudioClip CloakClip {  get { return _class.CloakClip; } }
         public AudioClip ScannersClip {  get { return _class.ScannersClip; } }
+        public AudioClip RechargeClip { get { return _class.RechargeClip; } }
         public Material CloakEffect {  get { return _class.CloakEffect; } }
         public Material ShieldEffect {  get { return _class.ShieldEffect; } }
         public GameObject EmpPrefab {  get { return _class.EmpPrefab; } }        

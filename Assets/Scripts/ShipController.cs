@@ -381,6 +381,50 @@ namespace VoidWars {
         }
 
         /// <summary>
+        /// Transfers some energy to the target ship.
+        /// </summary>
+        /// <param name="targetID"></param>
+        [Command]
+        public void CmdTransferEnergy(int targetID) {
+            var targetShip = controller.GetShip(targetID);
+            var oldEnergy = targetShip.Energy;
+            var newEnergy = Mathf.Min(oldEnergy + _data.EnergyRefuelAmount, _data.MaxEnergy);
+            var delta = newEnergy - oldEnergy;
+            useEnergy(delta);
+            targetShip.useEnergy(-delta);
+            RpcTransferEnergy(targetID, delta);
+        }
+
+        [ClientRpc]
+        void RpcTransferEnergy(int targetID, float delta) {
+            var msg = string.Format("E:+{0}", (int)delta);
+            controller.ShowPopupIndicator(targetID, msg, Color.green);
+            _audioSource.PlayOneShot(_data.RechargeClip);
+        }
+
+        /// <summary>
+        /// Transfers some energy to the target ship.
+        /// </summary>
+        /// <param name="targetID"></param>
+        [Command]
+        public void CmdTransferHealth(int targetID) {
+            var targetShip = controller.GetShip(targetID);
+            var oldHealth = targetShip.Health;
+            var newHealth = Mathf.Min(oldHealth + _data.HealthRefuelAmount, _data.MaxHealth);
+            var delta = newHealth - oldHealth;
+            _health -= delta;
+            targetShip._health += delta;
+            RpcTransferHealth(targetID, delta);
+        }
+
+        [ClientRpc]
+        void RpcTransferHealth(int targetID, float delta) {
+            var msg = string.Format("H:+{0}", (int)delta);
+            controller.ShowPopupIndicator(targetID, msg, Color.green);
+            _audioSource.PlayOneShot(_data.RechargeClip);
+        }
+
+        /// <summary>
         /// Gets the weapon type for the slot (0=primary, 1 = secondary)
         /// </summary>
         /// <param name="slot">Slot index.</param>
@@ -512,18 +556,18 @@ namespace VoidWars {
 
         [Server]
         private void useEnergy(float delta) {
-            var thisEnergy = (int)(100f * (_energy / MaxEnergy));
-            var thatEnergy = (int)(100f * ((_energy - delta) / MaxEnergy));
-            if (thatEnergy < 25 && thisEnergy >= 25) {
-                RpcShowMessage("Energy has dropped below 25%", Role.Engineer);
-            }
-            else if (thatEnergy < 50 && thisEnergy >= 50) {
-                RpcShowMessage("Energy has dropped below 50%", Role.Engineer);
-            }
+            var newEnergy = Mathf.Clamp(_energy - delta, 0f, MaxEnergy);
+            if (newEnergy != _energy) {
+                var thisEnergy = (int)(100f * (_energy / MaxEnergy));
+                var thatEnergy = (int)(100f * (newEnergy / MaxEnergy));
+                if (thatEnergy < 25 && thisEnergy >= 25) {
+                    RpcShowMessage("Energy has dropped below 25%", Role.Engineer);
+                }
+                else if (thatEnergy < 50 && thisEnergy >= 50) {
+                    RpcShowMessage("Energy has dropped below 50%", Role.Engineer);
+                }
 
-            _energy -= delta;
-            if (_energy < 0) {
-                _energy = 0;
+                _energy = newEnergy;
             }
         }
 

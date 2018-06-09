@@ -1510,7 +1510,7 @@ namespace VoidWars {
         }
 
         private void Start() {
-            TitleController.SetText("VOID WARS()");
+            TitleController.SetText("sora no senso");
             var boardMesh = Board.GetComponent<MeshRenderer>();
             var bounds = boardMesh.bounds;
             _boardBounds = new Rect(bounds.min.x, bounds.min.z, bounds.size.x, bounds.size.z);

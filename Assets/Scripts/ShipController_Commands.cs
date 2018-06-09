@@ -145,6 +145,38 @@ namespace VoidWars {
                 });
             }
 
+            // Help a friend?
+            var friendlyShips = controller.GetShipsOwnedBy(OwnerID);
+            if (friendlyShips.Count > 1) {
+                foreach (var friend in friendlyShips) {
+                    if (friend != this) {
+                        var separation = Vector3.Distance(transform.position, friend.transform.position);
+                        if (separation < _data.AssistanceRadius) { 
+                            if (_energy > _data.EnergyRefuelAmount) {
+                                actions.Add(new ActionItem {
+                                    Action = string.Format("refuel {0}", friend.ID),
+                                    Description = string.Format("Fuel {0} by {1}", friend.ShipData.Name, _data.EnergyRefuelAmount),
+                                    Detail = "Transfer energy to a friendly ship",
+                                    Icon = ImageManager.GetImage("EnergyIcon"),
+                                    EditorPrefabInfo = "ImageDetailPanel RechargeImage"
+                                });
+                            }
+
+                            if (_health > _data.HealthRefuelAmount) {
+                                actions.Add(new ActionItem {
+                                    Action = string.Format("heal {0}", friend.ID),
+                                    Description = string.Format("Heal {0} by {1}", friend.ShipData.Name, _data.HealthRefuelAmount),
+                                    Detail = "Transfer health to a friendly ship",
+                                    Icon = ImageManager.GetImage("HealthIcon"),
+                                    EditorPrefabInfo = "ImageDetailPanel HullImage"
+                                });
+                            }
+                            // TODO: repairs.
+                        }
+                    }
+                }
+            }
+
             // You can always pass!
             actions.Add(new ActionItem {
                 Action = "pass",
